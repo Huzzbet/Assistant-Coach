@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rotation Tracker – Minutes Manager</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        system-ui, -system-ui, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #1d4ed8 0, #020617 45%, #000 100%);
+      color: #f9fafb;
+      min-height: 100vh;
+    }
+
+    .app-shell {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 12px 12px 32px;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(15,23,42,.98), rgba(15,23,42,.9));
+      box-shadow: 0 18px 40px rgba(15,23,42,.7);
+      border: 1px solid rgba(148,163,184,.4);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      background: radial-gradient(circle at 30% 20%, #f97316, #ea580c 40%, #0f172a 85%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 0 2px rgba(251,146,60,.6), 0 12px 25px rgba(15,23,42,.9);
+      font-size: 20px;
+    }
+
+    .brand-main {
+      font-weight: 800;
+      letter-spacing: .08em;
+      font-size: 18px;
+      text-transform: uppercase;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    .clock-block {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .game-clock {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: .08em;
+    }
+
+    .clock-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      color: #9ca3af;
+    }
+
+    .clock-controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn {
+      border-radius: 999px;
+      padding: 5px 11px;
+      border: 1px solid rgba(148,163,184,.7);
+      background: rgba(15,23,42,.9);
+      color: #e5e7eb;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      box-shadow: 0 8px 16px rgba(15,23,42,.8);
+      transition: transform .08s, box-shadow .08s, background .1s, border .1s;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 22px rgba(15,23,42,.9);
+      background: rgba(37,99,235,1);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      border-color: rgba(34,197,94,.9);
+      color: #022c22;
+      box-shadow: 0 12px 24px rgba(22,163,74,.85);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border-color: rgba(148,163,184,.7);
+      box-shadow: none;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,.5);
+      background: rgba(15,23,42,.8);
+      font-size: 10px;
+      color: #cbd5f5;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr);
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    @media (min-width: 840px) {
+      .layout {
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      }
+    }
+
+    .panel {
+      background: rgba(15,23,42,.96);
+      border-radius: 18px;
+      border: 1px solid rgba(148,163,184,.55);
+      padding: 10px 12px 12px;
+      box-shadow: 0 18px 45px rgba(15,23,42,.9);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .panel-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      color: #9ca3af;
+    }
+
+    .panel-sub {
+      font-size: 11px;
+      color: #c4b5fd;
+    }
+
+    .hint {
+      font-size: 10px;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+
+    /* Court layout */
+    .court-wrapper {
+      margin-top: 4px;
+      padding: 10px;
+      border-radius: 16px;
+      background: radial-gradient(circle at top, rgba(59,130,246,.3), rgba(15,23,42,1));
+      border: 1px solid rgba(129,140,248,.9);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .court {
+      border-radius: 14px;
+      border: 2px solid rgba(55,65,81,.9);
+      padding: 8px;
+      position: relative;
+      height: 270px;
+      display: grid;
+      grid-template-rows: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .court::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      margin: auto;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      border: 1px dashed rgba(148,163,184,.7);
+      opacity: .6;
+    }
+
+    .court-label {
+      position: absolute;
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      color: #6b7280;
+    }
+
+    .slot {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slot[data-role="PG"],
+    .slot[data-role="SG"] {
+      align-items: flex-start;
+      padding-top: 10px;
+    }
+
+    .slot[data-role="C"] {
+      grid-column: span 2;
+      align-items: flex-end;
+      padding-bottom: 4px;
+    }
+
+    .player-chip {
+      min-width: 120px;
+      max-width: 150px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      border: 1px solid rgba(148,163,184,.7);
+      background: rgba(15,23,42,.98);
+      box-shadow: 0 10px 20px rgba(15,23,42,.9);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      cursor: pointer;
+      transition: transform .08s, box-shadow .08s, border .1s, background .1s;
+      font-size: 11px;
+    }
+
+    .player-chip:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 26px rgba(15,23,42,1);
+      border-color: rgba(96,165,250,1);
+    }
+
+    .player-main {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .player-number {
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      background: radial-gradient(circle, #f97316, #ea580c);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .player-name {
+      font-weight: 600;
+    }
+
+    .player-role {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: #9ca3af;
+    }
+
+    .player-time {
+      font-size: 11px;
+      color: #a5b4fc;
+      text-align: right;
+    }
+
+    .player-time span {
+      font-size: 10px;
+      color: #6b7280;
+      display: block;
+    }
+
+    .empty-slot {
+      opacity: .35;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      color: #6b7280;
+      border: 1px dashed rgba(75,85,99,.8);
+      border-radius: 999px;
+      padding: 6px 10px;
+    }
+
+    /* Bench */
+    .bench-strip {
+      margin-top: 8px;
+      border-radius: 16px;
+      background: rgba(15,23,42,.95);
+      border: 1px solid rgba(55,65,81,.9);
+      padding: 8px 10px 10px;
+    }
+
+    .bench-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .bench-title-row span {
+      font-size: 11px;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+    }
+
+    .bench-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .bench-player {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 5px 9px;
+      border: 1px solid rgba(75,85,99,.9);
+      background: rgba(15,23,42,.98);
+      font-size: 11px;
+      cursor: pointer;
+      transition: transform .08s, box-shadow .08s, border .1s, background .1s;
+    }
+
+    .bench-player:hover {
+      transform: translateY(-1px);
+      border-color: rgba(96,165,250,1);
+      box-shadow: 0 10px 20px rgba(15,23,42,1);
+      background: rgba(15,23,42,1);
+    }
+
+    .bench-name {
+      font-weight: 500;
+    }
+
+    .bench-number {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(59,130,246,.2);
+      color: #bfdbfe;
+    }
+
+    .bench-time {
+      font-size: 10px;
+      color: #6b7280;
+    }
+
+    .bench-order-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .bench-order-btn {
+      border: none;
+      background: rgba(15,23,42,.95);
+      border-radius: 999px;
+      font-size: 10px;
+      padding: 2px 5px;
+      color: #9ca3af;
+      cursor: pointer;
+      border: 1px solid rgba(55,65,81,.9);
+    }
+
+    .bench-order-btn:hover {
+      background: rgba(31,41,55,1);
+      color: #e5e7eb;
+    }
+
+    /* Sub mode states */
+    .sub-mode-indicator {
+      font-size: 11px;
+      color: #f97316;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .chip-sub-on {
+      border-color: rgba(34,197,94,1) !important;
+      box-shadow: 0 0 0 1px rgba(34,197,94,.8), 0 12px 24px rgba(22,163,74,.8) !important;
+    }
+
+    .chip-sub-off {
+      border-color: rgba(248,113,113,1) !important;
+      box-shadow: 0 0 0 1px rgba(248,113,113,.85), 0 12px 24px rgba(185,28,28,.85) !important;
+      background: rgba(30,64,175,1);
+    }
+
+    .btn-disabled {
+      opacity: .4;
+      pointer-events: none;
+    }
+
+    /* Right panel: player summary */
+    .summary-list {
+      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .summary-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      font-size: 11px;
+      padding: 5px 7px;
+      border-radius: 10px;
+      background: rgba(15,23,42,1);
+      border: 1px solid rgba(31,41,55,1);
+    }
+
+    .summary-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .summary-name {
+      font-weight: 500;
+    }
+
+    .summary-role {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: #6b7280;
+    }
+
+    .summary-status {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      color: #a5b4fc;
+    }
+
+    .summary-time {
+      font-size: 11px;
+      color: #e5e7eb;
+      text-align: right;
+    }
+
+    .summary-time span {
+      font-size: 9px;
+      color: #6b7280;
+      display: block;
+    }
+
+    .status-on {
+      color: #4ade80;
+    }
+
+    .status-bench {
+      color: #facc15;
+    }
+
+    .footer-hint {
+      font-size: 10px;
+      color: #6b7280;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-logo">⏱️</div>
+        <div>
+          <div class="brand-main">Rotation Tracker</div>
+          <div class="brand-sub">Live minutes & substitutions for rep hoops</div>
+        </div>
+      </div>
+      <div class="clock-block">
+        <div class="clock-label">Game Clock</div>
+        <div class="game-clock" id="gameClock">10:00</div>
+        <div class="clock-controls">
+          <button class="btn btn-primary" id="btnToggleClock">Start</button>
+          <button class="btn btn-ghost" id="btnResetClock">Reset</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <!-- LEFT: COURT + BENCH -->
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">On Court</div>
+            <div class="panel-sub">Tap players in sub mode to mark on/off</div>
+          </div>
+          <button class="btn" id="btnSubMode">
+            🧩 Sub Mode
+          </button>
+        </div>
+        <div class="court-wrapper">
+          <div class="court-label">Half Court</div>
+          <div class="court" id="court">
+            <!-- Slots will be rendered via JS -->
+          </div>
+        </div>
+
+        <div id="subModeIndicator" class="sub-mode-indicator" style="display:none;">
+          <span>Sub mode active:</span>
+          <span>Tap <strong>ON COURT</strong> players coming off (red) & <strong>BENCH</strong> players coming on (green), then confirm.</span>
+        </div>
+
+        <div class="bench-strip">
+          <div class="bench-title-row">
+            <span>Bench</span>
+            <div>
+              <button class="btn btn-ghost" id="btnConfirmSub" disabled>Confirm Sub</button>
+              <button class="btn btn-ghost" id="btnCancelSub" disabled>Cancel</button>
+            </div>
+          </div>
+          <div class="bench-list" id="benchList">
+            <!-- Bench players rendered via JS -->
+          </div>
+        </div>
+
+        <p class="hint">Tip: use the ▲ / ▼ buttons on each bench player to reorder them to match how they’re sitting.</p>
+      </section>
+
+      <!-- RIGHT: SUMMARY -->
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Player Minutes</div>
+            <div class="panel-sub">Total court time across the game</div>
+          </div>
+          <span class="tag">
+            <span style="width:6px;height:6px;border-radius:999px;background:radial-gradient(circle,#22c55e,#15803d);box-shadow:0 0 8px rgba(34,197,94,.9);"></span>
+            Auto-updates every second while clock runs
+          </span>
+        </div>
+
+        <div class="summary-list" id="summaryList"></div>
+
+        <p class="footer-hint">
+          Tap <strong>Sub Mode</strong> to make changes safely, then confirm. The app handles the timing for you so you can stay locked into the game.
+        </p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // ----- DATA MODEL -----
+    const players = [
+      { id: "p1", name: "Player 1", number: 4, role: "Guard" },
+      { id: "p2", name: "Player 2", number: 5, role: "Guard" },
+      { id: "p3", name: "Player 3", number: 7, role: "Wing" },
+      { id: "p4", name: "Player 4", number: 9, role: "Wing" },
+      { id: "p5", name: "Player 5", number: 12, role: "Big" },
+      { id: "p6", name: "Player 6", number: 14, role: "Guard" },
+      { id: "p7", name: "Player 7", number: 15, role: "Wing" },
+      { id: "p8", name: "Player 8", number: 20, role: "Big" },
+      { id: "p9", name: "Player 9", number: 22, role: "Big" }
+    ];
+
+    // Initial states: first 5 on, rest bench
+    const state = {
+      gameSeconds: 10 * 60, // start at 10:00
+      clockRunning: false,
+      lastTick: null,
+      players: {}, // id -> { secondsPlayed, status, position, benchIndex }
+      subMode: false,
+      subOns: new Set(),  // bench players coming on
+      subOffs: new Set()  // on-court players coming off
+    };
+
+    const COURT_POSITIONS = ["PG", "SG", "SF", "PF", "C"];
+
+    function initState() {
+      let benchIndex = 0;
+      players.forEach((p, idx) => {
+        state.players[p.id] = {
+          secondsPlayed: 0,
+          status: idx < 5 ? "on" : "bench",
+          position: idx < 5 ? COURT_POSITIONS[idx] : null,
+          benchIndex: idx >= 5 ? benchIndex++ : null
+        };
+      });
+    }
+
+    initState();
+
+    // ----- UTILITIES -----
+    function formatTime(seconds) {
+      const s = Math.max(0, Math.floor(seconds));
+      const m = Math.floor(s / 60);
+      const r = s % 60;
+      return `${String(m).padStart(2, "0")}:${String(r).padStart(2, "0")}`;
+    }
+
+    function getOnCourtPlayers() {
+      return players.filter(p => state.players[p.id].status === "on");
+    }
+
+    function getBenchPlayers() {
+      return players
+        .filter(p => state.players[p.id].status === "bench")
+        .sort((a, b) => state.players[a.id].benchIndex - state.players[b.id].benchIndex);
+    }
+
+    // ----- RENDERING -----
+    const courtEl = document.getElementById("court");
+    const benchListEl = document.getElementById("benchList");
+    const summaryListEl = document.getElementById("summaryList");
+    const gameClockEl = document.getElementById("gameClock");
+    const btnToggleClock = document.getElementById("btnToggleClock");
+    const btnResetClock = document.getElementById("btnResetClock");
+    const btnSubMode = document.getElementById("btnSubMode");
+    const btnConfirmSub = document.getElementById("btnConfirmSub");
+    const btnCancelSub = document.getElementById("btnCancelSub");
+    const subModeIndicator = document.getElementById("subModeIndicator");
+
+    function renderCourt() {
+      courtEl.innerHTML = "";
+      COURT_POSITIONS.forEach(pos => {
+        const slot = document.createElement("div");
+        slot.className = "slot";
+        slot.dataset.role = pos;
+        const playerOnPos = players.find(
+          p => state.players[p.id].status === "on" && state.players[p.id].position === pos
+        );
+
+        if (playerOnPos) {
+          const chip = createCourtChip(playerOnPos);
+          slot.appendChild(chip);
+        } else {
+          const empty = document.createElement("div");
+          empty.className = "empty-slot";
+          empty.textContent = pos;
+          slot.appendChild(empty);
+        }
+
+        courtEl.appendChild(slot);
+      });
+    }
+
+    function createCourtChip(player) {
+      const st = state.players[player.id];
+      const div = document.createElement("div");
+      div.className = "player-chip";
+      div.dataset.playerId = player.id;
+
+      if (state.subMode && state.subOffs.has(player.id)) {
+        div.classList.add("chip-sub-off");
+      }
+
+      div.innerHTML = `
+        <div class="player-main">
+          <div class="player-number">${player.number}</div>
+          <div>
+            <div class="player-name">${player.name}</div>
+            <div class="player-role">${st.position || ""}</div>
+          </div>
+        </div>
+        <div class="player-time">
+          ${formatTime(st.secondsPlayed)}
+          <span>mins</span>
+        </div>
+      `;
+
+      div.addEventListener("click", () => {
+        if (!state.subMode) return;
+        toggleSubOff(player.id);
+      });
+
+      return div;
+    }
+
+    function renderBench() {
+      benchListEl.innerHTML = "";
+      const benchPlayers = getBenchPlayers();
+      if (!benchPlayers.length) {
+        const p = document.createElement("p");
+        p.className = "hint";
+        p.textContent = "No one on the bench right now.";
+        benchListEl.appendChild(p);
+        return;
+      }
+
+      benchPlayers.forEach((p, idx) => {
+        const st = state.players[p.id];
+        const wrapper = document.createElement("div");
+        wrapper.className = "bench-player";
+        wrapper.dataset.playerId = p.id;
+        if (state.subMode && state.subOns.has(p.id)) {
+          wrapper.classList.add("chip-sub-on");
+        }
+
+        wrapper.innerHTML = `
+          <div class="bench-number">#${p.number}</div>
+          <div>
+            <div class="bench-name">${p.name}</div>
+            <div class="bench-time">${formatTime(st.secondsPlayed)}</div>
+          </div>
+        `;
+
+        wrapper.addEventListener("click", () => {
+          if (!state.subMode) return;
+          toggleSubOn(p.id);
+        });
+
+        const orderBtns = document.createElement("div");
+        orderBtns.className = "bench-order-btns";
+
+        const upBtn = document.createElement("button");
+        upBtn.type = "button";
+        upBtn.className = "bench-order-btn";
+        upBtn.textContent = "▲";
+        upBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          moveBenchPlayer(p.id, -1);
+        });
+
+        const downBtn = document.createElement("button");
+        downBtn.type = "button";
+        downBtn.className = "bench-order-btn";
+        downBtn.textContent = "▼";
+        downBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          moveBenchPlayer(p.id, 1);
+        });
+
+        orderBtns.appendChild(upBtn);
+        orderBtns.appendChild(downBtn);
+        wrapper.appendChild(orderBtns);
+
+        benchListEl.appendChild(wrapper);
+      });
+    }
+
+    function renderSummary() {
+      summaryListEl.innerHTML = "";
+      players.forEach(p => {
+        const st = state.players[p.id];
+        const row = document.createElement("div");
+        row.className = "summary-item";
+        const statusClass = st.status === "on" ? "status-on" : "status-bench";
+        const statusText = st.status === "on" ? "ON COURT" : "BENCH";
+
+        row.innerHTML = `
+          <div class="summary-left">
+            <div class="player-number">${p.number}</div>
+            <div>
+              <div class="summary-name">${p.name}</div>
+              <div class="summary-role">${p.role}</div>
+            </div>
+          </div>
+          <div class="summary-time">
+            ${formatTime(st.secondsPlayed)}
+            <span class="summary-status ${statusClass}">${statusText}</span>
+          </div>
+        `;
+        summaryListEl.appendChild(row);
+      });
+    }
+
+    function renderAll() {
+      gameClockEl.textContent = formatTime(state.gameSeconds);
+      renderCourt();
+      renderBench();
+      renderSummary();
+      updateSubButtons();
+    }
+
+    // ----- BENCH ORDER -----
+    function moveBenchPlayer(playerId, direction) {
+      const benchPlayers = getBenchPlayers();
+      const index = benchPlayers.findIndex(p => p.id === playerId);
+      if (index === -1) return;
+      const newIndex = index + direction;
+      if (newIndex < 0 || newIndex >= benchPlayers.length) return;
+
+      // swap benchIndex values
+      const otherId = benchPlayers[newIndex].id;
+      const temp = state.players[playerId].benchIndex;
+      state.players[playerId].benchIndex = state.players[otherId].benchIndex;
+      state.players[otherId].benchIndex = temp;
+
+      renderBench();
+    }
+
+    // ----- SUB MODE -----
+    function toggleSubMode() {
+      state.subMode = !state.subMode;
+      state.subOns.clear();
+      state.subOffs.clear();
+
+      if (state.subMode) {
+        btnSubMode.classList.add("btn-primary");
+        subModeIndicator.style.display = "flex";
+      } else {
+        btnSubMode.classList.remove("btn-primary");
+        subModeIndicator.style.display = "none";
+      }
+
+      updateSubButtons();
+      renderBench();
+      renderCourt();
+    }
+
+    function toggleSubOn(playerId) {
+      if (state.subOns.has(playerId)) {
+        state.subOns.delete(playerId);
+      } else {
+        state.subOns.add(playerId);
+      }
+      renderBench();
+      updateSubButtons();
+    }
+
+    function toggleSubOff(playerId) {
+      if (state.subOffs.has(playerId)) {
+        state.subOffs.delete(playerId);
+      } else {
+        state.subOffs.add(playerId);
+      }
+      renderCourt();
+      updateSubButtons();
+    }
+
+    function updateSubButtons() {
+      const sizeOn = state.subOns.size;
+      const sizeOff = state.subOffs.size;
+
+      if (state.subMode) {
+        btnConfirmSub.disabled = !(sizeOn > 0 && sizeOn === sizeOff);
+        btnCancelSub.disabled = false;
+        btnConfirmSub.classList.toggle("btn-disabled", btnConfirmSub.disabled);
+        btnCancelSub.classList.remove("btn-disabled");
+      } else {
+        btnConfirmSub.disabled = true;
+        btnCancelSub.disabled = true;
+        btnConfirmSub.classList.add("btn-disabled");
+        btnCancelSub.classList.add("btn-disabled");
+      }
+    }
+
+    function cancelSubMode() {
+      state.subOns.clear();
+      state.subOffs.clear();
+      state.subMode = false;
+      subModeIndicator.style.display = "none";
+      btnSubMode.classList.remove("btn-primary");
+      updateSubButtons();
+      renderCourt();
+      renderBench();
+    }
+
+    function applySubstitution() {
+      if (!state.subMode) return;
+      const onCount = state.subOns.size;
+      if (onCount === 0 || onCount !== state.subOffs.size) return;
+
+      const ons = Array.from(state.subOns);
+      const offs = Array.from(state.subOffs);
+
+      // For each pair, swap on/off
+      for (let i = 0; i < ons.length; i++) {
+        const onId = ons[i];
+        const offId = offs[i];
+
+        const offState = state.players[offId];
+        const onState = state.players[onId];
+
+        // New on-court player inherits the position of the player coming off
+        const newPosition = offState.position;
+
+        // Move off player to bench
+        offState.status = "bench";
+        offState.position = null;
+        offState.benchIndex = getBenchPlayers().length + i + 1;
+
+        // Move on player to court
+        onState.status = "on";
+        onState.position = newPosition;
+        onState.benchIndex = null;
+      }
+
+      cancelSubMode();
+      renderAll();
+    }
+
+    // ----- CLOCK & TICKING -----
+    let tickInterval = null;
+
+    function startClock() {
+      if (state.clockRunning) return;
+      state.clockRunning = true;
+      btnToggleClock.textContent = "Pause";
+      btnToggleClock.classList.add("btn-primary");
+      state.lastTick = Date.now();
+
+      tickInterval = setInterval(() => {
+        const now = Date.now();
+        const delta = (now - state.lastTick) / 1000;
+        state.lastTick = now;
+
+        if (state.gameSeconds > 0) {
+          state.gameSeconds = Math.max(0, state.gameSeconds - delta);
+        }
+
+        // add seconds to all on-court players
+        getOnCourtPlayers().forEach(p => {
+          state.players[p.id].secondsPlayed += delta;
+        });
+
+        renderAll();
+
+        if (state.gameSeconds <= 0) {
+          stopClock();
+        }
+      }, 1000);
+    }
+
+    function stopClock() {
+      state.clockRunning = false;
+      btnToggleClock.textContent = "Start";
+      btnToggleClock.classList.remove("btn-primary");
+      if (tickInterval) {
+        clearInterval(tickInterval);
+        tickInterval = null;
+      }
+    }
+
+    function resetClock() {
+      stopClock();
+      state.gameSeconds = 10 * 60;
+      players.forEach(p => {
+        state.players[p.id].secondsPlayed = 0;
+      });
+      renderAll();
+    }
+
+    // ----- EVENT LISTENERS -----
+    btnToggleClock.addEventListener("click", () => {
+      if (state.clockRunning) {
+        stopClock();
+      } else {
+        startClock();
+      }
+    });
+
+    btnResetClock.addEventListener("click", () => {
+      if (confirm("Reset clock and player minutes?")) {
+        resetClock();
+      }
+    });
+
+    btnSubMode.addEventListener("click", () => {
+      toggleSubMode();
+    });
+
+    btnCancelSub.addEventListener("click", () => {
+      cancelSubMode();
+    });
+
+    btnConfirmSub.addEventListener("click", () => {
+      applySubstitution();
+    });
+
+    // ----- INIT -----
+    renderAll();
+  </script>
+</body>
+</html>
