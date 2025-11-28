@@ -527,9 +527,7 @@
         </div>
         <div class="team-select-wrap">
           <div class="team-select-label">Team</div>
-          <select id="teamSelect" class="team-select">
-            <!-- options filled by JS -->
-          </select>
+          <select id="teamSelect" class="team-select"></select>
         </div>
       </div>
       <div class="clock-block">
@@ -598,9 +596,7 @@
         </div>
 
         <div class="minutes-list" id="minutesList"></div>
-
         <div class="alerts" id="alerts"></div>
-
         <div class="segments" id="segments"></div>
 
         <div class="footnote">
@@ -630,21 +626,19 @@
         initialBench: [44, 51, 89, 0]
       },
       domestic_template: {
-        name: 'Domestic Team (edit)',
-        // copy of rep roster as a starting template – you can change these easily
+        name: 'Domestic U14',
         players: [
-          { id: 1, number: 4,  name: 'Player A', short: 'G', long: 'Guard' },
-          { id: 2, number: 5,  name: 'Player B', short: 'G', long: 'Guard' },
-          { id: 3, number: 6,  name: 'Player C', short: 'W', long: 'Wing'  },
-          { id: 4, number: 7,  name: 'Player D', short: 'W', long: 'Wing'  },
-          { id: 5, number: 8,  name: 'Player E', short: 'C', long: 'Big'   },
-          { id: 6, number: 9,  name: 'Player F', short: 'G', long: 'Guard' },
-          { id: 7, number: 10, name: 'Player G', short: 'B', long: 'Big'   },
-          { id: 8, number: 11, name: 'Player H', short: 'W', long: 'Wing'  },
-          { id: 9, number: 12, name: 'Player I', short: 'G', long: 'Guard' }
+          { id: 16, number: 16, name: 'Archer Kenny',      short: 'G', long: 'Guard' },
+          { id: 20, number: 20, name: 'Bill Pham',         short: 'G', long: 'Guard' },
+          { id: 22, number: 22, name: "Thomas O'Sullivan", short: 'G', long: 'Guard' },
+          { id: 36, number: 36, name: 'Jacob Nguyen',      short: 'G', long: 'Guard' },
+          { id: 72, number: 72, name: 'Tate Power',        short: 'G', long: 'Guard' },
+          { id: 90, number: 90, name: 'Ethan Poon',        short: 'G', long: 'Guard' },
+          { id: 93, number: 93, name: 'Lior Rizvash',      short: 'G', long: 'Guard' },
+          { id: 94, number: 94, name: 'Rodion Prystupa',   short: 'G', long: 'Guard' }
         ],
-        initialOn: [1, 2, 3, 4, 5],
-        initialBench: [6, 7, 8, 9]
+        initialOn: [16, 20, 22, 36, 72],   // Archer, Bill, Thomas, Jacob, Tate
+        initialBench: [90, 93, 94]         // Ethan, Lior, Rodion
       }
     };
 
