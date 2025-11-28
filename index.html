@@ -545,7 +545,6 @@
     </div>
 
     <div class="layout-grid">
-      <!-- LEFT PANEL -->
       <div class="panel">
         <div class="panel-header">
           <div>
@@ -579,7 +578,6 @@
         </div>
       </div>
 
-      <!-- RIGHT PANEL -->
       <div class="panel">
         <div class="minutes-header">
           <div>
@@ -612,20 +610,20 @@
       rep_u14: {
         name: 'Rep U14',
         players: [
-          { id: 13, number: 13, name: 'Archie Stone',    short: 'PG', long: 'Guard' },
-          { id: 14, number: 14, name: 'Ethan Lieberthal',short: 'SG', long: 'Guard' },
-          { id: 23, number: 23, name: 'Lucas Nguyen',    short: 'SF', long: 'Wing'  },
-          { id: 24, number: 24, name: 'Jediah Rayer',    short: 'PF', long: 'Wing'  },
-          { id: 40, number: 40, name: 'Lenny McArthur',  short: 'C',  long: 'Big'   },
-          { id: 44, number: 44, name: 'James Sullivan',  short: 'G',  long: 'Guard' },
-          { id: 51, number: 51, name: 'Brooks Hurren',   short: 'B',  long: 'Big'   },
-          { id: 89, number: 89, name: 'Max Arden',       short: 'W',  long: 'Wing'  },
-          { id: 0,  number: 0,  name: 'Jax',             short: 'G',  long: 'Guard' }
+          { id: 13, number: 13, name: 'Archie Stone',     short: 'PG', long: 'Guard' },
+          { id: 14, number: 14, name: 'Ethan Lieberthal', short: 'SG', long: 'Guard' },
+          { id: 23, number: 23, name: 'Lucas Nguyen',     short: 'SF', long: 'Wing'  },
+          { id: 24, number: 24, name: 'Jediah Rayer',     short: 'PF', long: 'Wing'  },
+          { id: 40, number: 40, name: 'Lenny McArthur',   short: 'C',  long: 'Big'   },
+          { id: 44, number: 44, name: 'James Sullivan',   short: 'G',  long: 'Guard' },
+          { id: 51, number: 51, name: 'Brooks Hurren',    short: 'B',  long: 'Big'   },
+          { id: 89, number: 89, name: 'Max Arden',        short: 'W',  long: 'Wing'  },
+          { id: 0,  number: 0,  name: 'Jax',              short: 'G',  long: 'Guard' }
         ],
         initialOn: [13, 14, 23, 24, 40],
         initialBench: [44, 51, 89, 0]
       },
-      domestic_template: {
+      domestic_u14: {
         name: 'Domestic U14',
         players: [
           { id: 16, number: 16, name: 'Archer Kenny',      short: 'G', long: 'Guard' },
@@ -637,8 +635,8 @@
           { id: 93, number: 93, name: 'Lior Rizvash',      short: 'G', long: 'Guard' },
           { id: 94, number: 94, name: 'Rodion Prystupa',   short: 'G', long: 'Guard' }
         ],
-        initialOn: [16, 20, 22, 36, 72],   // Archer, Bill, Thomas, Jacob, Tate
-        initialBench: [90, 93, 94]         // Ethan, Lior, Rodion
+        initialOn: [16, 20, 22, 36, 72],
+        initialBench: [90, 93, 94]
       }
     };
 
@@ -656,8 +654,6 @@
     };
 
     // ---------- STATE ----------
-    let PLAYERS = TEAM_CONFIGS.rep_u14.players;
-
     const state = {
       teamId: 'rep_u14',
       mode: 'rep',
@@ -674,25 +670,34 @@
       segments: []
     };
 
+    // helpers
+    function currentTeam() {
+      return TEAM_CONFIGS[state.teamId];
+    }
+    function allPlayers() {
+      return currentTeam().players;
+    }
+    function findPlayer(id) {
+      return allPlayers().find(p => p.id === id);
+    }
+
+    function formatTime(sec) {
+      const safe = Number.isFinite(sec) ? sec : 0;
+      const s = Math.max(0, Math.floor(safe));
+      const m = Math.floor(s / 60);
+      const r = s % 60;
+      return `${String(m).padStart(2, '0')}:${String(r).padStart(2, '0')}`;
+    }
+
     function initPlayerStats() {
       state.minutes = {};
       state.fouls = {};
-      PLAYERS.forEach(p => {
+      allPlayers().forEach(p => {
         state.minutes[p.id] = 0;
         state.fouls[p.id] = false;
       });
     }
     initPlayerStats();
-
-    function findPlayer(id) {
-      return PLAYERS.find(p => p.id === id);
-    }
-    function formatTime(sec) {
-      const s = Math.max(0, Math.floor(sec));
-      const m = Math.floor(s / 60);
-      const r = s % 60;
-      return `${String(m).padStart(2, '0')}:${String(r).padStart(2, '0')}`;
-    }
 
     // ---------- RENDER ----------
     function renderTeamSelect() {
@@ -773,8 +778,8 @@
       bot.innerHTML = '';
 
       const ids = state.onCourt;
-      [ids[0], ids[1]].forEach(id => top.appendChild(createCourtChip(id)));
-      [ids[2], ids[3]].forEach(id => mid.appendChild(createCourtChip(id)));
+      [ids[0], ids[1]].forEach(id => id != null && top.appendChild(createCourtChip(id)));
+      [ids[2], ids[3]].forEach(id => id != null && mid.appendChild(createCourtChip(id)));
       if (ids[4] != null) bot.appendChild(createCourtChip(ids[4]));
     }
 
@@ -887,13 +892,13 @@
       if (!ids.length) return;
 
       let total = 0;
-      ids.forEach(id => total += state.minutes[id]);
+      ids.forEach(id => total += state.minutes[id] || 0);
       if (total === 0) return;
       const avg = total / ids.length;
 
       let over = null, under = null;
       ids.forEach(id => {
-        const diff = state.minutes[id] - avg;
+        const diff = (state.minutes[id] || 0) - avg;
         if (diff > 120 && (!over || diff > over.diff)) over = { id, diff };
         if (diff < -120 && (!under || diff < under.diff)) under = { id, diff };
       });
@@ -975,7 +980,8 @@
       }
       state.clockSeconds -= 1;
       state.onCourt.forEach(id => {
-        if (state.minutes[id] != null) state.minutes[id] += 1;
+        if (state.minutes[id] == null) state.minutes[id] = 0;
+        state.minutes[id] += 1;
       });
       renderClock();
       renderCourt();
@@ -1001,7 +1007,6 @@
       const cfg = TEAM_CONFIGS[teamId];
       if (!cfg) return;
       state.teamId = teamId;
-      PLAYERS = cfg.players;
       state.onCourt = [...cfg.initialOn];
       state.bench = [...cfg.initialBench];
       state.subMode = false;
@@ -1012,7 +1017,7 @@
       renderAll();
     }
 
-    // ---------- INTERACTION HELPERS ----------
+    // ---------- INTERACTION ----------
     function toggleSubMode() {
       state.subMode = !state.subMode;
       state.selectedOn = [];
@@ -1123,7 +1128,7 @@
       renderSegments();
     }
 
-    // ---------- EVENTS ----------
+    // ---------- EVENT LISTENERS ----------
     document.getElementById('startBtn').addEventListener('click', () => {
       state.running = !state.running;
       document.getElementById('startBtn').textContent = state.running ? 'Pause' : 'Start';
@@ -1142,8 +1147,7 @@
     document.getElementById('modeToggle').addEventListener('click', e => {
       const btn = e.target.closest('.mode-pill');
       if (!btn) return;
-      const mode = btn.dataset.mode;
-      setMode(mode);
+      setMode(btn.dataset.mode);
     });
 
     document.getElementById('courtArea').addEventListener('click', e => {
@@ -1176,8 +1180,7 @@
     document.getElementById('segmentButtons').addEventListener('click', e => {
       const btn = e.target.closest('.segment-btn');
       if (!btn) return;
-      const label = btn.dataset.seg;
-      state.currentSegment = label;
+      state.currentSegment = btn.dataset.seg;
       state.clockSeconds = MODES[state.mode].segmentLength;
       renderSegmentControls();
       renderClock();
