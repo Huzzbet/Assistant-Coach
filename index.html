@@ -31,11 +31,13 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 16px;
+      gap: 12px;
+      flex-wrap: wrap;
     }
     .title-block {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
     .app-icon {
       width: 42px;
@@ -58,8 +60,27 @@
       font-size: 12px;
       color: #9ca3af;
     }
+    .team-select-wrap {
+      margin-left: 8px;
+    }
+    .team-select-label {
+      font-size: 10px;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      margin-bottom: 3px;
+    }
+    .team-select {
+      font-size: 12px;
+      border-radius: 999px;
+      padding: 4px 10px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: #020617;
+      color: #e5e7eb;
+    }
     .clock-block {
       text-align: right;
+      min-width: 240px;
     }
     .clock-label {
       font-size: 10px;
@@ -98,6 +119,26 @@
     .btn:active {
       transform: translateY(1px);
     }
+    .mode-toggle {
+      margin-top: 6px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .mode-pill {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: transparent;
+      color: #e5e7eb;
+      font-size: 11px;
+      padding: 3px 10px;
+      cursor: pointer;
+    }
+    .mode-pill.active {
+      background: radial-gradient(circle at 15% 0, #1d4ed8, #1e40af 70%);
+      border-color: transparent;
+    }
     .layout-grid {
       display: grid;
       grid-template-columns: 1.2fr 1fr;
@@ -131,7 +172,6 @@
       font-size: 11px;
       color: #6b7280;
     }
-    /* Sub mode toggle */
     .sub-mode-btn {
       font-size: 11px;
       border-radius: 999px;
@@ -150,7 +190,6 @@
       color: #ecfdf5;
       box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.8);
     }
-    /* Court */
     .court-wrapper {
       border-radius: 20px;
       padding: 16px 12px 12px;
@@ -238,7 +277,6 @@
       border-color: transparent;
       color: #fefce8;
     }
-    /* Bench */
     .bench-wrapper {
       margin-top: 8px;
     }
@@ -324,7 +362,6 @@
       justify-content: flex-end;
       gap: 8px;
     }
-    /* Right panel – minutes */
     .minutes-header {
       display: flex;
       justify-content: space-between;
@@ -435,7 +472,6 @@
       background: radial-gradient(circle at 10% 0, #f97316, #b45309 80%);
       color: #fefce8;
     }
-    /* Alerts & segments */
     .alerts {
       margin-top: 8px;
       font-size: 11px;
@@ -481,11 +517,19 @@
 <body>
   <div class="app-shell">
     <div class="top-row">
-      <div class="title-block">
-        <div class="app-icon">⏱</div>
-        <div class="title-text">
-          <h1>ROTATION TRACKER</h1>
-          <span>Live minutes & substitutions for rep hoops</span>
+      <div style="display:flex; align-items:flex-start;">
+        <div class="title-block">
+          <div class="app-icon">⏱</div>
+          <div class="title-text">
+            <h1>ROTATION TRACKER</h1>
+            <span>Live minutes & substitutions for rep hoops</span>
+          </div>
+        </div>
+        <div class="team-select-wrap">
+          <div class="team-select-label">Team</div>
+          <select id="teamSelect" class="team-select">
+            <!-- options filled by JS -->
+          </select>
         </div>
       </div>
       <div class="clock-block">
@@ -494,6 +538,10 @@
         <div>
           <button class="btn primary" id="startBtn">Start</button>
           <button class="btn" id="resetBtn">Reset</button>
+        </div>
+        <div class="mode-toggle" id="modeToggle">
+          <button class="mode-pill active" data-mode="rep">Rep · 4×10</button>
+          <button class="mode-pill" data-mode="domestic">Domestic · 2×18</button>
         </div>
       </div>
     </div>
@@ -544,13 +592,8 @@
         </div>
 
         <div class="segment-row">
-          <div class="segment-label">Segment: <span id="segmentLabel">Q1</span></div>
-          <div class="segment-buttons" id="segmentButtons">
-            <button class="segment-btn active" data-seg="Q1">Q1</button>
-            <button class="segment-btn" data-seg="Q2">Q2</button>
-            <button class="segment-btn" data-seg="Q3">Q3</button>
-            <button class="segment-btn" data-seg="Q4">Q4</button>
-          </div>
+          <div class="segment-label">Segment: <span id="segmentLabel">Q1 · Rep</span></div>
+          <div class="segment-buttons" id="segmentButtons"></div>
           <button class="btn small" id="saveSegmentBtn">Save Snapshot</button>
         </div>
 
@@ -568,30 +611,67 @@
   </div>
 
   <script>
-    // ---- PLAYERS ----
-    const PLAYERS = [
-      { id: 13, number: 13, name: 'Archie Stone',  short: 'PG', long: 'Guard' },
-      { id: 14, number: 14, name: 'Ethan Lieberthal', short: 'SG', long: 'Guard' },
-      { id: 23, number: 23, name: 'Lucas Nguyen', short: 'SF', long: 'Wing' },
-      { id: 24, number: 24, name: 'Jediah Rayer', short: 'PF', long: 'Wing' },
-      { id: 40, number: 40, name: 'Lenny McArthur', short: 'C',  long: 'Big' },
-      { id: 44, number: 44, name: 'James Sullivan', short: 'G',  long: 'Guard' },
-      { id: 51, number: 51, name: 'Brooks Hurren', short: 'B',  long: 'Big' },
-      { id: 89, number: 89, name: 'Max Arden',     short: 'W',  long: 'Wing' },
-      { id: 0,  number: 0,  name: 'Jax',           short: 'G',  long: 'Guard' }
-    ];
+    // ---------- CONFIG ----------
+    const TEAM_CONFIGS = {
+      rep_u14: {
+        name: 'Rep U14',
+        players: [
+          { id: 13, number: 13, name: 'Archie Stone',    short: 'PG', long: 'Guard' },
+          { id: 14, number: 14, name: 'Ethan Lieberthal',short: 'SG', long: 'Guard' },
+          { id: 23, number: 23, name: 'Lucas Nguyen',    short: 'SF', long: 'Wing'  },
+          { id: 24, number: 24, name: 'Jediah Rayer',    short: 'PF', long: 'Wing'  },
+          { id: 40, number: 40, name: 'Lenny McArthur',  short: 'C',  long: 'Big'   },
+          { id: 44, number: 44, name: 'James Sullivan',  short: 'G',  long: 'Guard' },
+          { id: 51, number: 51, name: 'Brooks Hurren',   short: 'B',  long: 'Big'   },
+          { id: 89, number: 89, name: 'Max Arden',       short: 'W',  long: 'Wing'  },
+          { id: 0,  number: 0,  name: 'Jax',             short: 'G',  long: 'Guard' }
+        ],
+        initialOn: [13, 14, 23, 24, 40],
+        initialBench: [44, 51, 89, 0]
+      },
+      domestic_template: {
+        name: 'Domestic Team (edit)',
+        // copy of rep roster as a starting template – you can change these easily
+        players: [
+          { id: 1, number: 4,  name: 'Player A', short: 'G', long: 'Guard' },
+          { id: 2, number: 5,  name: 'Player B', short: 'G', long: 'Guard' },
+          { id: 3, number: 6,  name: 'Player C', short: 'W', long: 'Wing'  },
+          { id: 4, number: 7,  name: 'Player D', short: 'W', long: 'Wing'  },
+          { id: 5, number: 8,  name: 'Player E', short: 'C', long: 'Big'   },
+          { id: 6, number: 9,  name: 'Player F', short: 'G', long: 'Guard' },
+          { id: 7, number: 10, name: 'Player G', short: 'B', long: 'Big'   },
+          { id: 8, number: 11, name: 'Player H', short: 'W', long: 'Wing'  },
+          { id: 9, number: 12, name: 'Player I', short: 'G', long: 'Guard' }
+        ],
+        initialOn: [1, 2, 3, 4, 5],
+        initialBench: [6, 7, 8, 9]
+      }
+    };
 
-    const INITIAL_ON_COURT = [13, 14, 23, 24, 40]; // starters
-    const INITIAL_BENCH    = [44, 51, 89, 0];
+    const MODES = {
+      rep: {
+        label: 'Rep',
+        segmentLabels: ['Q1', 'Q2', 'Q3', 'Q4'],
+        segmentLength: 10 * 60
+      },
+      domestic: {
+        label: 'Domestic',
+        segmentLabels: ['H1', 'H2'],
+        segmentLength: 18 * 60
+      }
+    };
 
-    // ---- STATE ----
+    // ---------- STATE ----------
+    let PLAYERS = TEAM_CONFIGS.rep_u14.players;
+
     const state = {
-      clockSeconds: 600,
-      running: false,
-      timerId: null,
+      teamId: 'rep_u14',
+      mode: 'rep',
       currentSegment: 'Q1',
-      onCourt: [...INITIAL_ON_COURT],
-      bench:   [...INITIAL_BENCH],
+      clockSeconds: MODES.rep.segmentLength,
+      running: false,
+      onCourt: [...TEAM_CONFIGS.rep_u14.initialOn],
+      bench: [...TEAM_CONFIGS.rep_u14.initialBench],
       minutes: {},
       fouls: {},
       subMode: false,
@@ -600,16 +680,19 @@
       segments: []
     };
 
-    // init minutes + fouls
-    PLAYERS.forEach(p => {
-      state.minutes[p.id] = 0;
-      state.fouls[p.id] = false;
-    });
+    function initPlayerStats() {
+      state.minutes = {};
+      state.fouls = {};
+      PLAYERS.forEach(p => {
+        state.minutes[p.id] = 0;
+        state.fouls[p.id] = false;
+      });
+    }
+    initPlayerStats();
 
     function findPlayer(id) {
       return PLAYERS.find(p => p.id === id);
     }
-
     function formatTime(sec) {
       const s = Math.max(0, Math.floor(sec));
       const m = Math.floor(s / 60);
@@ -617,13 +700,32 @@
       return `${String(m).padStart(2, '0')}:${String(r).padStart(2, '0')}`;
     }
 
-    // ---- RENDER ----
+    // ---------- RENDER ----------
+    function renderTeamSelect() {
+      const select = document.getElementById('teamSelect');
+      select.innerHTML = '';
+      Object.entries(TEAM_CONFIGS).forEach(([id, cfg]) => {
+        const opt = document.createElement('option');
+        opt.value = id;
+        opt.textContent = cfg.name;
+        if (id === state.teamId) opt.selected = true;
+        select.appendChild(opt);
+      });
+    }
+
     function renderClock() {
       document.getElementById('clockDisplay').textContent = formatTime(state.clockSeconds);
       const status = document.getElementById('runningStatus');
       status.textContent = state.running
         ? 'Clock running · minutes updating live'
         : 'Clock paused · tap Start to begin';
+    }
+
+    function renderModeToggle() {
+      document.querySelectorAll('#modeToggle .mode-pill').forEach(btn => {
+        const mode = btn.dataset.mode;
+        btn.classList.toggle('active', mode === state.mode);
+      });
     }
 
     function renderSubMode() {
@@ -639,12 +741,11 @@
 
     function createCourtChip(id) {
       const p = findPlayer(id);
+      if (!p) return document.createElement('div');
       const chip = document.createElement('div');
       chip.className = 'player-chip';
       chip.dataset.id = String(id);
-      if (state.subMode && state.selectedOn.includes(id)) {
-        chip.classList.add('selected');
-      }
+      if (state.subMode && state.selectedOn.includes(id)) chip.classList.add('selected');
 
       const num = document.createElement('div');
       num.className = 'number-pill';
@@ -653,22 +754,11 @@
 
       const meta = document.createElement('div');
       meta.className = 'player-meta';
-
-      const name = document.createElement('div');
-      name.className = 'player-name';
-      name.textContent = p.name;
-      meta.appendChild(name);
-
-      const role = document.createElement('div');
-      role.className = 'player-role';
-      role.textContent = p.short;
-      meta.appendChild(role);
-
-      const mins = document.createElement('div');
-      mins.className = 'player-mins';
-      mins.textContent = formatTime(state.minutes[id]) + ' mins';
-      meta.appendChild(mins);
-
+      meta.innerHTML = `
+        <div class="player-name">${p.name}</div>
+        <div class="player-role">${p.short}</div>
+        <div class="player-mins">${formatTime(state.minutes[id])} mins</div>
+      `;
       chip.appendChild(meta);
 
       const foulBtn = document.createElement('button');
@@ -699,16 +789,14 @@
       grid.innerHTML = '';
       state.bench.forEach(id => {
         const p = findPlayer(id);
+        if (!p) return;
         const card = document.createElement('div');
         card.className = 'bench-card';
         card.dataset.id = String(id);
-        if (state.subMode && state.selectedBench.includes(id)) {
-          card.classList.add('selected');
-        }
+        if (state.subMode && state.selectedBench.includes(id)) card.classList.add('selected');
 
         const main = document.createElement('div');
         main.className = 'bench-main';
-
         const num = document.createElement('div');
         num.className = 'bench-number';
         num.textContent = p.number;
@@ -716,7 +804,10 @@
 
         const labels = document.createElement('div');
         labels.className = 'bench-labels';
-        labels.innerHTML = `<div>${p.name}</div><div class="bench-mins">${formatTime(state.minutes[id])}</div>`;
+        labels.innerHTML = `
+          <div>${p.name}</div>
+          <div class="bench-mins">${formatTime(state.minutes[id])}</div>
+        `;
         main.appendChild(labels);
 
         const foulBtn = document.createElement('button');
@@ -743,7 +834,6 @@
         ctrls.appendChild(down);
 
         card.appendChild(ctrls);
-
         grid.appendChild(card);
       });
     }
@@ -752,9 +842,9 @@
       const list = document.getElementById('minutesList');
       list.innerHTML = '';
       const allIds = state.onCourt.concat(state.bench);
-
       allIds.forEach(id => {
         const p = findPlayer(id);
+        if (!p) return;
         const row = document.createElement('div');
         row.className = 'minutes-row';
         if (state.onCourt.includes(id)) row.classList.add('on');
@@ -769,21 +859,13 @@
 
         const nb = document.createElement('div');
         nb.className = 'minutes-name-block';
-
-        const nm = document.createElement('div');
-        nm.textContent = p.name;
-        nb.appendChild(nm);
-
-        const rl = document.createElement('div');
-        rl.className = 'minutes-role';
-        rl.textContent = p.long;
-        nb.appendChild(rl);
-
-        const st = document.createElement('div');
-        st.className = 'minutes-status ' + (state.onCourt.includes(id) ? '' : 'bench');
-        st.textContent = state.onCourt.includes(id) ? 'On Court' : 'Bench';
-        nb.appendChild(st);
-
+        nb.innerHTML = `
+          <div>${p.name}</div>
+          <div class="minutes-role">${p.long}</div>
+          <div class="minutes-status ${state.onCourt.includes(id) ? '' : 'bench'}">
+            ${state.onCourt.includes(id) ? 'On Court' : 'Bench'}
+          </div>
+        `;
         info.appendChild(nb);
 
         if (state.fouls[id]) {
@@ -811,19 +893,15 @@
       if (!ids.length) return;
 
       let total = 0;
-      ids.forEach(id => { total += state.minutes[id]; });
+      ids.forEach(id => total += state.minutes[id]);
       if (total === 0) return;
       const avg = total / ids.length;
 
       let over = null, under = null;
       ids.forEach(id => {
         const diff = state.minutes[id] - avg;
-        if (diff > 120 && (!over || diff > over.diff)) {
-          over = { id, diff };
-        }
-        if (diff < -120 && (!under || diff < under.diff)) {
-          under = { id, diff };
-        }
+        if (diff > 120 && (!over || diff > over.diff)) over = { id, diff };
+        if (diff < -120 && (!under || diff < under.diff)) under = { id, diff };
       });
 
       if (over) {
@@ -851,7 +929,7 @@
 
         const title = document.createElement('div');
         title.className = 'segment-card-title';
-        title.textContent = seg.segment;
+        title.textContent = `${seg.segment} · ${seg.modeLabel}`;
         card.appendChild(title);
 
         seg.top.forEach(item => {
@@ -864,25 +942,35 @@
       });
     }
 
-    function renderSegmentLabel() {
-      document.getElementById('segmentLabel').textContent = state.currentSegment;
-      document.querySelectorAll('.segment-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.seg === state.currentSegment);
+    function renderSegmentControls() {
+      const container = document.getElementById('segmentButtons');
+      container.innerHTML = '';
+      const modeCfg = MODES[state.mode];
+      modeCfg.segmentLabels.forEach(label => {
+        const btn = document.createElement('button');
+        btn.className = 'segment-btn' + (label === state.currentSegment ? ' active' : '');
+        btn.dataset.seg = label;
+        btn.textContent = label;
+        container.appendChild(btn);
       });
+      const segLabel = document.getElementById('segmentLabel');
+      segLabel.textContent = `${state.currentSegment} · ${modeCfg.label}`;
     }
 
     function renderAll() {
+      renderTeamSelect();
       renderClock();
+      renderModeToggle();
       renderSubMode();
       renderCourt();
       renderBench();
       renderMinutes();
       renderAlerts();
       renderSegments();
-      renderSegmentLabel();
+      renderSegmentControls();
     }
 
-    // ---- TIMER ----
+    // ---------- TIMER ----------
     function tick() {
       if (!state.running) return;
       if (state.clockSeconds <= 0) {
@@ -893,7 +981,7 @@
       }
       state.clockSeconds -= 1;
       state.onCourt.forEach(id => {
-        state.minutes[id] += 1;
+        if (state.minutes[id] != null) state.minutes[id] += 1;
       });
       renderClock();
       renderCourt();
@@ -901,10 +989,36 @@
       renderMinutes();
       renderAlerts();
     }
-
     setInterval(tick, 1000);
 
-    // ---- INTERACTION HELPERS ----
+    // ---------- MODE & TEAM ----------
+    function setMode(newMode) {
+      if (!MODES[newMode]) return;
+      state.mode = newMode;
+      const cfg = MODES[newMode];
+      state.currentSegment = cfg.segmentLabels[0];
+      state.clockSeconds = cfg.segmentLength;
+      renderModeToggle();
+      renderSegmentControls();
+      renderClock();
+    }
+
+    function loadTeam(teamId) {
+      const cfg = TEAM_CONFIGS[teamId];
+      if (!cfg) return;
+      state.teamId = teamId;
+      PLAYERS = cfg.players;
+      state.onCourt = [...cfg.initialOn];
+      state.bench = [...cfg.initialBench];
+      state.subMode = false;
+      state.selectedOn = [];
+      state.selectedBench = [];
+      state.segments = [];
+      initPlayerStats();
+      renderAll();
+    }
+
+    // ---------- INTERACTION HELPERS ----------
     function toggleSubMode() {
       state.subMode = !state.subMode;
       state.selectedOn = [];
@@ -915,6 +1029,7 @@
     }
 
     function toggleFoul(id) {
+      if (state.fouls[id] == null) return;
       state.fouls[id] = !state.fouls[id];
       renderCourt();
       renderBench();
@@ -958,7 +1073,7 @@
       }
       for (let i = 0; i < state.selectedOn.length; i++) {
         const offId = state.selectedOn[i];
-        const onId  = state.selectedBench[i];
+        const onId = state.selectedBench[i];
         const offIdx = state.onCourt.indexOf(offId);
         const benchIdx = state.bench.indexOf(onId);
         if (offIdx === -1 || benchIdx === -1) continue;
@@ -980,59 +1095,68 @@
     }
 
     function resetGame() {
+      const teamCfg = TEAM_CONFIGS[state.teamId];
+      const modeCfg = MODES[state.mode];
       state.running = false;
-      state.clockSeconds = 600;
-      state.onCourt = [...INITIAL_ON_COURT];
-      state.bench   = [...INITIAL_BENCH];
+      state.clockSeconds = modeCfg.segmentLength;
+      state.currentSegment = modeCfg.segmentLabels[0];
+      state.onCourt = [...teamCfg.initialOn];
+      state.bench = [...teamCfg.initialBench];
+      state.subMode = false;
       state.selectedOn = [];
       state.selectedBench = [];
-      state.subMode = false;
-      state.currentSegment = 'Q1';
       state.segments = [];
-      Object.keys(state.minutes).forEach(id => { state.minutes[id] = 0; });
-      Object.keys(state.fouls).forEach(id => { state.fouls[id] = false; });
+      initPlayerStats();
       renderAll();
+      document.getElementById('startBtn').textContent = 'Start';
     }
 
     function saveSegmentSnapshot() {
       const allIds = state.onCourt.concat(state.bench);
+      if (!allIds.length) return;
       const snapshot = allIds.map(id => ({
         id,
-        name: findPlayer(id).name,
-        seconds: state.minutes[id]
+        name: findPlayer(id)?.name || 'Player',
+        seconds: state.minutes[id] || 0
       }));
       snapshot.sort((a, b) => b.seconds - a.seconds);
       const top = snapshot.slice(0, 3);
       state.segments.push({
         segment: state.currentSegment,
+        modeLabel: MODES[state.mode].label,
         top
       });
       renderSegments();
     }
 
-    // ---- EVENT BINDINGS ----
+    // ---------- EVENTS ----------
     document.getElementById('startBtn').addEventListener('click', () => {
       state.running = !state.running;
       document.getElementById('startBtn').textContent = state.running ? 'Pause' : 'Start';
       renderClock();
     });
 
-    document.getElementById('resetBtn').addEventListener('click', () => {
-      document.getElementById('startBtn').textContent = 'Start';
-      resetGame();
-    });
-
+    document.getElementById('resetBtn').addEventListener('click', resetGame);
     document.getElementById('subModeBtn').addEventListener('click', toggleSubMode);
-
     document.getElementById('confirmSubBtn').addEventListener('click', confirmSubs);
     document.getElementById('cancelSubBtn').addEventListener('click', cancelSubs);
 
+    document.getElementById('teamSelect').addEventListener('change', e => {
+      loadTeam(e.target.value);
+    });
+
+    document.getElementById('modeToggle').addEventListener('click', e => {
+      const btn = e.target.closest('.mode-pill');
+      if (!btn) return;
+      const mode = btn.dataset.mode;
+      setMode(mode);
+    });
+
     document.getElementById('courtArea').addEventListener('click', e => {
-      const foulBtn = e.target.closest('[data-foul]');
       const chip = e.target.closest('.player-chip');
       if (!chip) return;
       const id = parseInt(chip.dataset.id, 10);
-      if (foulBtn) {
+      if (e.target.closest('[data-foul]')) {
         toggleFoul(id);
       } else {
         toggleOnSelection(id);
@@ -1043,9 +1167,7 @@
       const card = e.target.closest('.bench-card');
       if (!card) return;
       const id = parseInt(card.dataset.id, 10);
-
-      const foulBtn = e.target.closest('[data-foul]');
-      if (foulBtn) {
+      if (e.target.closest('[data-foul]')) {
         toggleFoul(id);
         return;
       }
@@ -1060,15 +1182,16 @@
     document.getElementById('segmentButtons').addEventListener('click', e => {
       const btn = e.target.closest('.segment-btn');
       if (!btn) return;
-      state.currentSegment = btn.dataset.seg;
-      state.clockSeconds = 600; // 10:00 for every quarter
-      renderSegmentLabel();
+      const label = btn.dataset.seg;
+      state.currentSegment = label;
+      state.clockSeconds = MODES[state.mode].segmentLength;
+      renderSegmentControls();
       renderClock();
     });
 
     document.getElementById('saveSegmentBtn').addEventListener('click', saveSegmentSnapshot);
 
-    // ---- INIT ----
+    // ---------- INIT ----------
     renderAll();
   </script>
 </body>
