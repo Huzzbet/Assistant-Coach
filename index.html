@@ -331,6 +331,7 @@
     }
     .bench-labels {
       font-size: 12px;
+      flex: 1;
     }
     .bench-mins {
       font-size: 11px;
@@ -431,6 +432,8 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      flex: 1;
+      min-width: 0;
     }
     .minutes-number {
       width: 22px;
@@ -442,11 +445,14 @@
       justify-content: center;
       font-size: 11px;
       color: #e5e7eb;
+      flex-shrink: 0;
     }
     .minutes-name-block {
       display: flex;
       flex-direction: column;
       gap: 1px;
+      flex: 1;
+      min-width: 0;
     }
     .minutes-role {
       font-size: 10px;
@@ -467,6 +473,8 @@
       font-size: 12px;
       font-variant-numeric: tabular-nums;
       color: #e5e7eb;
+      margin-left: 8px;
+      flex-shrink: 0;
     }
     .minutes-foul-pill {
       font-size: 10px;
@@ -514,6 +522,32 @@
       font-size: 10px;
       color: #6b7280;
       margin-top: 6px;
+    }
+
+    /* 🔋 FATIGUE BAR STYLES */
+    .fatigue-wrap {
+      margin-top: 2px;
+    }
+    .fatigue-bar-bg {
+      width: 100%;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      overflow: hidden;
+    }
+    .fatigue-bar-inner {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.25s ease-out;
+    }
+    .fatigue-low {
+      background: linear-gradient(to right, #22c55e, #15803d);
+    }
+    .fatigue-med {
+      background: linear-gradient(to right, #eab308, #ca8a04);
+    }
+    .fatigue-high {
+      background: linear-gradient(to right, #f97316, #b91c1c);
     }
   </style>
 </head>
@@ -657,6 +691,12 @@
       }
     };
 
+    // Total game lengths for fatigue (seconds)
+    const TOTAL_GAME_SECONDS = {
+      rep: MODES.rep.segmentLength * MODES.rep.segmentLabels.length,        // 40 mins
+      domestic: MODES.domestic.segmentLength * MODES.domestic.segmentLabels.length // 36 mins
+    };
+
     // ---------- STATE ----------
     const state = {
       teamId: 'rep_u14',
@@ -702,6 +742,26 @@
       });
     }
     initPlayerStats();
+
+    // ---------- FATIGUE ----------
+    function fatigueBarHTML(id) {
+      const sec = state.minutes[id] || 0;
+      const maxSec = TOTAL_GAME_SECONDS[state.mode] || (40 * 60);
+      const ratio = Math.max(0, Math.min(1, sec / maxSec));
+      const pct = (ratio * 100).toFixed(0);
+
+      let levelClass = 'fatigue-low';
+      if (ratio > 0.66) levelClass = 'fatigue-high';
+      else if (ratio > 0.33) levelClass = 'fatigue-med';
+
+      return `
+        <div class="fatigue-wrap">
+          <div class="fatigue-bar-bg">
+            <div class="fatigue-bar-inner ${levelClass}" style="width:${pct}%;"></div>
+          </div>
+        </div>
+      `;
+    }
 
     // ---------- RENDER ----------
     function renderTeamSelect() {
@@ -761,6 +821,7 @@
         <div class="player-name">${p.name}</div>
         <div class="player-role">${p.short}</div>
         <div class="player-mins">${formatTime(state.minutes[id])} mins</div>
+        ${fatigueBarHTML(id)}
       `;
       chip.appendChild(meta);
 
@@ -810,6 +871,7 @@
         labels.innerHTML = `
           <div>${p.name}</div>
           <div class="bench-mins">${formatTime(state.minutes[id])}</div>
+          ${fatigueBarHTML(id)}
         `;
         main.appendChild(labels);
 
@@ -868,6 +930,7 @@
           <div class="minutes-status ${state.onCourt.includes(id) ? '' : 'bench'}">
             ${state.onCourt.includes(id) ? 'On Court' : 'Bench'}
           </div>
+          ${fatigueBarHTML(id)}
         `;
         info.appendChild(nb);
 
@@ -1005,6 +1068,9 @@
       renderModeToggle();
       renderSegmentControls();
       renderClock();
+      renderMinutes(); // refresh fatigue bars relative to new max
+      renderBench();
+      renderCourt();
     }
 
     function loadTeam(teamId) {
