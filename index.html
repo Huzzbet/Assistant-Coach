@@ -106,6 +106,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
     }
     .btn.primary {
       background: radial-gradient(circle at 15% 0, #2563eb, #1d4ed8 55%, #1e40af 100%);
@@ -134,6 +135,7 @@
       font-size: 11px;
       padding: 3px 10px;
       cursor: pointer;
+      transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, background 0.15s ease-out;
     }
     .mode-pill.active {
       background: radial-gradient(circle at 15% 0, #1d4ed8, #1e40af 70%);
@@ -155,6 +157,8 @@
       padding: 14px;
       border: 1px solid rgba(55, 65, 81, 0.9);
       box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.7);
+      position: relative;
+      overflow: hidden;
     }
     .panel-header {
       display: flex;
@@ -183,6 +187,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, background 0.15s ease-out;
     }
     .sub-mode-btn.on {
       border-color: rgba(34, 197, 94, 0.9);
@@ -227,10 +232,12 @@
       box-shadow: 0 10px 22px rgba(15, 23, 42, 0.9);
       cursor: pointer;
       position: relative;
+      transition: box-shadow 0.18s ease-out, border-color 0.18s ease-out, transform 0.18s ease-out;
     }
     .player-chip.selected {
       border-color: #22c55e;
-      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.8), 0 12px 26px rgba(34, 197, 94, 0.35);
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.9), 0 14px 28px rgba(34, 197, 94, 0.45);
+      transform: translateY(-1px) scale(1.01);
     }
     .number-pill {
       width: 28px;
@@ -271,6 +278,7 @@
       font-size: 10px;
       padding: 2px 6px;
       cursor: pointer;
+      transition: background 0.12s ease-out, transform 0.12s ease-out;
     }
     .foul-btn.on {
       background: radial-gradient(circle at 15% 0, #f97316, #c2410c 70%);
@@ -279,6 +287,7 @@
     }
     .bench-wrapper {
       margin-top: 8px;
+      position: relative;
     }
     .bench-header-row {
       display: flex;
@@ -307,10 +316,12 @@
       background: radial-gradient(circle at 10% 0, #020617, #020617 70%, #020617 100%);
       box-shadow: 0 8px 18px rgba(15, 23, 42, 0.85);
       cursor: pointer;
+      transition: box-shadow 0.18s ease-out, border-color 0.18s ease-out, transform 0.18s ease-out;
     }
     .bench-card.selected {
       border-color: #22c55e;
-      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.8), 0 10px 24px rgba(34, 197, 94, 0.35);
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.9), 0 12px 24px rgba(34, 197, 94, 0.45);
+      transform: translateY(-1px) scale(1.01);
     }
     .bench-main {
       display: flex;
@@ -351,6 +362,10 @@
       font-size: 10px;
       padding: 2px 6px;
       cursor: pointer;
+      transition: background 0.12s ease-out, transform 0.12s ease-out;
+    }
+    .bench-arrow:active {
+      transform: translateY(1px);
     }
     .bench-tip {
       font-size: 10px;
@@ -398,10 +413,12 @@
       font-size: 11px;
       padding: 3px 9px;
       cursor: pointer;
+      transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, background 0.15s ease-out;
     }
     .segment-btn.active {
       background: radial-gradient(circle at 15% 0, #1d4ed8, #1e40af 70%);
       border-color: transparent;
+      animation: segmentPulse 2.4s ease-in-out infinite;
     }
 
     /* UPDATED: show full list, no scroll */
@@ -421,6 +438,7 @@
       align-items: center;
       padding: 4px 2px;
       border-radius: 10px;
+      transition: background 0.15s ease-out, transform 0.15s ease-out;
     }
     .minutes-row + .minutes-row {
       border-top: 1px dashed rgba(55, 65, 81, 0.9);
@@ -510,6 +528,7 @@
       padding: 6px 8px;
       font-size: 11px;
       background: radial-gradient(circle at top left, #020617 0, #000 80%);
+      transition: box-shadow 0.2s ease-out, transform 0.2s ease-out, border-color 0.2s ease-out;
     }
     .segment-card-title {
       font-size: 11px;
@@ -549,6 +568,82 @@
     .fatigue-high {
       background: linear-gradient(to right, #f97316, #b91c1c);
     }
+
+    /* ✨ MICRO-ANIMATIONS & PULSES */
+
+    /* On-court players when clock is running */
+    .on-court-active {
+      animation: glowPulse 2.2s ease-in-out infinite;
+    }
+
+    @keyframes glowPulse {
+      0% {
+        box-shadow: 0 10px 22px rgba(34, 197, 94, 0.10);
+        border-color: rgba(55, 65, 81, 0.9);
+      }
+      50% {
+        box-shadow: 0 14px 30px rgba(34, 197, 94, 0.35);
+        border-color: rgba(34, 197, 94, 0.75);
+      }
+      100% {
+        box-shadow: 0 10px 22px rgba(34, 197, 94, 0.10);
+        border-color: rgba(55, 65, 81, 0.9);
+      }
+    }
+
+    /* Segment button subtle pulse */
+    @keyframes segmentPulse {
+      0% {
+        transform: translateY(0);
+        box-shadow: 0 0 0 rgba(37, 99, 235, 0);
+      }
+      50% {
+        transform: translateY(-1px);
+        box-shadow: 0 0 8px rgba(37, 99, 235, 0.45);
+      }
+      100% {
+        transform: translateY(0);
+        box-shadow: 0 0 0 rgba(37, 99, 235, 0);
+      }
+    }
+
+    /* Haptic tap for key buttons */
+    .btn-haptic {
+      animation: hapticTap 0.12s ease-out;
+    }
+    @keyframes hapticTap {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(0.96);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    /* Flash for confirm sub / snapshot / new segment card */
+    .panel-flash {
+      animation: panelFlash 0.35s ease-out;
+    }
+    .segment-flash {
+      animation: panelFlash 0.45s ease-out;
+    }
+    @keyframes panelFlash {
+      0% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.0);
+        border-color: rgba(55, 65, 81, 0.9);
+      }
+      40% {
+        box-shadow: 0 0 18px 0 rgba(59, 130, 246, 0.55);
+        border-color: rgba(59, 130, 246, 0.85);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.0);
+        border-color: rgba(55, 65, 81, 0.9);
+      }
+    }
   </style>
 </head>
 <body>
@@ -582,7 +677,7 @@
     </div>
 
     <div class="layout-grid">
-      <div class="panel">
+      <div class="panel" id="leftPanel">
         <div class="panel-header">
           <div>
             <div class="panel-title">On Court</div>
@@ -600,7 +695,7 @@
           </div>
         </div>
 
-        <div class="bench-wrapper">
+        <div class="bench-wrapper" id="benchWrapper">
           <div class="bench-header-row">
             <div class="panel-title">Bench</div>
           </div>
@@ -615,7 +710,7 @@
         </div>
       </div>
 
-      <div class="panel">
+      <div class="panel" id="rightPanel">
         <div class="minutes-header">
           <div>
             <div class="panel-title">Player Minutes</div>
@@ -763,6 +858,13 @@
       `;
     }
 
+    // ---------- SMALL HELPER FOR FLASHES ----------
+    function flashElement(el, cls, duration = 250) {
+      if (!el) return;
+      el.classList.add(cls);
+      setTimeout(() => el.classList.remove(cls), duration);
+    }
+
     // ---------- RENDER ----------
     function renderTeamSelect() {
       const select = document.getElementById('teamSelect');
@@ -808,7 +910,13 @@
       const chip = document.createElement('div');
       chip.className = 'player-chip';
       chip.dataset.id = String(id);
-      if (state.subMode && state.selectedOn.includes(id)) chip.classList.add('selected');
+
+      if (state.subMode && state.selectedOn.includes(id)) {
+        chip.classList.add('selected');
+      }
+      if (state.running) {
+        chip.classList.add('on-court-active');
+      }
 
       const num = document.createElement('div');
       num.className = 'number-pill';
@@ -857,7 +965,9 @@
         const card = document.createElement('div');
         card.className = 'bench-card';
         card.dataset.id = String(id);
-        if (state.subMode && state.selectedBench.includes(id)) card.classList.add('selected');
+        if (state.subMode && state.selectedBench.includes(id)) {
+          card.classList.add('selected');
+        }
 
         const main = document.createElement('div');
         main.className = 'bench-main';
@@ -989,7 +1099,7 @@
     function renderSegments() {
       const container = document.getElementById('segments');
       container.innerHTML = '';
-      state.segments.forEach(seg => {
+      state.segments.forEach((seg, idx) => {
         const card = document.createElement('div');
         card.className = 'segment-card';
 
@@ -1154,6 +1264,10 @@
       renderCourt();
       renderBench();
       renderMinutes();
+
+      // Micro flash on confirm + bench area
+      flashElement(document.getElementById('confirmSubBtn'), 'btn-haptic', 150);
+      flashElement(document.getElementById('benchWrapper'), 'panel-flash', 350);
     }
 
     function cancelSubs() {
@@ -1196,17 +1310,29 @@
         top
       });
       renderSegments();
+
+      // Flash the last segment card + button
+      const segmentsContainer = document.getElementById('segments');
+      const lastCard = segmentsContainer.lastElementChild;
+      flashElement(lastCard, 'segment-flash', 450);
+      flashElement(document.getElementById('saveSegmentBtn'), 'btn-haptic', 150);
     }
 
     // ---------- EVENT LISTENERS ----------
     document.getElementById('startBtn').addEventListener('click', () => {
       state.running = !state.running;
-      document.getElementById('startBtn').textContent = state.running ? 'Pause' : 'Start';
+      const startBtn = document.getElementById('startBtn');
+      startBtn.textContent = state.running ? 'Pause' : 'Start';
+      flashElement(startBtn, 'btn-haptic', 150);
       renderClock();
+      renderCourt(); // ensure on-court active pulse toggles instantly
     });
 
     document.getElementById('resetBtn').addEventListener('click', resetGame);
-    document.getElementById('subModeBtn').addEventListener('click', toggleSubMode);
+    document.getElementById('subModeBtn').addEventListener('click', () => {
+      flashElement(document.getElementById('subModeBtn'), 'btn-haptic', 150);
+      toggleSubMode();
+    });
     document.getElementById('confirmSubBtn').addEventListener('click', confirmSubs);
     document.getElementById('cancelSubBtn').addEventListener('click', cancelSubs);
 
@@ -1217,6 +1343,7 @@
     document.getElementById('modeToggle').addEventListener('click', e => {
       const btn = e.target.closest('.mode-pill');
       if (!btn) return;
+      flashElement(btn, 'btn-haptic', 150);
       setMode(btn.dataset.mode);
     });
 
