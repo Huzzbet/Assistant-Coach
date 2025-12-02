@@ -571,7 +571,7 @@
 
     /* ✨ MICRO-ANIMATIONS & PULSES */
 
-    /* On-court players when clock is running */
+    /* On-court players when clock is running (not in Sub Mode) */
     .on-court-active {
       animation: glowPulse 2.2s ease-in-out infinite;
     }
@@ -904,6 +904,8 @@
       }
     }
 
+    // ✅ UPDATED createCourtChip: pulse only when NOT in Sub Mode,
+    // so the green "selected" highlight is clear during subs
     function createCourtChip(id) {
       const p = findPlayer(id);
       if (!p) return document.createElement('div');
@@ -911,10 +913,13 @@
       chip.className = 'player-chip';
       chip.dataset.id = String(id);
 
+      // Selected in Sub Mode = bright green
       if (state.subMode && state.selectedOn.includes(id)) {
         chip.classList.add('selected');
       }
-      if (state.running) {
+
+      // Only show active pulse when running and not in Sub Mode
+      if (state.running && !state.subMode) {
         chip.classList.add('on-court-active');
       }
 
@@ -1099,7 +1104,7 @@
     function renderSegments() {
       const container = document.getElementById('segments');
       container.innerHTML = '';
-      state.segments.forEach((seg, idx) => {
+      state.segments.forEach(seg => {
         const card = document.createElement('div');
         card.className = 'segment-card';
 
