@@ -221,7 +221,7 @@
     }
     .player-chip {
       min-width: 130px;
-      max-width: 170px;
+      max-width: 190px;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -420,8 +420,6 @@
       border-color: transparent;
       animation: segmentPulse 2.4s ease-in-out infinite;
     }
-
-    /* UPDATED: show full list, no scroll */
     .minutes-list {
       max-height: none;
       overflow-y: visible;
@@ -431,7 +429,6 @@
       padding: 6px 8px;
       background: radial-gradient(circle at top, #020617 0, #020617 60%, #020617 100%);
     }
-
     .minutes-row {
       display: flex;
       justify-content: space-between;
@@ -543,7 +540,7 @@
       margin-top: 6px;
     }
 
-    /* 🔋 FATIGUE BAR STYLES */
+    /* FATIGUE BAR */
     .fatigue-wrap {
       margin-top: 2px;
     }
@@ -569,13 +566,10 @@
       background: linear-gradient(to right, #f97316, #b91c1c);
     }
 
-    /* ✨ MICRO-ANIMATIONS & PULSES */
-
-    /* On-court players when clock is running (not in Sub Mode) */
+    /* MICRO-ANIMATIONS */
     .on-court-active {
       animation: glowPulse 2.2s ease-in-out infinite;
     }
-
     @keyframes glowPulse {
       0% {
         box-shadow: 0 10px 22px rgba(34, 197, 94, 0.10);
@@ -590,8 +584,6 @@
         border-color: rgba(55, 65, 81, 0.9);
       }
     }
-
-    /* Segment button subtle pulse */
     @keyframes segmentPulse {
       0% {
         transform: translateY(0);
@@ -606,24 +598,14 @@
         box-shadow: 0 0 0 rgba(37, 99, 235, 0);
       }
     }
-
-    /* Haptic tap for key buttons */
     .btn-haptic {
       animation: hapticTap 0.12s ease-out;
     }
     @keyframes hapticTap {
-      0% {
-        transform: scale(1);
-      }
-      50% {
-        transform: scale(0.96);
-      }
-      100% {
-        transform: scale(1);
-      }
+      0% { transform: scale(1); }
+      50% { transform: scale(0.96); }
+      100% { transform: scale(1); }
     }
-
-    /* Flash for confirm sub / snapshot / new segment card */
     .panel-flash {
       animation: panelFlash 0.35s ease-out;
     }
@@ -681,7 +663,7 @@
         <div class="panel-header">
           <div>
             <div class="panel-title">On Court</div>
-            <div class="panel-sub">Tap players in Sub Mode to mark on/off</div>
+            <div class="panel-sub">Use ▲ / ▼ to arrange spots · Sub Mode to mark on/off</div>
           </div>
           <button class="sub-mode-btn" id="subModeBtn">🧩 Sub Mode</button>
         </div>
@@ -786,7 +768,6 @@
       }
     };
 
-    // Total game lengths for fatigue (seconds)
     const TOTAL_GAME_SECONDS = {
       rep: MODES.rep.segmentLength * MODES.rep.segmentLabels.length,        // 40 mins
       domestic: MODES.domestic.segmentLength * MODES.domestic.segmentLabels.length // 36 mins
@@ -838,7 +819,7 @@
     }
     initPlayerStats();
 
-    // ---------- FATIGUE ----------
+    // FATIGUE
     function fatigueBarHTML(id) {
       const sec = state.minutes[id] || 0;
       const maxSec = TOTAL_GAME_SECONDS[state.mode] || (40 * 60);
@@ -858,7 +839,7 @@
       `;
     }
 
-    // ---------- SMALL HELPER FOR FLASHES ----------
+    // helper for flashes
     function flashElement(el, cls, duration = 250) {
       if (!el) return;
       el.classList.add(cls);
@@ -904,8 +885,20 @@
       }
     }
 
-    // ✅ UPDATED createCourtChip: pulse only when NOT in Sub Mode,
-    // so the green "selected" highlight is clear during subs
+    // NEW: move on-court player up/down in the array
+    function moveOnCourt(id, dir) {
+      const idx = state.onCourt.indexOf(id);
+      if (idx === -1) return;
+      const newIdx = idx + (dir === 'up' ? -1 : 1);
+      if (newIdx < 0 || newIdx >= state.onCourt.length) return;
+      const arr = state.onCourt;
+      const tmp = arr[idx];
+      arr[idx] = arr[newIdx];
+      arr[newIdx] = tmp;
+      renderCourt();
+      renderMinutes();
+    }
+
     function createCourtChip(id) {
       const p = findPlayer(id);
       if (!p) return document.createElement('div');
@@ -913,12 +906,12 @@
       chip.className = 'player-chip';
       chip.dataset.id = String(id);
 
-      // Selected in Sub Mode = bright green
+      // Selected in Sub Mode
       if (state.subMode && state.selectedOn.includes(id)) {
         chip.classList.add('selected');
       }
 
-      // Only show active pulse when running and not in Sub Mode
+      // Glow only when running & not in Sub Mode
       if (state.running && !state.subMode) {
         chip.classList.add('on-court-active');
       }
@@ -938,11 +931,29 @@
       `;
       chip.appendChild(meta);
 
+      // Right side: foul + arrows stacked vertically
+      const side = document.createElement('div');
+      side.className = 'bench-controls';
+
       const foulBtn = document.createElement('button');
       foulBtn.className = 'foul-btn' + (state.fouls[id] ? ' on' : '');
       foulBtn.textContent = state.fouls[id] ? 'Foul ⚠︎' : 'Mark Foul';
       foulBtn.dataset.foul = 'true';
-      chip.appendChild(foulBtn);
+      side.appendChild(foulBtn);
+
+      const up = document.createElement('button');
+      up.className = 'bench-arrow court-arrow';
+      up.textContent = '▲';
+      up.dataset.dir = 'up';
+      side.appendChild(up);
+
+      const down = document.createElement('button');
+      down.className = 'bench-arrow court-arrow';
+      down.textContent = '▼';
+      down.dataset.dir = 'down';
+      side.appendChild(down);
+
+      chip.appendChild(side);
 
       return chip;
     }
@@ -1002,396 +1013,4 @@
         ctrls.className = 'bench-controls';
 
         const up = document.createElement('button');
-        up.className = 'bench-arrow';
-        up.textContent = '▲';
-        up.dataset.dir = 'up';
-        ctrls.appendChild(up);
-
-        const down = document.createElement('button');
-        down.className = 'bench-arrow';
-        down.textContent = '▼';
-        down.dataset.dir = 'down';
-        ctrls.appendChild(down);
-
-        card.appendChild(ctrls);
-        grid.appendChild(card);
-      });
-    }
-
-    function renderMinutes() {
-      const list = document.getElementById('minutesList');
-      list.innerHTML = '';
-      const allIds = state.onCourt.concat(state.bench);
-      allIds.forEach(id => {
-        const p = findPlayer(id);
-        if (!p) return;
-        const row = document.createElement('div');
-        row.className = 'minutes-row';
-        if (state.onCourt.includes(id)) row.classList.add('on');
-
-        const info = document.createElement('div');
-        info.className = 'minutes-info';
-
-        const num = document.createElement('div');
-        num.className = 'minutes-number';
-        num.textContent = p.number;
-        info.appendChild(num);
-
-        const nb = document.createElement('div');
-        nb.className = 'minutes-name-block';
-        nb.innerHTML = `
-          <div>${p.name}</div>
-          <div class="minutes-role">${p.long}</div>
-          <div class="minutes-status ${state.onCourt.includes(id) ? '' : 'bench'}">
-            ${state.onCourt.includes(id) ? 'On Court' : 'Bench'}
-          </div>
-          ${fatigueBarHTML(id)}
-        `;
-        info.appendChild(nb);
-
-        if (state.fouls[id]) {
-          const foul = document.createElement('div');
-          foul.className = 'minutes-foul-pill';
-          foul.textContent = 'Foul Trouble';
-          info.appendChild(foul);
-        }
-
-        row.appendChild(info);
-
-        const time = document.createElement('div');
-        time.className = 'minutes-time';
-        time.textContent = formatTime(state.minutes[id]);
-        row.appendChild(time);
-
-        list.appendChild(row);
-      });
-    }
-
-    function renderAlerts() {
-      const container = document.getElementById('alerts');
-      container.innerHTML = '';
-      const ids = state.onCourt.concat(state.bench);
-      if (!ids.length) return;
-
-      let total = 0;
-      ids.forEach(id => total += state.minutes[id] || 0);
-      if (total === 0) return;
-      const avg = total / ids.length;
-
-      let over = null, under = null;
-      ids.forEach(id => {
-        const diff = (state.minutes[id] || 0) - avg;
-        if (diff > 120 && (!over || diff > over.diff)) over = { id, diff };
-        if (diff < -120 && (!under || diff < under.diff)) under = { id, diff };
-      });
-
-      if (over) {
-        const p = findPlayer(over.id);
-        const line = document.createElement('div');
-        line.className = 'alert-line warn';
-        line.textContent = `${p.name} is ${formatTime(over.diff)} above team average minutes.`;
-        container.appendChild(line);
-      }
-      if (under) {
-        const p = findPlayer(under.id);
-        const line = document.createElement('div');
-        line.className = 'alert-line';
-        line.textContent = `${p.name} is ${formatTime(-under.diff)} below team average minutes.`;
-        container.appendChild(line);
-      }
-    }
-
-    function renderSegments() {
-      const container = document.getElementById('segments');
-      container.innerHTML = '';
-      state.segments.forEach(seg => {
-        const card = document.createElement('div');
-        card.className = 'segment-card';
-
-        const title = document.createElement('div');
-        title.className = 'segment-card-title';
-        title.textContent = `${seg.segment} · ${seg.modeLabel}`;
-        card.appendChild(title);
-
-        seg.top.forEach(item => {
-          const line = document.createElement('div');
-          line.textContent = `${item.name}: ${formatTime(item.seconds)}`;
-          card.appendChild(line);
-        });
-
-        container.appendChild(card);
-      });
-    }
-
-    function renderSegmentControls() {
-      const container = document.getElementById('segmentButtons');
-      container.innerHTML = '';
-      const modeCfg = MODES[state.mode];
-      modeCfg.segmentLabels.forEach(label => {
-        const btn = document.createElement('button');
-        btn.className = 'segment-btn' + (label === state.currentSegment ? ' active' : '');
-        btn.dataset.seg = label;
-        btn.textContent = label;
-        container.appendChild(btn);
-      });
-      const segLabel = document.getElementById('segmentLabel');
-      segLabel.textContent = `${state.currentSegment} · ${modeCfg.label}`;
-    }
-
-    function renderAll() {
-      renderTeamSelect();
-      renderClock();
-      renderModeToggle();
-      renderSubMode();
-      renderCourt();
-      renderBench();
-      renderMinutes();
-      renderAlerts();
-      renderSegments();
-      renderSegmentControls();
-    }
-
-    // ---------- TIMER ----------
-    function tick() {
-      if (!state.running) return;
-      if (state.clockSeconds <= 0) {
-        state.clockSeconds = 0;
-        state.running = false;
-        renderClock();
-        return;
-      }
-      state.clockSeconds -= 1;
-      state.onCourt.forEach(id => {
-        if (state.minutes[id] == null) state.minutes[id] = 0;
-        state.minutes[id] += 1;
-      });
-      renderClock();
-      renderCourt();
-      renderBench();
-      renderMinutes();
-      renderAlerts();
-    }
-    setInterval(tick, 1000);
-
-    // ---------- MODE & TEAM ----------
-    function setMode(newMode) {
-      if (!MODES[newMode]) return;
-      state.mode = newMode;
-      const cfg = MODES[newMode];
-      state.currentSegment = cfg.segmentLabels[0];
-      state.clockSeconds = cfg.segmentLength;
-      renderModeToggle();
-      renderSegmentControls();
-      renderClock();
-      renderMinutes(); // refresh fatigue bars relative to new max
-      renderBench();
-      renderCourt();
-    }
-
-    function loadTeam(teamId) {
-      const cfg = TEAM_CONFIGS[teamId];
-      if (!cfg) return;
-      state.teamId = teamId;
-      state.onCourt = [...cfg.initialOn];
-      state.bench = [...cfg.initialBench];
-      state.subMode = false;
-      state.selectedOn = [];
-      state.selectedBench = [];
-      state.segments = [];
-      initPlayerStats();
-      renderAll();
-    }
-
-    // ---------- INTERACTION ----------
-    function toggleSubMode() {
-      state.subMode = !state.subMode;
-      state.selectedOn = [];
-      state.selectedBench = [];
-      renderSubMode();
-      renderCourt();
-      renderBench();
-    }
-
-    function toggleFoul(id) {
-      if (state.fouls[id] == null) return;
-      state.fouls[id] = !state.fouls[id];
-      renderCourt();
-      renderBench();
-      renderMinutes();
-    }
-
-    function toggleOnSelection(id) {
-      if (!state.subMode) return;
-      const idx = state.selectedOn.indexOf(id);
-      if (idx >= 0) state.selectedOn.splice(idx, 1);
-      else state.selectedOn.push(id);
-      renderCourt();
-    }
-
-    function toggleBenchSelection(id) {
-      if (!state.subMode) return;
-      const idx = state.selectedBench.indexOf(id);
-      if (idx >= 0) state.selectedBench.splice(idx, 1);
-      else state.selectedBench.push(id);
-      renderBench();
-    }
-
-    function moveBench(id, dir) {
-      const idx = state.bench.indexOf(id);
-      if (idx === -1) return;
-      const newIdx = idx + (dir === 'up' ? -1 : 1);
-      if (newIdx < 0 || newIdx >= state.bench.length) return;
-      const arr = state.bench;
-      const tmp = arr[idx];
-      arr[idx] = arr[newIdx];
-      arr[newIdx] = tmp;
-      renderBench();
-    }
-
-    function confirmSubs() {
-      if (!state.subMode) return;
-      if (state.selectedOn.length === 0 && state.selectedBench.length === 0) return;
-      if (state.selectedOn.length !== state.selectedBench.length) {
-        alert('Select the same number of players to sub off and on.');
-        return;
-      }
-      for (let i = 0; i < state.selectedOn.length; i++) {
-        const offId = state.selectedOn[i];
-        const onId = state.selectedBench[i];
-        const offIdx = state.onCourt.indexOf(offId);
-        const benchIdx = state.bench.indexOf(onId);
-        if (offIdx === -1 || benchIdx === -1) continue;
-        state.onCourt[offIdx] = onId;
-        state.bench[benchIdx] = offId;
-      }
-      state.selectedOn = [];
-      state.selectedBench = [];
-      renderCourt();
-      renderBench();
-      renderMinutes();
-
-      // Micro flash on confirm + bench area
-      flashElement(document.getElementById('confirmSubBtn'), 'btn-haptic', 150);
-      flashElement(document.getElementById('benchWrapper'), 'panel-flash', 350);
-    }
-
-    function cancelSubs() {
-      state.selectedOn = [];
-      state.selectedBench = [];
-      renderCourt();
-      renderBench();
-    }
-
-    function resetGame() {
-      const teamCfg = TEAM_CONFIGS[state.teamId];
-      const modeCfg = MODES[state.mode];
-      state.running = false;
-      state.clockSeconds = modeCfg.segmentLength;
-      state.currentSegment = modeCfg.segmentLabels[0];
-      state.onCourt = [...teamCfg.initialOn];
-      state.bench = [...teamCfg.initialBench];
-      state.subMode = false;
-      state.selectedOn = [];
-      state.selectedBench = [];
-      state.segments = [];
-      initPlayerStats();
-      renderAll();
-      document.getElementById('startBtn').textContent = 'Start';
-    }
-
-    function saveSegmentSnapshot() {
-      const allIds = state.onCourt.concat(state.bench);
-      if (!allIds.length) return;
-      const snapshot = allIds.map(id => ({
-        id,
-        name: findPlayer(id)?.name || 'Player',
-        seconds: state.minutes[id] || 0
-      }));
-      snapshot.sort((a, b) => b.seconds - a.seconds);
-      const top = snapshot.slice(0, 3);
-      state.segments.push({
-        segment: state.currentSegment,
-        modeLabel: MODES[state.mode].label,
-        top
-      });
-      renderSegments();
-
-      // Flash the last segment card + button
-      const segmentsContainer = document.getElementById('segments');
-      const lastCard = segmentsContainer.lastElementChild;
-      flashElement(lastCard, 'segment-flash', 450);
-      flashElement(document.getElementById('saveSegmentBtn'), 'btn-haptic', 150);
-    }
-
-    // ---------- EVENT LISTENERS ----------
-    document.getElementById('startBtn').addEventListener('click', () => {
-      state.running = !state.running;
-      const startBtn = document.getElementById('startBtn');
-      startBtn.textContent = state.running ? 'Pause' : 'Start';
-      flashElement(startBtn, 'btn-haptic', 150);
-      renderClock();
-      renderCourt(); // ensure on-court active pulse toggles instantly
-    });
-
-    document.getElementById('resetBtn').addEventListener('click', resetGame);
-    document.getElementById('subModeBtn').addEventListener('click', () => {
-      flashElement(document.getElementById('subModeBtn'), 'btn-haptic', 150);
-      toggleSubMode();
-    });
-    document.getElementById('confirmSubBtn').addEventListener('click', confirmSubs);
-    document.getElementById('cancelSubBtn').addEventListener('click', cancelSubs);
-
-    document.getElementById('teamSelect').addEventListener('change', e => {
-      loadTeam(e.target.value);
-    });
-
-    document.getElementById('modeToggle').addEventListener('click', e => {
-      const btn = e.target.closest('.mode-pill');
-      if (!btn) return;
-      flashElement(btn, 'btn-haptic', 150);
-      setMode(btn.dataset.mode);
-    });
-
-    document.getElementById('courtArea').addEventListener('click', e => {
-      const chip = e.target.closest('.player-chip');
-      if (!chip) return;
-      const id = parseInt(chip.dataset.id, 10);
-      if (e.target.closest('[data-foul]')) {
-        toggleFoul(id);
-      } else {
-        toggleOnSelection(id);
-      }
-    });
-
-    document.getElementById('benchGrid').addEventListener('click', e => {
-      const card = e.target.closest('.bench-card');
-      if (!card) return;
-      const id = parseInt(card.dataset.id, 10);
-      if (e.target.closest('[data-foul]')) {
-        toggleFoul(id);
-        return;
-      }
-      const arrow = e.target.closest('.bench-arrow');
-      if (arrow) {
-        moveBench(id, arrow.dataset.dir);
-        return;
-      }
-      toggleBenchSelection(id);
-    });
-
-    document.getElementById('segmentButtons').addEventListener('click', e => {
-      const btn = e.target.closest('.segment-btn');
-      if (!btn) return;
-      state.currentSegment = btn.dataset.seg;
-      state.clockSeconds = MODES[state.mode].segmentLength;
-      renderSegmentControls();
-      renderClock();
-    });
-
-    document.getElementById('saveSegmentBtn').addEventListener('click', saveSegmentSnapshot);
-
-    // ---------- INIT ----------
-    renderAll();
-  </script>
-</body>
-</html>
+       
