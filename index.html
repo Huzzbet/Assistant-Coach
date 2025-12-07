@@ -531,24 +531,43 @@
       color: #7dd3fc;
       margin-bottom: 3px;
     }
-    .suggestion-line {
+    .suggestion-pair {
+      margin-bottom: 3px;
+      padding: 3px 4px;
+      border-radius: 10px;
+      background: radial-gradient(circle at left, rgba(15, 23, 42, 0.8), transparent 70%);
       display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .suggestion-pair-main {
+      display: flex;
+      justify-content: space-between;
       gap: 4px;
-      margin-bottom: 2px;
+    }
+    .suggestion-off,
+    .suggestion-on {
+      font-size: 11px;
+      display: flex;
+      flex-direction: column;
     }
     .suggestion-label {
-      width: 30px;
-      color: #9ca3af;
+      font-size: 9px;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
-      font-size: 10px;
+      letter-spacing: 0.14em;
+      color: #9ca3af;
     }
     .suggestion-player {
       color: #e5e7eb;
       font-weight: 500;
     }
+    .suggestion-gap {
+      font-size: 9px;
+      color: #a5b4fc;
+      margin-top: 1px;
+    }
     .suggestion-tag {
-      margin-top: 3px;
+      margin-top: 4px;
       color: #bae6fd;
       font-size: 10px;
     }
@@ -757,15 +776,8 @@
         <div class="alerts" id="alerts"></div>
 
         <div class="suggestion-card hidden" id="suggestionCard">
-          <div class="suggestion-title">Suggested Sub</div>
-          <div class="suggestion-line">
-            <div class="suggestion-label">Off</div>
-            <div class="suggestion-player" id="suggestOff"></div>
-          </div>
-          <div class="suggestion-line">
-            <div class="suggestion-label">On</div>
-            <div class="suggestion-player" id="suggestOn"></div>
-          </div>
+          <div class="suggestion-title">Suggested Subs</div>
+          <div id="suggestPairs"></div>
           <div class="suggestion-tag" id="suggestTag"></div>
         </div>
 
@@ -870,10 +882,9 @@
       segments: []
     };
 
-    // suggested sub DOM refs (elements exist because script is at bottom)
+    // suggested sub DOM refs
     const suggestionCard = document.getElementById('suggestionCard');
-    const suggestOffEl = document.getElementById('suggestOff');
-    const suggestOnEl = document.getElementById('suggestOn');
+    const suggestPairsEl = document.getElementById('suggestPairs');
     const suggestTagEl = document.getElementById('suggestTag');
 
     function currentTeam() {
@@ -1405,8 +1416,8 @@
       flashElement(document.getElementById('saveSegmentBtn'), 'btn-haptic', 150);
     }
 
-    // ----- suggested sub based on even minutes over full game -----
-    function computeSuggestedSub() {
+    // ----- multi-pair suggested subs based on even minutes over full game -----
+    function computeSuggestedSubPairs() {
       const totalPlayers = state.onCourt.length + state.bench.length;
       if (!state.onCourt.length || !state.bench.length || totalPlayers === 0) return null;
 
@@ -1420,47 +1431,88 @@
         diffMap[id] = (state.minutes[id] || 0) - idealPerPlayer;
       });
 
-      let offId = state.onCourt[0];
-      state.onCourt.forEach(id => {
-        if (diffMap[id] > diffMap[offId]) offId = id;
-      });
+      const onSorted = [...state.onCourt].sort((a, b) => diffMap[b] - diffMap[a]); // most over-played first
+      const benchSorted = [...state.bench].sort((a, b) => diffMap[a] - diffMap[b]); // most under-played first
 
-      let onId = state.bench[0];
-      state.bench.forEach(id => {
-        if (diffMap[id] < diffMap[onId]) onId = id;
-      });
+      const maxPairs = Math.min(3, onSorted.length, benchSorted.length);
+      const pairs = [];
+      for (let i = 0; i < maxPairs; i++) {
+        const offId = onSorted[i];
+        const onId = benchSorted[i];
+        const offSecs = state.minutes[offId] || 0;
+        const onSecs = state.minutes[onId] || 0;
+        const gapMinutes = (offSecs - onSecs) / 60;
 
-      const offSecs = state.minutes[offId] || 0;
-      const onSecs = state.minutes[onId] || 0;
-      const minutesGap = (offSecs - onSecs) / 60;
+        // only include meaningful gaps
+        if (gapMinutes <= 1) continue;
 
-      let tag;
-      if (minutesGap > 4) {
-        tag = 'Big minutes gap – ideal time to rotate 2–3 kids to stay even by full time.';
-      } else if (minutesGap > 2.5) {
-        tag = 'Nice 3-minute rep window to flatten minutes.';
-      } else if (minutesGap > 1) {
-        tag = 'Small edge – sub now if you want to keep minutes on track.';
-      } else {
-        tag = 'Rotations are pretty even – no urgent sub needed.';
+        pairs.push({
+          offId,
+          onId,
+          offSecs,
+          onSecs,
+          gapMinutes
+        });
       }
 
-      return { offId, onId, offSecs, onSecs, tag };
+      if (!pairs.length) return null;
+
+      let tag;
+      const biggestGap = pairs[0].gapMinutes;
+      if (biggestGap > 4) {
+        tag = 'Big minutes spread – this rotation will drag everyone back towards even by full time.';
+      } else if (biggestGap > 2.5) {
+        tag = 'Perfect 3-minute rep window – rotate this group to keep minutes balanced.';
+      } else {
+        tag = 'Small but useful edge – these subs will tidy up minute balance.';
+      }
+
+      return { pairs, tag };
     }
 
     function showSuggestedSub() {
-      const suggestion = computeSuggestedSub();
+      const suggestion = computeSuggestedSubPairs();
       if (!suggestion) {
         suggestionCard.classList.add('hidden');
         return;
       }
-      const off = findPlayer(suggestion.offId);
-      const on = findPlayer(suggestion.onId);
 
-      suggestOffEl.textContent =
-        `${off.name} (#${off.number}) · ${formatTime(suggestion.offSecs)}`;
-      suggestOnEl.textContent =
-        `${on.name} (#${on.number}) · ${formatTime(suggestion.onSecs)}`;
+      suggestPairsEl.innerHTML = '';
+      suggestion.pairs.forEach((p, idx) => {
+        const off = findPlayer(p.offId);
+        const on = findPlayer(p.onId);
+        const pairDiv = document.createElement('div');
+        pairDiv.className = 'suggestion-pair';
+
+        const main = document.createElement('div');
+        main.className = 'suggestion-pair-main';
+
+        const offBlock = document.createElement('div');
+        offBlock.className = 'suggestion-off';
+        offBlock.innerHTML = `
+          <div class="suggestion-label">Off ${idx + 1}</div>
+          <div class="suggestion-player">${off.name} (#${off.number}) · ${formatTime(p.offSecs)}</div>
+        `;
+
+        const onBlock = document.createElement('div');
+        onBlock.className = 'suggestion-on';
+        onBlock.innerHTML = `
+          <div class="suggestion-label">On ${idx + 1}</div>
+          <div class="suggestion-player">${on.name} (#${on.number}) · ${formatTime(p.onSecs)}</div>
+        `;
+
+        main.appendChild(offBlock);
+        main.appendChild(onBlock);
+        pairDiv.appendChild(main);
+
+        const gap = document.createElement('div');
+        gap.className = 'suggestion-gap';
+        gap.textContent = `Minutes gap: ${p.gapMinutes.toFixed(1)} mins`;
+        pairDiv.appendChild(gap);
+
+        suggestPairsEl.appendChild(pairDiv);
+      });
+
       suggestTagEl.textContent = suggestion.tag;
 
       suggestionCard.classList.remove('hidden');
