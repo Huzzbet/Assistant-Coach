@@ -514,7 +514,7 @@
       background: radial-gradient(circle at left, rgba(234, 179, 8, 0.18), transparent 70%);
     }
 
-    /* NEW: Suggested sub card */
+    /* Suggested sub card */
     .suggestion-card {
       margin-top: 6px;
       font-size: 11px;
@@ -583,7 +583,7 @@
       margin-top: 6px;
     }
 
-    /* FATIGUE BAR */
+    /* Fatigue bar */
     .fatigue-wrap {
       margin-top: 2px;
     }
@@ -609,7 +609,7 @@
       background: linear-gradient(to right, #f97316, #b91c1c);
     }
 
-    /* MICRO-ANIMATIONS */
+    /* Micro animations */
     .on-court-active {
       animation: glowPulse 2.2s ease-in-out infinite;
     }
@@ -749,7 +749,6 @@
           <div class="segment-buttons" id="segmentButtons"></div>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
             <button class="btn small" id="saveSegmentBtn">Save Snapshot</button>
-            <!-- NEW: suggested sub button -->
             <button class="btn small primary" id="suggestSubBtn">Suggest Sub</button>
           </div>
         </div>
@@ -757,7 +756,6 @@
         <div class="minutes-list" id="minutesList"></div>
         <div class="alerts" id="alerts"></div>
 
-        <!-- NEW: suggested sub card -->
         <div class="suggestion-card hidden" id="suggestionCard">
           <div class="suggestion-title">Suggested Sub</div>
           <div class="suggestion-line">
@@ -784,7 +782,6 @@
     // ---------- CONFIG ----------
     const TEAM_CONFIGS = {
       rep_u14: {
-        // UPDATED NAME
         name: 'Under 12 Rep',
         players: [
           { id: 13, number: 13, name: 'Archie Stone',     short: 'PG', long: 'Guard' },
@@ -832,9 +829,29 @@
     };
 
     const TOTAL_GAME_SECONDS = {
-      rep: MODES.rep.segmentLength * MODES.rep.segmentLabels.length,        // 40 mins
-      domestic: MODES.domestic.segmentLength * MODES.domestic.segmentLabels.length // 36 mins
+      rep: MODES.rep.segmentLength * MODES.rep.segmentLabels.length,
+      domestic: MODES.domestic.segmentLength * MODES.domestic.segmentLabels.length
     };
+
+    // how far through the game we are in seconds
+    function getElapsedGameSeconds() {
+      const modeCfg = MODES[state.mode];
+      if (!modeCfg) return 0;
+
+      const labels = modeCfg.segmentLabels;
+      const segIndex = labels.indexOf(state.currentSegment);
+
+      const completedSegments = Math.max(0, segIndex);
+      const elapsedCompleted = completedSegments * modeCfg.segmentLength;
+      const elapsedCurrent = modeCfg.segmentLength - state.clockSeconds;
+
+      const total = elapsedCompleted + elapsedCurrent;
+      const maxTotal =
+        TOTAL_GAME_SECONDS[state.mode] ||
+        (modeCfg.segmentLength * modeCfg.segmentLabels.length);
+
+      return Math.max(0, Math.min(maxTotal, total));
+    }
 
     // ---------- STATE ----------
     const state = {
@@ -853,13 +870,12 @@
       segments: []
     };
 
-    // suggested sub DOM refs
+    // suggested sub DOM refs (elements exist because script is at bottom)
     const suggestionCard = document.getElementById('suggestionCard');
     const suggestOffEl = document.getElementById('suggestOff');
     const suggestOnEl = document.getElementById('suggestOn');
     const suggestTagEl = document.getElementById('suggestTag');
 
-    // helpers
     function currentTeam() {
       return TEAM_CONFIGS[state.teamId];
     }
@@ -888,7 +904,6 @@
     }
     initPlayerStats();
 
-    // FATIGUE
     function fatigueBarHTML(id) {
       const sec = state.minutes[id] || 0;
       const maxSec = TOTAL_GAME_SECONDS[state.mode] || (40 * 60);
@@ -908,14 +923,12 @@
       `;
     }
 
-    // helper for flashes
     function flashElement(el, cls, duration = 250) {
       if (!el) return;
       el.classList.add(cls);
       setTimeout(() => el.classList.remove(cls), duration);
     }
 
-    // ---------- RENDER ----------
     function renderTeamSelect() {
       const select = document.getElementById('teamSelect');
       select.innerHTML = '';
@@ -954,7 +967,6 @@
       }
     }
 
-    // NEW: move on-court player up/down in the array
     function moveOnCourt(id, dir) {
       const idx = state.onCourt.indexOf(id);
       if (idx === -1) return;
@@ -975,12 +987,10 @@
       chip.className = 'player-chip';
       chip.dataset.id = String(id);
 
-      // Selected in Sub Mode
       if (state.subMode && state.selectedOn.includes(id)) {
         chip.classList.add('selected');
       }
 
-      // Glow only when running & not in Sub Mode
       if (state.running && !state.subMode) {
         chip.classList.add('on-court-active');
       }
@@ -1000,7 +1010,6 @@
       `;
       chip.appendChild(meta);
 
-      // Right side: foul + arrows stacked vertically
       const side = document.createElement('div');
       side.className = 'bench-controls';
 
@@ -1231,7 +1240,6 @@
       renderSegmentControls();
     }
 
-    // ---------- TIMER ----------
     function tick() {
       if (!state.running) return;
       if (state.clockSeconds <= 0) {
@@ -1253,7 +1261,6 @@
     }
     setInterval(tick, 1000);
 
-    // ---------- MODE & TEAM ----------
     function setMode(newMode) {
       if (!MODES[newMode]) return;
       state.mode = newMode;
@@ -1282,7 +1289,6 @@
       renderAll();
     }
 
-    // ---------- INTERACTION ----------
     function toggleSubMode() {
       state.subMode = !state.subMode;
       state.selectedOn = [];
@@ -1399,35 +1405,44 @@
       flashElement(document.getElementById('saveSegmentBtn'), 'btn-haptic', 150);
     }
 
-    // ---------- SUGGESTED SUB LOGIC ----------
+    // ----- suggested sub based on even minutes over full game -----
     function computeSuggestedSub() {
-      if (!state.onCourt.length || !state.bench.length) return null;
+      const totalPlayers = state.onCourt.length + state.bench.length;
+      if (!state.onCourt.length || !state.bench.length || totalPlayers === 0) return null;
 
-      // Off: most total minutes
-      let offId = state.onCourt[0];
-      state.onCourt.forEach(id => {
-        if ((state.minutes[id] || 0) > (state.minutes[offId] || 0)) offId = id;
+      const elapsed = getElapsedGameSeconds();
+      if (elapsed < 60) return null; // don’t suggest in first minute
+
+      const idealPerPlayer = elapsed / totalPlayers;
+      const diffMap = {};
+      const allIds = state.onCourt.concat(state.bench);
+      allIds.forEach(id => {
+        diffMap[id] = (state.minutes[id] || 0) - idealPerPlayer;
       });
 
-      // On: fewest total minutes
+      let offId = state.onCourt[0];
+      state.onCourt.forEach(id => {
+        if (diffMap[id] > diffMap[offId]) offId = id;
+      });
+
       let onId = state.bench[0];
       state.bench.forEach(id => {
-        if ((state.minutes[id] || 0) < (state.minutes[onId] || 0)) onId = id;
+        if (diffMap[id] < diffMap[onId]) onId = id;
       });
 
       const offSecs = state.minutes[offId] || 0;
       const onSecs = state.minutes[onId] || 0;
-      const diff = offSecs - onSecs;
+      const minutesGap = (offSecs - onSecs) / 60;
 
       let tag;
-      if (diff > 6 * 60) {
-        tag = 'Big minutes gap – perfect time to balance your rotation.';
-      } else if (diff > 3 * 60) {
-        tag = 'Solid window for a regular sub to keep everyone involved.';
-      } else if (diff > 60) {
-        tag = 'Minutes are fairly even – rotate if you want fresh legs or a match-up look.';
+      if (minutesGap > 4) {
+        tag = 'Big minutes gap – ideal time to rotate 2–3 kids to stay even by full time.';
+      } else if (minutesGap > 2.5) {
+        tag = 'Nice 3-minute rep window to flatten minutes.';
+      } else if (minutesGap > 1) {
+        tag = 'Small edge – sub now if you want to keep minutes on track.';
       } else {
-        tag = 'Rotations already very balanced – no strong sub needed right now.';
+        tag = 'Rotations are pretty even – no urgent sub needed.';
       }
 
       return { offId, onId, offSecs, onSecs, tag };
@@ -1442,8 +1457,10 @@
       const off = findPlayer(suggestion.offId);
       const on = findPlayer(suggestion.onId);
 
-      suggestOffEl.textContent = `${off.name} (#${off.number}) · ${formatTime(suggestion.offSecs)}`;
-      suggestOnEl.textContent = `${on.name} (#${on.number}) · ${formatTime(suggestion.onSecs)}`;
+      suggestOffEl.textContent =
+        `${off.name} (#${off.number}) · ${formatTime(suggestion.offSecs)}`;
+      suggestOnEl.textContent =
+        `${on.name} (#${on.number}) · ${formatTime(suggestion.onSecs)}`;
       suggestTagEl.textContent = suggestion.tag;
 
       suggestionCard.classList.remove('hidden');
@@ -1486,20 +1503,17 @@
       if (!chip) return;
       const id = parseInt(chip.dataset.id, 10);
 
-      // arrows: reorder on court
       const arrow = e.target.closest('.court-arrow');
       if (arrow) {
         moveOnCourt(id, arrow.dataset.dir);
         return;
       }
 
-      // foul toggle
       if (e.target.closest('[data-foul]')) {
         toggleFoul(id);
         return;
       }
 
-      // selection only in Sub Mode
       toggleOnSelection(id);
     });
 
@@ -1530,7 +1544,6 @@
 
     document.getElementById('saveSegmentBtn').addEventListener('click', saveSegmentSnapshot);
 
-    // NEW: suggest sub button
     document.getElementById('suggestSubBtn').addEventListener('click', () => {
       flashElement(document.getElementById('suggestSubBtn'), 'btn-haptic', 150);
       showSuggestedSub();
