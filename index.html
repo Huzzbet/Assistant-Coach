@@ -513,6 +513,49 @@
       border-color: rgba(234, 179, 8, 0.8);
       background: radial-gradient(circle at left, rgba(234, 179, 8, 0.18), transparent 70%);
     }
+
+    /* NEW: Suggested sub card */
+    .suggestion-card {
+      margin-top: 6px;
+      font-size: 11px;
+      border-radius: 14px;
+      padding: 7px 8px 8px;
+      border: 1px solid rgba(56, 189, 248, 0.7);
+      background: radial-gradient(circle at top left, rgba(8, 47, 73, 0.9), #020617 70%);
+      box-shadow: 0 14px 30px rgba(8, 47, 73, 0.8);
+    }
+    .suggestion-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: #7dd3fc;
+      margin-bottom: 3px;
+    }
+    .suggestion-line {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 2px;
+    }
+    .suggestion-label {
+      width: 30px;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 10px;
+    }
+    .suggestion-player {
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+    .suggestion-tag {
+      margin-top: 3px;
+      color: #bae6fd;
+      font-size: 10px;
+    }
+    .hidden {
+      display: none;
+    }
+
     .segments {
       margin-top: 8px;
       display: grid;
@@ -704,11 +747,30 @@
         <div class="segment-row">
           <div class="segment-label">Segment: <span id="segmentLabel">Q1 · Rep</span></div>
           <div class="segment-buttons" id="segmentButtons"></div>
-          <button class="btn small" id="saveSegmentBtn">Save Snapshot</button>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="btn small" id="saveSegmentBtn">Save Snapshot</button>
+            <!-- NEW: suggested sub button -->
+            <button class="btn small primary" id="suggestSubBtn">Suggest Sub</button>
+          </div>
         </div>
 
         <div class="minutes-list" id="minutesList"></div>
         <div class="alerts" id="alerts"></div>
+
+        <!-- NEW: suggested sub card -->
+        <div class="suggestion-card hidden" id="suggestionCard">
+          <div class="suggestion-title">Suggested Sub</div>
+          <div class="suggestion-line">
+            <div class="suggestion-label">Off</div>
+            <div class="suggestion-player" id="suggestOff"></div>
+          </div>
+          <div class="suggestion-line">
+            <div class="suggestion-label">On</div>
+            <div class="suggestion-player" id="suggestOn"></div>
+          </div>
+          <div class="suggestion-tag" id="suggestTag"></div>
+        </div>
+
         <div class="segments" id="segments"></div>
 
         <div class="footnote">
@@ -722,7 +784,8 @@
     // ---------- CONFIG ----------
     const TEAM_CONFIGS = {
       rep_u14: {
-        name: 'Rep U14',
+        // UPDATED NAME
+        name: 'Under 12 Rep',
         players: [
           { id: 13, number: 13, name: 'Archie Stone',     short: 'PG', long: 'Guard' },
           { id: 14, number: 14, name: 'Ethan Lieberthal', short: 'SG', long: 'Guard' },
@@ -789,6 +852,12 @@
       selectedBench: [],
       segments: []
     };
+
+    // suggested sub DOM refs
+    const suggestionCard = document.getElementById('suggestionCard');
+    const suggestOffEl = document.getElementById('suggestOff');
+    const suggestOnEl = document.getElementById('suggestOn');
+    const suggestTagEl = document.getElementById('suggestTag');
 
     // helpers
     function currentTeam() {
@@ -1330,6 +1399,57 @@
       flashElement(document.getElementById('saveSegmentBtn'), 'btn-haptic', 150);
     }
 
+    // ---------- SUGGESTED SUB LOGIC ----------
+    function computeSuggestedSub() {
+      if (!state.onCourt.length || !state.bench.length) return null;
+
+      // Off: most total minutes
+      let offId = state.onCourt[0];
+      state.onCourt.forEach(id => {
+        if ((state.minutes[id] || 0) > (state.minutes[offId] || 0)) offId = id;
+      });
+
+      // On: fewest total minutes
+      let onId = state.bench[0];
+      state.bench.forEach(id => {
+        if ((state.minutes[id] || 0) < (state.minutes[onId] || 0)) onId = id;
+      });
+
+      const offSecs = state.minutes[offId] || 0;
+      const onSecs = state.minutes[onId] || 0;
+      const diff = offSecs - onSecs;
+
+      let tag;
+      if (diff > 6 * 60) {
+        tag = 'Big minutes gap – perfect time to balance your rotation.';
+      } else if (diff > 3 * 60) {
+        tag = 'Solid window for a regular sub to keep everyone involved.';
+      } else if (diff > 60) {
+        tag = 'Minutes are fairly even – rotate if you want fresh legs or a match-up look.';
+      } else {
+        tag = 'Rotations already very balanced – no strong sub needed right now.';
+      }
+
+      return { offId, onId, offSecs, onSecs, tag };
+    }
+
+    function showSuggestedSub() {
+      const suggestion = computeSuggestedSub();
+      if (!suggestion) {
+        suggestionCard.classList.add('hidden');
+        return;
+      }
+      const off = findPlayer(suggestion.offId);
+      const on = findPlayer(suggestion.onId);
+
+      suggestOffEl.textContent = `${off.name} (#${off.number}) · ${formatTime(suggestion.offSecs)}`;
+      suggestOnEl.textContent = `${on.name} (#${on.number}) · ${formatTime(suggestion.onSecs)}`;
+      suggestTagEl.textContent = suggestion.tag;
+
+      suggestionCard.classList.remove('hidden');
+      flashElement(suggestionCard, 'panel-flash', 350);
+    }
+
     // ---------- EVENT LISTENERS ----------
     document.getElementById('startBtn').addEventListener('click', () => {
       state.running = !state.running;
@@ -1409,6 +1529,12 @@
     });
 
     document.getElementById('saveSegmentBtn').addEventListener('click', saveSegmentSnapshot);
+
+    // NEW: suggest sub button
+    document.getElementById('suggestSubBtn').addEventListener('click', () => {
+      flashElement(document.getElementById('suggestSubBtn'), 'btn-haptic', 150);
+      showSuggestedSub();
+    });
 
     // ---------- INIT ----------
     renderAll();
