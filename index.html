@@ -317,6 +317,7 @@
       box-shadow: 0 8px 18px rgba(15, 23, 42, 0.85);
       cursor: pointer;
       transition: box-shadow 0.18s ease-out, border-color 0.18s ease-out, transform 0.18s ease-out;
+      position: relative;
     }
     .bench-card.selected {
       border-color: #22c55e;
@@ -328,6 +329,7 @@
       align-items: center;
       gap: 8px;
       flex: 1;
+      min-width: 0;
     }
     .bench-number {
       width: 26px;
@@ -339,16 +341,27 @@
       justify-content: center;
       font-size: 12px;
       color: #e5e7eb;
+      flex-shrink: 0;
     }
     .bench-labels {
       font-size: 12px;
       flex: 1;
+      min-width: 0;
     }
     .bench-mins {
       font-size: 11px;
       color: #9ca3af;
       font-variant-numeric: tabular-nums;
     }
+
+    /* NEW: time since last sub (bench only) */
+    .bench-sat {
+      font-size: 10px;
+      color: #6b7280;
+      font-variant-numeric: tabular-nums;
+      margin-top: 1px;
+    }
+
     .bench-controls {
       display: flex;
       flex-direction: column;
@@ -367,6 +380,29 @@
     .bench-arrow:active {
       transform: translateY(1px);
     }
+
+    /* NEW: Next Up nudge */
+    .nextup-pill {
+      position: absolute;
+      right: 44px;
+      top: 6px;
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(56, 189, 248, 0.75);
+      background: radial-gradient(circle at 20% 0, rgba(56, 189, 248, 0.30), rgba(2, 6, 23, 0.75) 70%);
+      color: #bae6fd;
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.15);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .bench-card.nextup {
+      border-color: rgba(56, 189, 248, 0.75);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.25), 0 10px 22px rgba(8, 47, 73, 0.55);
+    }
+
     .bench-tip {
       font-size: 10px;
       color: #6b7280;
@@ -436,6 +472,7 @@
       padding: 4px 2px;
       border-radius: 10px;
       transition: background 0.15s ease-out, transform 0.15s ease-out;
+      position: relative;
     }
     .minutes-row + .minutes-row {
       border-top: 1px dashed rgba(55, 65, 81, 0.9);
@@ -443,6 +480,21 @@
     .minutes-row.on {
       background: radial-gradient(circle at left, rgba(34, 197, 94, 0.14), transparent 70%);
     }
+
+    /* NEW: subtle Next Up badge in minutes list too */
+    .minutes-nextup {
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(56, 189, 248, 0.75);
+      background: radial-gradient(circle at 20% 0, rgba(56, 189, 248, 0.28), rgba(2, 6, 23, 0.75) 70%);
+      color: #bae6fd;
+      margin-left: 6px;
+      flex-shrink: 0;
+    }
+
     .minutes-info {
       display: flex;
       align-items: center;
@@ -484,6 +536,14 @@
     .minutes-status.bench {
       color: #9ca3af;
     }
+
+    /* NEW: sat time in minutes list (bench only) */
+    .minutes-sat {
+      font-size: 10px;
+      color: #6b7280;
+      font-variant-numeric: tabular-nums;
+    }
+
     .minutes-time {
       font-size: 12px;
       font-variant-numeric: tabular-nums;
@@ -879,7 +939,10 @@
       subMode: false,
       selectedOn: [],
       selectedBench: [],
-      segments: []
+      segments: [],
+
+      // NEW: track when each player was subbed to the bench (elapsed game seconds)
+      lastWentBenchAt: {}
     };
 
     // suggested sub DOM refs
@@ -913,7 +976,17 @@
         state.fouls[p.id] = false;
       });
     }
+
+    // NEW: initialise bench timers (bench players show sat time from game start, starters are null)
+    function initBenchTimers() {
+      const elapsed = getElapsedGameSeconds(); // should be 0 at load/reset
+      state.lastWentBenchAt = {};
+      allPlayers().forEach(p => state.lastWentBenchAt[p.id] = null);
+      state.bench.forEach(id => state.lastWentBenchAt[id] = elapsed);
+    }
+
     initPlayerStats();
+    initBenchTimers();
 
     function fatigueBarHTML(id) {
       const sec = state.minutes[id] || 0;
@@ -938,6 +1011,28 @@
       if (!el) return;
       el.classList.add(cls);
       setTimeout(() => el.classList.remove(cls), duration);
+    }
+
+    // NEW: compute “sat since” string for bench players
+    function satSinceText(id) {
+      if (state.onCourt.includes(id)) return '';
+      const t0 = state.lastWentBenchAt?.[id];
+      if (t0 == null) return '';
+      const elapsed = getElapsedGameSeconds();
+      const satSecs = Math.max(0, elapsed - t0);
+      return `Sat: ${formatTime(satSecs)}`;
+    }
+
+    // NEW: pick a single “Next Up” bench player (uses your existing suggested sub logic)
+    function getNextUpId() {
+      // Don’t nag during Sub Mode
+      if (state.subMode) return null;
+      // Only show once some game time has elapsed
+      const elapsed = getElapsedGameSeconds();
+      if (elapsed < 60) return null;
+      const suggestion = computeSuggestedSubPairs();
+      if (!suggestion || !suggestion.pairs?.length) return null;
+      return suggestion.pairs[0].onId; // most under-played bench player
     }
 
     function renderTeamSelect() {
@@ -1064,14 +1159,27 @@
     function renderBench() {
       const grid = document.getElementById('benchGrid');
       grid.innerHTML = '';
+
+      const nextUpId = getNextUpId();
+
       state.bench.forEach(id => {
         const p = findPlayer(id);
         if (!p) return;
         const card = document.createElement('div');
         card.className = 'bench-card';
         card.dataset.id = String(id);
+
         if (state.subMode && state.selectedBench.includes(id)) {
           card.classList.add('selected');
+        }
+
+        // NEW: Next Up nudge
+        if (nextUpId != null && id === nextUpId) {
+          card.classList.add('nextup');
+          const pill = document.createElement('div');
+          pill.className = 'nextup-pill';
+          pill.textContent = 'NEXT UP';
+          card.appendChild(pill);
         }
 
         const main = document.createElement('div');
@@ -1083,9 +1191,11 @@
 
         const labels = document.createElement('div');
         labels.className = 'bench-labels';
+        const satText = satSinceText(id);
         labels.innerHTML = `
-          <div>${p.name}</div>
+          <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name}</div>
           <div class="bench-mins">${formatTime(state.minutes[id])}</div>
+          ${satText ? `<div class="bench-sat">${satText}</div>` : ``}
           ${fatigueBarHTML(id)}
         `;
         main.appendChild(labels);
@@ -1121,10 +1231,14 @@
     function renderMinutes() {
       const list = document.getElementById('minutesList');
       list.innerHTML = '';
+
+      const nextUpId = getNextUpId();
       const allIds = state.onCourt.concat(state.bench);
+
       allIds.forEach(id => {
         const p = findPlayer(id);
         if (!p) return;
+
         const row = document.createElement('div');
         row.className = 'minutes-row';
         if (state.onCourt.includes(id)) row.classList.add('on');
@@ -1139,12 +1253,19 @@
 
         const nb = document.createElement('div');
         nb.className = 'minutes-name-block';
+
+        const satText = satSinceText(id);
+
         nb.innerHTML = `
-          <div>${p.name}</div>
+          <div style="display:flex; align-items:center; gap:6px; min-width:0;">
+            <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name}</div>
+            ${(!state.onCourt.includes(id) && nextUpId != null && id === nextUpId) ? `<div class="minutes-nextup">NEXT UP</div>` : ``}
+          </div>
           <div class="minutes-role">${p.long}</div>
           <div class="minutes-status ${state.onCourt.includes(id) ? '' : 'bench'}">
             ${state.onCourt.includes(id) ? 'On Court' : 'Bench'}
           </div>
+          ${(!state.onCourt.includes(id) && satText) ? `<div class="minutes-sat">${satText}</div>` : ``}
           ${fatigueBarHTML(id)}
         `;
         info.appendChild(nb);
@@ -1264,6 +1385,7 @@
         if (state.minutes[id] == null) state.minutes[id] = 0;
         state.minutes[id] += 1;
       });
+
       renderClock();
       renderCourt();
       renderBench();
@@ -1278,6 +1400,10 @@
       const cfg = MODES[newMode];
       state.currentSegment = cfg.segmentLabels[0];
       state.clockSeconds = cfg.segmentLength;
+
+      // NEW: reset bench timers for new mode
+      initBenchTimers();
+
       renderModeToggle();
       renderSegmentControls();
       renderClock();
@@ -1297,6 +1423,10 @@
       state.selectedBench = [];
       state.segments = [];
       initPlayerStats();
+
+      // NEW: reset bench timers for new team
+      initBenchTimers();
+
       renderAll();
     }
 
@@ -1307,6 +1437,7 @@
       renderSubMode();
       renderCourt();
       renderBench();
+      renderMinutes();
     }
 
     function toggleFoul(id) {
@@ -1352,15 +1483,26 @@
         alert('Select the same number of players to sub off and on.');
         return;
       }
+
+      const elapsed = getElapsedGameSeconds();
+
       for (let i = 0; i < state.selectedOn.length; i++) {
         const offId = state.selectedOn[i];
         const onId = state.selectedBench[i];
         const offIdx = state.onCourt.indexOf(offId);
         const benchIdx = state.bench.indexOf(onId);
         if (offIdx === -1 || benchIdx === -1) continue;
+
+        // NEW: record "went to bench" time for the player subbed OFF
+        state.lastWentBenchAt[offId] = elapsed;
+
+        // NEW: clear bench time for the player coming ON (they're no longer sitting)
+        state.lastWentBenchAt[onId] = null;
+
         state.onCourt[offIdx] = onId;
         state.bench[benchIdx] = offId;
       }
+
       state.selectedOn = [];
       state.selectedBench = [];
       renderCourt();
@@ -1375,6 +1517,7 @@
       state.selectedBench = [];
       renderCourt();
       renderBench();
+      renderMinutes();
     }
 
     function resetGame() {
@@ -1390,6 +1533,10 @@
       state.selectedBench = [];
       state.segments = [];
       initPlayerStats();
+
+      // NEW: reset bench timers
+      initBenchTimers();
+
       renderAll();
       document.getElementById('startBtn').textContent = 'Start';
     }
@@ -1527,6 +1674,8 @@
       flashElement(startBtn, 'btn-haptic', 150);
       renderClock();
       renderCourt();
+      renderBench();
+      renderMinutes();
     });
 
     document.getElementById('resetBtn').addEventListener('click', resetGame);
@@ -1590,8 +1739,13 @@
       if (!btn) return;
       state.currentSegment = btn.dataset.seg;
       state.clockSeconds = MODES[state.mode].segmentLength;
+
+      // Note: bench sat time is based on elapsed game time across segments, so no reset needed here.
+
       renderSegmentControls();
       renderClock();
+      renderBench();
+      renderMinutes();
     });
 
     document.getElementById('saveSegmentBtn').addEventListener('click', saveSegmentSnapshot);
