@@ -871,21 +871,25 @@
         initialBench: [44, 51, 89, 0, 12]
       },
       domestic_u14: {
-        name: 'Domestic U14',
-        players: [
-          { id: 16, number: 16, name: 'Archer Kenny',      short: 'G', long: 'Guard' },
-          { id: 20, number: 20, name: 'Bill Pham',         short: 'G', long: 'Guard' },
-          { id: 22, number: 22, name: "Thomas O'Sullivan", short: 'G', long: 'Guard' },
-          { id: 36, number: 36, name: 'Jacob Nguyen',      short: 'G', long: 'Guard' },
-          { id: 72, number: 72, name: 'Tate Power',        short: 'G', long: 'Guard' },
-          { id: 90, number: 90, name: 'Ethan Poon',        short: 'G', long: 'Guard' },
-          { id: 93, number: 93, name: 'Lior Rizvash',      short: 'G', long: 'Guard' },
-          { id: 94, number: 94, name: 'Rodion Prystupa',   short: 'G', long: 'Guard' }
-        ],
-        initialOn: [16, 20, 22, 36, 72],
-        initialBench: [90, 93, 94]
-      }
-    };
+  name: 'Domestic U14',
+  players: [
+    { id: 22, number: 22, name: "Thomas O'Sullivan", short: 'PG', long: 'Guard' },
+    { id: 72, number: 72, name: 'Tate Power',        short: 'SG', long: 'Guard' },
+    { id: 16, number: 16, name: 'Archer Kenny',      short: 'SF', long: 'Wing'  },
+    { id: 20, number: 20, name: 'Bill Pham',         short: 'SF', long: 'Wing'  },
+    { id: 36, number: 36, name: 'Jacob Nguyen',      short: 'C',  long: 'Big'   },
+    { id: 90, number: 90, name: 'Ethan Poon',        short: 'SF', long: 'Wing'  },
+    { id: 94, number: 94, name: 'Rodion Prystupa',   short: 'PF', long: 'Forward' },
+    { id: 101, number: 10, name: 'Max Payne',       short: 'SG', long: 'Guard' },
+    { id: 102, number: 102, name: 'Alvin Chen',      short: 'PF', long: 'Forward' }
+  ],
+
+  // Starting 5 (balanced lineup)
+  initialOn: [22, 72, 16, 94, 36],
+
+  // Bench rotation
+  initialBench: [20, 90, 101, 102]
+}
 
     const MODES = {
       rep: {
