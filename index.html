@@ -1,1194 +1,267 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rotation Tracker</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-    body {
-      margin: 0;
-      padding: 16px;
-      background: radial-gradient(circle at top, #1d2a3f 0, #020617 60%, #000 100%);
-      color: #f9fafb;
-      display: flex;
-      justify-content: center;
-    }
-    .app-shell {
-      width: 100%;
-      max-width: 980px;
-      background: #020617;
-      border-radius: 28px;
-      padding: 18px 18px 22px;
-      box-shadow: 0 26px 70px rgba(0, 0, 0, 0.85);
-      border: 1px solid rgba(148, 163, 184, 0.35);
-    }
-    .top-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .title-block {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .app-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      background: radial-gradient(circle at 30% 20%, #f97316, #ea580c 55%, #9a3412 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 12px 24px rgba(249, 115, 22, 0.5);
-      font-size: 20px;
-    }
-    .title-text h1 {
-      margin: 0;
-      font-size: 20px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-    }
-    .title-text span {
-      font-size: 12px;
-      color: #9ca3af;
-    }
-    .team-select-wrap {
-      margin-left: 8px;
-    }
-    .team-select-label {
-      font-size: 10px;
-      color: #9ca3af;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      margin-bottom: 3px;
-    }
-    .team-select {
-      font-size: 12px;
-      border-radius: 999px;
-      padding: 4px 10px;
-      border: 1px solid rgba(148, 163, 184, 0.7);
-      background: #020617;
-      color: #e5e7eb;
-    }
-    .clock-block {
-      text-align: right;
-      min-width: 240px;
-    }
-    .clock-label {
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: #9ca3af;
-      margin-bottom: 4px;
-    }
-    .clock-display {
-      font-size: 26px;
-      font-weight: 600;
-      font-variant-numeric: tabular-nums;
-      margin-bottom: 6px;
-    }
-    .btn {
-      border-radius: 999px;
-      padding: 6px 14px;
-      border: 1px solid rgba(148, 163, 184, 0.6);
-      background: #020617;
-      color: #e5e7eb;
-      font-size: 12px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
-    }
-    .btn.primary {
-      background: radial-gradient(circle at 15% 0, #2563eb, #1d4ed8 55%, #1e40af 100%);
-      border-color: transparent;
-      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.6);
-    }
-    .btn.small {
-      padding: 4px 10px;
-      font-size: 11px;
-    }
-    .btn:active {
-      transform: translateY(1px);
-    }
-    .mode-toggle {
-      margin-top: 6px;
-      display: flex;
-      justify-content: flex-end;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-    .mode-pill {
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.7);
-      background: transparent;
-      color: #e5e7eb;
-      font-size: 11px;
-      padding: 3px 10px;
-      cursor: pointer;
-      transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, background 0.15s ease-out;
-    }
-    .mode-pill.active {
-      background: radial-gradient(circle at 15% 0, #1d4ed8, #1e40af 70%);
-      border-color: transparent;
-    }
-    .layout-grid {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: 16px;
-    }
-    @media (max-width: 800px) {
-      .layout-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-    .panel {
-      background: radial-gradient(circle at top, #020617 0, #020617 55%, #000 100%);
-      border-radius: 22px;
-      padding: 14px;
-      border: 1px solid rgba(55, 65, 81, 0.9);
-      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.7);
-      position: relative;
-      overflow: hidden;
-    }
-    .panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-    .panel-title {
-      font-size: 11px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: #9ca3af;
-    }
-    .panel-sub {
-      font-size: 11px;
-      color: #6b7280;
-    }
-    .sub-mode-btn {
-      font-size: 11px;
-      border-radius: 999px;
-      padding: 4px 12px;
-      border: 1px solid rgba(148, 163, 184, 0.7);
-      background: transparent;
-      color: #e5e7eb;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, background 0.15s ease-out;
-    }
-    .sub-mode-btn.on {
-      border-color: rgba(34, 197, 94, 0.9);
-      background: radial-gradient(circle at 20% 0, #16a34a, #14532d 70%);
-      color: #ecfdf5;
-      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.8);
-    }
-    .court-wrapper {
-      border-radius: 20px;
-      padding: 16px 12px 12px;
-      background: radial-gradient(circle at top, #020617 0, #020617 50%, #020617 100%);
-      border: 1px solid rgba(75, 85, 99, 0.9);
-      margin-bottom: 10px;
-    }
-    .court-label {
-      text-align: center;
-      font-size: 10px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: #4b5563;
-      margin-bottom: 6px;
-    }
-    .court-rows {
-      display: grid;
-      row-gap: 10px;
-    }
-    .court-row {
-      display: flex;
-      justify-content: space-around;
-      gap: 10px;
-    }
-    .player-chip {
-      min-width: 130px;
-      max-width: 190px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      background: radial-gradient(circle at 15% 0, #020617, #020617 70%, #020617 100%);
-      border: 1px solid rgba(55, 65, 81, 0.9);
-      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.9);
-      cursor: pointer;
-      position: relative;
-      transition: box-shadow 0.18s ease-out, border-color 0.18s ease-out, transform 0.18s ease-out;
-    }
-    .player-chip.selected {
-      border-color: #22c55e;
-      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.9), 0 14px 28px rgba(34, 197, 94, 0.45);
-      transform: translateY(-1px) scale(1.01);
-    }
-    .number-pill {
-      width: 28px;
-      height: 28px;
-      border-radius: 999px;
-      background: radial-gradient(circle at 30% 20%, #f97316, #ea580c 60%, #c2410c 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: 600;
-      color: #fefce8;
-      flex-shrink: 0;
-    }
-    .player-meta {
-      flex: 1;
-    }
-    .player-name {
-      font-size: 13px;
-      font-weight: 600;
-    }
-    .player-role {
-      font-size: 11px;
-      color: #9ca3af;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-    }
-    .player-mins {
-      font-size: 11px;
-      color: #cbd5f5;
-      font-variant-numeric: tabular-nums;
-    }
-    .foul-btn {
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.7);
-      background: transparent;
-      color: #e5e7eb;
-      font-size: 10px;
-      padding: 2px 6px;
-      cursor: pointer;
-      transition: background 0.12s ease-out, transform 0.12s ease-out;
-    }
-    .foul-btn.on {
-      background: radial-gradient(circle at 15% 0, #f97316, #c2410c 70%);
-      border-color: transparent;
-      color: #fefce8;
-    }
-    .bench-wrapper {
-      margin-top: 8px;
-      position: relative;
-    }
-    .bench-header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-    }
-    .bench-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-    }
-    @media (max-width: 640px) {
-      .bench-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-    .bench-card {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 6px;
-      padding: 6px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(55, 65, 81, 0.9);
-      background: radial-gradient(circle at 10% 0, #020617, #020617 70%, #020617 100%);
-      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.85);
-      cursor: pointer;
-      transition: box-shadow 0.18s ease-out, border-color 0.18s ease-out, transform 0.18s ease-out;
-      position: relative;
-    }
-    .bench-card.selected {
-      border-color: #22c55e;
-      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.9), 0 12px 24px rgba(34, 197, 94, 0.45);
-      transform: translateY(-1px) scale(1.01);
-    }
-    .bench-main {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex: 1;
-      min-width: 0;
-    }
-    .bench-number {
-      width: 26px;
-      height: 26px;
-      border-radius: 999px;
-      background: radial-gradient(circle at 30% 20%, #111827, #020617 70%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      color: #e5e7eb;
-      flex-shrink: 0;
-    }
-    .bench-labels {
-      font-size: 12px;
-      flex: 1;
-      min-width: 0;
-    }
-    .bench-mins {
-      font-size: 11px;
-      color: #9ca3af;
-      font-variant-numeric: tabular-nums;
-    }
-
-    /* NEW: time since last sub (bench only) */
-    .bench-sat {
-      font-size: 10px;
-      color: #6b7280;
-      font-variant-numeric: tabular-nums;
-      margin-top: 1px;
-    }
-
-    .bench-controls {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    .bench-arrow {
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.8);
-      background: transparent;
-      color: #e5e7eb;
-      font-size: 10px;
-      padding: 2px 6px;
-      cursor: pointer;
-      transition: background 0.12s ease-out, transform 0.12s ease-out;
-    }
-    .bench-arrow:active {
-      transform: translateY(1px);
-    }
-
-    /* NEW: Next Up nudge */
-    .nextup-pill {
-      position: absolute;
-      right: 44px;
-      top: 6px;
-      font-size: 9px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      padding: 2px 6px;
-      border-radius: 999px;
-      border: 1px solid rgba(56, 189, 248, 0.75);
-      background: radial-gradient(circle at 20% 0, rgba(56, 189, 248, 0.30), rgba(2, 6, 23, 0.75) 70%);
-      color: #bae6fd;
-      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.15);
-      pointer-events: none;
-      white-space: nowrap;
-    }
-    .bench-card.nextup {
-      border-color: rgba(56, 189, 248, 0.75);
-      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.25), 0 10px 22px rgba(8, 47, 73, 0.55);
-    }
-
-    .bench-tip {
-      font-size: 10px;
-      color: #6b7280;
-      margin-top: 4px;
-    }
-    .sub-actions {
-      margin-top: 8px;
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-    }
-    .minutes-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 6px;
-    }
-    .minutes-sub {
-      font-size: 11px;
-      color: #9ca3af;
-    }
-    .segment-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 6px;
-      flex-wrap: wrap;
-    }
-    .segment-label {
-      font-size: 11px;
-      color: #9ca3af;
-    }
-    .segment-buttons {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-    .segment-btn {
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.7);
-      background: transparent;
-      color: #e5e7eb;
-      font-size: 11px;
-      padding: 3px 9px;
-      cursor: pointer;
-      transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, background 0.15s ease-out;
-    }
-    .segment-btn.active {
-      background: radial-gradient(circle at 15% 0, #1d4ed8, #1e40af 70%);
-      border-color: transparent;
-      animation: segmentPulse 2.4s ease-in-out infinite;
-    }
-    .minutes-list {
-      max-height: none;
-      overflow-y: visible;
-      margin-top: 6px;
-      border-radius: 16px;
-      border: 1px solid rgba(55, 65, 81, 0.9);
-      padding: 6px 8px;
-      background: radial-gradient(circle at top, #020617 0, #020617 60%, #020617 100%);
-    }
-    .minutes-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 4px 2px;
-      border-radius: 10px;
-      transition: background 0.15s ease-out, transform 0.15s ease-out;
-      position: relative;
-    }
-    .minutes-row + .minutes-row {
-      border-top: 1px dashed rgba(55, 65, 81, 0.9);
-    }
-    .minutes-row.on {
-      background: radial-gradient(circle at left, rgba(34, 197, 94, 0.14), transparent 70%);
-    }
-
-    /* NEW: subtle Next Up badge in minutes list too */
-    .minutes-nextup {
-      font-size: 9px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      padding: 2px 6px;
-      border-radius: 999px;
-      border: 1px solid rgba(56, 189, 248, 0.75);
-      background: radial-gradient(circle at 20% 0, rgba(56, 189, 248, 0.28), rgba(2, 6, 23, 0.75) 70%);
-      color: #bae6fd;
-      margin-left: 6px;
-      flex-shrink: 0;
-    }
-
-    .minutes-info {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex: 1;
-      min-width: 0;
-    }
-    .minutes-number {
-      width: 22px;
-      height: 22px;
-      border-radius: 999px;
-      background: radial-gradient(circle at 30% 20%, #0f172a, #020617 70%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      color: #e5e7eb;
-      flex-shrink: 0;
-    }
-    .minutes-name-block {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      flex: 1;
-      min-width: 0;
-    }
-    .minutes-role {
-      font-size: 10px;
-      color: #6b7280;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-    }
-    .minutes-status {
-      font-size: 10px;
-      color: #22c55e;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-    }
-    .minutes-status.bench {
-      color: #9ca3af;
-    }
-
-    /* NEW: sat time in minutes list (bench only) */
-    .minutes-sat {
-      font-size: 10px;
-      color: #6b7280;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .minutes-time {
-      font-size: 12px;
-      font-variant-numeric: tabular-nums;
-      color: #e5e7eb;
-      margin-left: 8px;
-      flex-shrink: 0;
-    }
-    .minutes-foul-pill {
-      font-size: 10px;
-      border-radius: 999px;
-      padding: 2px 6px;
-      background: radial-gradient(circle at 10% 0, #f97316, #b45309 80%);
-      color: #fefce8;
-    }
-    .alerts {
-      margin-top: 8px;
-      font-size: 11px;
-    }
-    .alert-line {
-      padding: 5px 6px;
-      border-radius: 10px;
-      margin-bottom: 4px;
-      border: 1px solid rgba(59, 130, 246, 0.6);
-      background: radial-gradient(circle at left, rgba(59, 130, 246, 0.14), transparent 70%);
-    }
-    .alert-line.warn {
-      border-color: rgba(234, 179, 8, 0.8);
-      background: radial-gradient(circle at left, rgba(234, 179, 8, 0.18), transparent 70%);
-    }
-
-    /* Suggested sub card */
-    .suggestion-card {
-      margin-top: 6px;
-      font-size: 11px;
-      border-radius: 14px;
-      padding: 7px 8px 8px;
-      border: 1px solid rgba(56, 189, 248, 0.7);
-      background: radial-gradient(circle at top left, rgba(8, 47, 73, 0.9), #020617 70%);
-      box-shadow: 0 14px 30px rgba(8, 47, 73, 0.8);
-    }
-    .suggestion-title {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-      color: #7dd3fc;
-      margin-bottom: 3px;
-    }
-    .suggestion-pair {
-      margin-bottom: 3px;
-      padding: 3px 4px;
-      border-radius: 10px;
-      background: radial-gradient(circle at left, rgba(15, 23, 42, 0.8), transparent 70%);
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-    }
-    .suggestion-pair-main {
-      display: flex;
-      justify-content: space-between;
-      gap: 4px;
-    }
-    .suggestion-off,
-    .suggestion-on {
-      font-size: 11px;
-      display: flex;
-      flex-direction: column;
-    }
-    .suggestion-label {
-      font-size: 9px;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: #9ca3af;
-    }
-    .suggestion-player {
-      color: #e5e7eb;
-      font-weight: 500;
-    }
-    .suggestion-gap {
-      font-size: 9px;
-      color: #a5b4fc;
-      margin-top: 1px;
-    }
-    .suggestion-tag {
-      margin-top: 4px;
-      color: #bae6fd;
-      font-size: 10px;
-    }
-    .hidden {
-      display: none;
-    }
-
-    .segments {
-      margin-top: 8px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 8px;
-    }
-    .segment-card {
-      border-radius: 14px;
-      border: 1px solid rgba(55, 65, 81, 0.9);
-      padding: 6px 8px;
-      font-size: 11px;
-      background: radial-gradient(circle at top left, #020617 0, #000 80%);
-      transition: box-shadow 0.2s ease-out, transform 0.2s ease-out, border-color 0.2s ease-out;
-    }
-    .segment-card-title {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: #9ca3af;
-      margin-bottom: 3px;
-    }
-    .footnote {
-      font-size: 10px;
-      color: #6b7280;
-      margin-top: 6px;
-    }
-
-    /* Fatigue bar */
-    .fatigue-wrap {
-      margin-top: 2px;
-    }
-    .fatigue-bar-bg {
-      width: 100%;
-      height: 4px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.9);
-      overflow: hidden;
-    }
-    .fatigue-bar-inner {
-      height: 100%;
-      border-radius: 999px;
-      transition: width 0.25s ease-out;
-    }
-    .fatigue-low {
-      background: linear-gradient(to right, #22c55e, #15803d);
-    }
-    .fatigue-med {
-      background: linear-gradient(to right, #eab308, #ca8a04);
-    }
-    .fatigue-high {
-      background: linear-gradient(to right, #f97316, #b91c1c);
-    }
-
-    /* Micro animations */
-    .on-court-active {
-      animation: glowPulse 2.2s ease-in-out infinite;
-    }
-    @keyframes glowPulse {
-      0% {
-        box-shadow: 0 10px 22px rgba(34, 197, 94, 0.10);
-        border-color: rgba(55, 65, 81, 0.9);
-      }
-      50% {
-        box-shadow: 0 14px 30px rgba(34, 197, 94, 0.35);
-        border-color: rgba(34, 197, 94, 0.75);
-      }
-      100% {
-        box-shadow: 0 10px 22px rgba(34, 197, 94, 0.10);
-        border-color: rgba(55, 65, 81, 0.9);
-      }
-    }
-    @keyframes segmentPulse {
-      0% {
-        transform: translateY(0);
-        box-shadow: 0 0 0 rgba(37, 99, 235, 0);
-      }
-      50% {
-        transform: translateY(-1px);
-        box-shadow: 0 0 8px rgba(37, 99, 235, 0.45);
-      }
-      100% {
-        transform: translateY(0);
-        box-shadow: 0 0 0 rgba(37, 99, 235, 0);
-      }
-    }
-    .btn-haptic {
-      animation: hapticTap 0.12s ease-out;
-    }
-    @keyframes hapticTap {
-      0% { transform: scale(1); }
-      50% { transform: scale(0.96); }
-      100% { transform: scale(1); }
-    }
-    .panel-flash {
-      animation: panelFlash 0.35s ease-out;
-    }
-    .segment-flash {
-      animation: panelFlash 0.45s ease-out;
-    }
-    @keyframes panelFlash {
-      0% {
-        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.0);
-        border-color: rgba(55, 65, 81, 0.9);
-      }
-      40% {
-        box-shadow: 0 0 18px 0 rgba(59, 130, 246, 0.55);
-        border-color: rgba(59, 130, 246, 0.85);
-      }
-      100% {
-        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.0);
-        border-color: rgba(55, 65, 81, 0.9);
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="app-shell">
-    <div class="top-row">
-      <div style="display:flex; align-items:flex-start;">
-        <div class="title-block">
-          <div class="app-icon">⏱</div>
-          <div class="title-text">
-            <h1>ROTATION TRACKER</h1>
-            <span>Live minutes & substitutions for rep hoops</span>
-          </div>
-        </div>
-        <div class="team-select-wrap">
-          <div class="team-select-label">Team</div>
-          <select id="teamSelect" class="team-select"></select>
-        </div>
-      </div>
-      <div class="clock-block">
-        <div class="clock-label">Game Clock</div>
-        <div class="clock-display" id="clockDisplay">10:00</div>
-        <div>
-          <button class="btn primary" id="startBtn">Start</button>
-          <button class="btn" id="resetBtn">Reset</button>
-        </div>
-        <div class="mode-toggle" id="modeToggle">
-          <button class="mode-pill active" data-mode="rep">Rep · 4×10</button>
-          <button class="mode-pill" data-mode="domestic">Domestic · 2×18</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="layout-grid">
-      <div class="panel" id="leftPanel">
-        <div class="panel-header">
-          <div>
-            <div class="panel-title">On Court</div>
-            <div class="panel-sub">Use ▲ / ▼ to arrange spots · Sub Mode to mark on/off</div>
-          </div>
-          <button class="sub-mode-btn" id="subModeBtn">🧩 Sub Mode</button>
-        </div>
-
-        <<!DOCTYPE html>
-<html lang="en">
-<head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Professional Basketball Half Court UI</title>
+<title>Rotation Tracker</title>
+
 <style>
-  :root{
-    --bg:#020617;
-    --panel:#06102a;
-    --panel2:rgba(7,16,42,0.78);
-    --line:rgba(255,255,255,0.14);
-    --line-soft:rgba(255,255,255,0.08);
-    --text:#f8fafc;
-    --muted:rgba(226,232,240,0.72);
-    --accent:#f97316;
-    --border:rgba(255,255,255,0.10);
-    --glow:0 0 0 1px rgba(255,255,255,0.04), 0 24px 60px rgba(0,0,0,0.48);
+
+/* ================= BASE ================= */
+* {
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 16px;
+  background: radial-gradient(circle at top, #1d2a3f 0, #020617 60%, #000 100%);
+  color: #f9fafb;
+  display: flex;
+  justify-content: center;
+}
+
+/* ================= LAYOUT ================= */
+.app-shell {
+  width: 100%;
+  max-width: 980px;
+}
+
+.layout-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 800px) {
+  .layout-grid {
+    grid-template-columns: 1fr;
   }
+}
 
-  *{box-sizing:border-box}
-  body{
-    margin:0;
-    background:
-      radial-gradient(circle at top, rgba(37,99,235,0.18), transparent 28%),
-      radial-gradient(circle at bottom, rgba(15,23,42,0.65), transparent 35%),
-      #020617;
-    color:var(--text);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    padding:24px;
-  }
+/* ================= PANEL ================= */
+.panel {
+  background: #020617;
+  border-radius: 24px;
+  padding: 16px;
+  border: 1px solid rgba(148,163,184,.25);
+}
 
-  .app-shell{
-    max-width:760px;
-    margin:0 auto;
-    background:linear-gradient(180deg, rgba(2,6,23,0.94), rgba(2,6,23,0.88));
-    border:1px solid rgba(255,255,255,0.08);
-    border-radius:28px;
-    padding:18px;
-    box-shadow:0 30px 80px rgba(0,0,0,0.5);
-  }
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
 
-  .section-card{
-    border:1px solid var(--border);
-    border-radius:26px;
-    padding:18px;
-    background:linear-gradient(180deg, rgba(2,6,23,0.55), rgba(2,6,23,0.82));
-    box-shadow:var(--glow);
-  }
+.panel-title {
+  font-size: 11px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: #9ca3af;
+}
 
-  .section-top{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:12px;
-    margin-bottom:14px;
-  }
+.panel-sub {
+  font-size: 11px;
+  color: #6b7280;
+}
 
-  .eyebrow{
-    font-size:12px;
-    letter-spacing:0.26em;
-    text-transform:uppercase;
-    color:rgba(255,255,255,0.62);
-    margin-bottom:4px;
-  }
+.sub-mode-btn {
+  border-radius: 999px;
+  padding: 6px 14px;
+  border: 1px solid rgba(148,163,184,.6);
+  background: transparent;
+  color: #fff;
+}
 
-  .help-text{
-    font-size:13px;
-    line-height:1.35;
-    color:rgba(255,255,255,0.46);
-    max-width:340px;
-  }
+/* ================= COURT ================= */
 
-  .sub-btn{
-    border:1px solid rgba(255,255,255,0.22);
-    color:var(--text);
-    background:rgba(255,255,255,0.03);
-    border-radius:999px;
-    padding:12px 18px;
-    font-size:14px;
-    line-height:1.1;
-    min-width:118px;
-    text-align:center;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,0.08);
-  }
+.court-wrapper {
+  border-radius: 20px;
+  padding: 16px;
+  border: 1px solid rgba(255,255,255,.08);
+}
 
-  .court-wrap{
-    border:1px solid rgba(255,255,255,0.14);
-    border-radius:24px;
-    padding:18px;
-    background:
-      linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01)),
-      linear-gradient(180deg, rgba(2,6,23,0.18), rgba(2,6,23,0.30));
-    position:relative;
-    overflow:hidden;
-  }
+.court-label {
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: .2em;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
 
-  .court-label{
-    text-align:center;
-    font-size:11px;
-    letter-spacing:0.32em;
-    text-transform:uppercase;
-    color:rgba(255,255,255,0.34);
-    margin-bottom:14px;
-  }
+.court {
+  position: relative;
+  height: 520px;
+  border-radius: 18px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg,
+      rgba(89,48,20,.25),
+      rgba(120,66,30,.35),
+      rgba(32,23,18,.55)
+    ),
+    linear-gradient(180deg, #071126, #06102a);
+}
 
-  .court{
-    position:relative;
-    min-height:560px;
-    border-radius:20px;
-    overflow:hidden;
-    border:1px solid rgba(255,255,255,0.08);
-    background:
-      linear-gradient(90deg,
-        rgba(255,255,255,0.02) 0%,
-        rgba(255,255,255,0.00) 8%,
-        rgba(255,255,255,0.00) 92%,
-        rgba(255,255,255,0.02) 100%
-      ),
-      repeating-linear-gradient(
-        90deg,
-        rgba(255,255,255,0.028) 0px,
-        rgba(255,255,255,0.028) 2px,
-        rgba(0,0,0,0.00) 2px,
-        rgba(0,0,0,0.00) 46px
-      ),
-      linear-gradient(180deg,
-        rgba(89,48,20,0.30) 0%,
-        rgba(120,66,30,0.38) 24%,
-        rgba(131,76,39,0.42) 48%,
-        rgba(96,54,29,0.36) 72%,
-        rgba(32,23,18,0.55) 100%
-      ),
-      linear-gradient(180deg, #071126 0%, #06102a 100%);
-    box-shadow:
-      inset 0 0 0 1px rgba(255,255,255,0.03),
-      inset 0 80px 160px rgba(2,6,23,0.34),
-      inset 0 -120px 160px rgba(2,6,23,0.46);
-  }
+/* COURT LINES */
+.court-lines { position:absolute; inset:0; pointer-events:none; }
 
-  /* subtle outer glow vignette */
-  .court::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-    background:
-      radial-gradient(circle at center, rgba(255,255,255,0.03), transparent 45%),
-      radial-gradient(circle at center, transparent 52%, rgba(2,6,23,0.62) 100%);
-  }
+.boundary {
+  position:absolute;
+  inset:18px;
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:18px;
+}
 
-  /* half-court lines */
-  .court-lines{
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-    opacity:0.9;
-  }
+.key {
+  position:absolute;
+  left:50%;
+  top:50px;
+  transform:translateX(-50%);
+  width:160px;
+  height:160px;
+  border:2px solid rgba(255,255,255,.15);
+  border-top:none;
+  border-radius:0 0 80px 80px;
+}
 
-  /* sidelines / baseline */
-  .court-lines .boundary{
-    position:absolute;
-    inset:18px;
-    border:1.5px solid var(--line);
-    border-radius:18px;
-  }
+.ft-circle {
+  position:absolute;
+  left:50%;
+  top:120px;
+  transform:translateX(-50%);
+  width:120px;
+  height:120px;
+  border:2px solid rgba(255,255,255,.1);
+  border-radius:50%;
+}
 
-  /* paint */
-  .court-lines .key{
-    position:absolute;
-    left:50%;
-    top:52px;
-    transform:translateX(-50%);
-    width:170px;
-    height:170px;
-    border:2px solid var(--line);
-    border-top:none;
-    border-radius:0 0 90px 90px;
-  }
+.rim {
+  position:absolute;
+  left:50%;
+  top:70px;
+  transform:translateX(-50%);
+  width:40px;
+  height:40px;
+  border:2px solid rgba(255,255,255,.2);
+  border-radius:50%;
+}
 
-  /* free throw circle */
-  .court-lines .ft-circle{
-    position:absolute;
-    left:50%;
-    top:128px;
-    transform:translateX(-50%);
-    width:128px;
-    height:128px;
-    border:2px solid var(--line-soft);
-    border-radius:50%;
-  }
+.backboard {
+  position:absolute;
+  left:50%;
+  top:50px;
+  transform:translateX(-50%);
+  width:80px;
+  border-top:2px solid rgba(255,255,255,.15);
+}
 
-  .court-lines .ft-circle::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    border-radius:50%;
-    border:2px dashed rgba(255,255,255,0.10);
-    clip-path:inset(50% 0 0 0);
-  }
+.arc {
+  position:absolute;
+  left:50%;
+  top:60px;
+  transform:translateX(-50%);
+  width:420px;
+  height:420px;
+  border:2px solid rgba(255,255,255,.1);
+  border-top:none;
+  border-radius:0 0 420px 420px;
+  clip-path: inset(0 0 45% 0);
+}
 
-  /* rim */
-  .court-lines .rim{
-    position:absolute;
-    left:50%;
-    top:68px;
-    transform:translateX(-50%);
-    width:52px;
-    height:52px;
-    border:2px solid rgba(255,255,255,0.18);
-    border-radius:50%;
-  }
+.corner-left, .corner-right {
+  position:absolute;
+  top:60px;
+  height:160px;
+  border-left:2px solid rgba(255,255,255,.1);
+}
+.corner-left { left:90px; }
+.corner-right { right:90px; }
 
-  /* backboard */
-  .court-lines .backboard{
-    position:absolute;
-    left:50%;
-    top:50px;
-    transform:translateX(-50%);
-    width:96px;
-    height:0;
-    border-top:2px solid rgba(255,255,255,0.14);
-  }
+/* PLAYER ROWS (CRITICAL FOR YOUR JS) */
+#courtTop, #courtMid, #courtBot {
+  position:absolute;
+  left:0;
+  right:0;
+  display:flex;
+  justify-content:space-around;
+}
 
-  /* restricted arc */
-  .court-lines .restricted{
-    position:absolute;
-    left:50%;
-    top:88px;
-    transform:translateX(-50%);
-    width:88px;
-    height:44px;
-    border:2px solid rgba(255,255,255,0.11);
-    border-bottom:none;
-    border-radius:88px 88px 0 0;
-  }
+#courtTop { top:60px; }
+#courtMid { top:220px; }
+#courtBot { bottom:40px; }
 
-  /* 3 point arc */
-  .court-lines .arc{
-    position:absolute;
-    left:50%;
-    top:68px;
-    transform:translateX(-50%);
-    width:480px;
-    height:480px;
-    border:2px solid rgba(255,255,255,0.11);
-    border-top:none;
-    border-radius:0 0 480px 480px;
-    clip-path:inset(0 0 45% 0);
-  }
+/* ================= PLAYERS ================= */
+.player-chip {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 14px;
+  border-radius:999px;
+  background:#020617;
+  border:1px solid rgba(255,255,255,.08);
+}
 
-  .court-lines .corner-left,
-  .court-lines .corner-right{
-    position:absolute;
-    top:68px;
-    width:0;
-    height:172px;
-    border-left:2px solid rgba(255,255,255,0.11);
-  }
+.number-pill {
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  background:#f97316;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+}
 
-  .court-lines .corner-left{ left:108px; }
-  .court-lines .corner-right{ right:108px; }
+.player-name { font-size:13px; font-weight:600; }
+.player-role { font-size:10px; color:#9ca3af; }
+.player-mins { font-size:11px; color:#cbd5f5; }
 
-  /* player cards */
-  .player{
-    position:absolute;
-    width:200px;
-    min-height:112px;
-    border-radius:999px;
-    background:
-      linear-gradient(180deg, rgba(4,13,36,0.96), rgba(2,8,24,0.96));
-    border:1px solid rgba(255,255,255,0.11);
-    box-shadow:
-      0 14px 28px rgba(0,0,0,0.34),
-      inset 0 1px 0 rgba(255,255,255,0.03);
-    display:flex;
-    align-items:center;
-    gap:14px;
-    padding:14px 16px;
-    z-index:3;
-  }
+/* ================= BENCH ================= */
+.bench-grid {
+  margin-top: 12px;
+}
 
-  .player.pg{ top:78px; left:26px; }
-  .player.sg{ top:78px; right:26px; }
-  .player.sf{ top:260px; left:26px; }
-  .player.pf{ top:260px; right:26px; }
-  .player.c{
-    left:50%;
-    bottom:36px;
-    transform:translateX(-50%);
-    width:220px;
-  }
+.bench-card {
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.1);
+  margin-bottom: 6px;
+}
 
-  .num{
-    width:52px;
-    height:52px;
-    min-width:52px;
-    border-radius:50%;
-    display:grid;
-    place-items:center;
-    background:var(--accent);
-    color:white;
-    font-weight:800;
-    font-size:18px;
-    box-shadow:0 10px 20px rgba(249,115,22,0.22);
-  }
+/* ================= MINUTES ================= */
+.minutes-list {
+  margin-top:10px;
+}
 
-  .meta{
-    min-width:0;
-    flex:1;
-  }
+.minutes-row {
+  display:flex;
+  justify-content:space-between;
+  padding:6px;
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
 
-  .name{
-    font-size:17px;
-    line-height:1.05;
-    font-weight:700;
-    letter-spacing:-0.02em;
-    margin-bottom:4px;
-  }
-
-  .pos{
-    font-size:14px;
-    color:rgba(255,255,255,0.62);
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    margin-bottom:4px;
-  }
-
-  .mins{
-    font-size:14px;
-    color:rgba(255,255,255,0.86);
-    margin-bottom:8px;
-  }
-
-  .bar{
-    width:100%;
-    height:7px;
-    border-radius:999px;
-    background:rgba(255,255,255,0.05);
-    overflow:hidden;
-  }
-
-  .bar > span{
-    display:block;
-    height:100%;
-    width:0%;
-    border-radius:inherit;
-    background:linear-gradient(90deg, rgba(249,115,22,0.68), rgba(249,115,22,0.28));
-  }
-
-  @media (max-width: 640px){
-    body{ padding:12px; }
-
-    .court{
-      min-height:540px;
-    }
-
-    .player{
-      width:170px;
-      min-height:102px;
-      padding:12px 14px;
-      gap:12px;
-    }
-
-    .player.c{ width:190px; }
-
-    .name{ font-size:15px; }
-    .pos,.mins{ font-size:13px; }
-
-    .num{
-      width:46px;
-      height:46px;
-      min-width:46px;
-      font-size:17px;
-    }
-
-    .court-lines .arc{
-      width:400px;
-      height:400px;
-    }
-
-    .court-lines .corner-left{ left:84px; }
-    .court-lines .corner-right{ right:84px; }
-  }
 </style>
 </head>
+
 <body>
 
-  <div class="app-shell">
-    <div class="section-card">
-      <div class="section-top">
+<div class="app-shell">
+  <div class="layout-grid">
+
+    <!-- LEFT PANEL -->
+    <div class="panel">
+      <div class="panel-header">
         <div>
-          <div class="eyebrow">On Court</div>
-          <div class="help-text">Use ▲ / ▼ to arrange spots · Sub Mode to mark on/off</div>
+          <div class="panel-title">On Court</div>
+          <div class="panel-sub">Use ▲ / ▼ to arrange spots · Sub Mode to mark on/off</div>
         </div>
-        <button class="sub-btn">🧩 Sub<br>Mode</button>
+        <button class="sub-mode-btn">Sub Mode</button>
       </div>
 
-      <div class="court-wrap">
+      <div class="court-wrapper">
         <div class="court-label">Half Court</div>
 
         <div class="court">
@@ -1196,7 +269,6 @@
             <div class="boundary"></div>
             <div class="backboard"></div>
             <div class="rim"></div>
-            <div class="restricted"></div>
             <div class="key"></div>
             <div class="ft-circle"></div>
             <div class="arc"></div>
@@ -1204,1024 +276,114 @@
             <div class="corner-right"></div>
           </div>
 
-          <div class="player pg">
-            <div class="num">22</div>
-            <div class="meta">
-              <div class="name">Thomas<br>O'Sullivan</div>
-              <div class="pos">PG</div>
-              <div class="mins">00:00 mins</div>
-              <div class="bar"><span style="width: 0%"></span></div>
-            </div>
-          </div>
-
-          <div class="player sg">
-            <div class="num">72</div>
-            <div class="meta">
-              <div class="name">Tate<br>Power</div>
-              <div class="pos">SG</div>
-              <div class="mins">00:00 mins</div>
-              <div class="bar"><span style="width: 0%"></span></div>
-            </div>
-          </div>
-
-          <div class="player sf">
-            <div class="num">16</div>
-            <div class="meta">
-              <div class="name">Archer<br>Kenny</div>
-              <div class="pos">SF</div>
-              <div class="mins">00:00 mins</div>
-              <div class="bar"><span style="width: 0%"></span></div>
-            </div>
-          </div>
-
-          <div class="player pf">
-            <div class="num">94</div>
-            <div class="meta">
-              <div class="name">Rodion<br>Prystupa</div>
-              <div class="pos">PF</div>
-              <div class="mins">00:00 mins</div>
-              <div class="bar"><span style="width: 0%"></span></div>
-            </div>
-          </div>
-
-          <div class="player c">
-            <div class="num">36</div>
-            <div class="meta">
-              <div class="name">Jacob<br>Nguyen</div>
-              <div class="pos">C</div>
-              <div class="mins">00:00 mins</div>
-              <div class="bar"><span style="width: 0%"></span></div>
-            </div>
-          </div>
+          <!-- KEEP THESE -->
+          <div id="courtTop"></div>
+          <div id="courtMid"></div>
+          <div id="courtBot"></div>
         </div>
       </div>
 
+      <div class="bench-grid" id="benchGrid"></div>
     </div>
-  </div>
 
-</body>
-</html>
-
-        <div class="bench-wrapper" id="benchWrapper">
-          <div class="bench-header-row">
-            <div class="panel-title">Bench</div>
-          </div>
-          <div class="bench-grid" id="benchGrid"></div>
-          <div class="bench-tip">
-            Tip: use the ▲ / ▼ buttons on each bench player to reorder them to match how they’re sitting.
-          </div>
-          <div class="sub-actions">
-            <button class="btn small primary" id="confirmSubBtn">Confirm Sub</button>
-            <button class="btn small" id="cancelSubBtn">Cancel</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel" id="rightPanel">
-        <div class="minutes-header">
-          <div>
-            <div class="panel-title">Player Minutes</div>
-            <div class="minutes-sub">Total court time across the game</div>
-          </div>
-          <div class="minutes-sub" id="runningStatus">Clock paused · tap Start to begin</div>
-        </div>
-
-        <div class="segment-row">
-          <div class="segment-label">Segment: <span id="segmentLabel">Q1 · Rep</span></div>
-          <div class="segment-buttons" id="segmentButtons"></div>
-          <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button class="btn small" id="saveSegmentBtn">Save Snapshot</button>
-            <button class="btn small primary" id="suggestSubBtn">Suggest Sub</button>
-          </div>
-        </div>
-
-        <div class="minutes-list" id="minutesList"></div>
-        <div class="alerts" id="alerts"></div>
-
-        <div class="suggestion-card hidden" id="suggestionCard">
-          <div class="suggestion-title">Suggested Subs</div>
-          <div id="suggestPairs"></div>
-          <div class="suggestion-tag" id="suggestTag"></div>
-        </div>
-
-        <div class="segments" id="segments"></div>
-
-        <div class="footnote">
-          Tap Sub Mode to make changes safely, then Confirm Sub. The app handles the timing for you so you can stay locked into the game.
-        </div>
-      </div>
+    <!-- RIGHT PANEL -->
+    <div class="panel">
+      <div class="panel-title">Player Minutes</div>
+      <div class="minutes-list" id="minutesList"></div>
     </div>
+
   </div>
+</div>
 
-  <script>
-    // ---------- CONFIG ----------
-    const TEAM_CONFIGS = {
-  rep_u14: {
-    name: 'Under 12 Rep',
-    players: [
-      { id: 13, number: 13, name: 'Archie Stone', short: 'PG', long: 'Guard' },
-      { id: 14, number: 14, name: 'Ethan Lieberthal', short: 'SG', long: 'Guard' },
-      { id: 23, number: 23, name: 'Lucas Nguyen', short: 'SF', long: 'Wing' },
-      { id: 24, number: 24, name: 'Jediah Rayer', short: 'PF', long: 'Wing' },
-      { id: 40, number: 40, name: 'Lenny McArthur', short: 'C', long: 'Big' },
-      { id: 44, number: 44, name: 'James Sullivan', short: 'G', long: 'Guard' },
-      { id: 51, number: 51, name: 'Brooks Hurren', short: 'B', long: 'Big' },
-      { id: 89, number: 89, name: 'Max Arden', short: 'W', long: 'Wing' },
-      { id: 0, number: 0, name: 'Jax', short: 'G', long: 'Guard' },
-      { id: 12, number: 12, name: 'Ty Rosen', short: 'G', long: 'Guard' }
-    ],
-    initialOn: [13, 14, 23, 24, 40],
-    initialBench: [44, 51, 89, 0, 12]
-  },
+<script>
 
-  domestic_u14: {
-    name: 'Domestic U14',
-    players: [
-      { id: 22, number: 22, name: "Thomas O'Sullivan", short: 'PG', long: 'Guard' },
-      { id: 72, number: 72, name: 'Tate Power', short: 'SG', long: 'Guard' },
-      { id: 16, number: 16, name: 'Archer Kenny', short: 'SF', long: 'Wing' },
-      { id: 20, number: 20, name: 'Bill Pham', short: 'SF', long: 'Wing' },
-      { id: 36, number: 36, name: 'Jacob Nguyen', short: 'C', long: 'Big' },
-      { id: 90, number: 90, name: 'Ethan Poon', short: 'SF', long: 'Wing' },
-      { id: 94, number: 94, name: 'Rodion Prystupa', short: 'PF', long: 'Forward' },
-      { id: 10, number: 10, name: 'Max Payne', short: 'SG', long: 'Guard' },
-      { id: 102, number: 102, name: 'Alvin Chen', short: 'PF', long: 'Forward' }
-    ],
-    initialOn: [22, 72, 16, 94, 36],
-    initialBench: [20, 90, 10, 102]
+/* ================= STATE ================= */
+const state = {
+  onCourt: [22,72,16,94,36],
+  bench: [20,90,10],
+  minutes:{},
+  players:{
+    22:{name:"Thomas O'Sullivan",pos:"PG"},
+    72:{name:"Tate Power",pos:"SG"},
+    16:{name:"Archer Kenny",pos:"SF"},
+    94:{name:"Rodion Prystupa",pos:"PF"},
+    36:{name:"Jacob Nguyen",pos:"C"},
+    20:{name:"Bill Pham",pos:"SF"},
+    90:{name:"Ethan Poon",pos:"SF"},
+    10:{name:"Max Payne",pos:"SG"}
   }
 };
 
-    const MODES = {
-      rep: {
-        label: 'Rep',
-        segmentLabels: ['Q1', 'Q2', 'Q3', 'Q4'],
-        segmentLength: 10 * 60
-      },
-      domestic: {
-        label: 'Domestic',
-        segmentLabels: ['H1', 'H2'],
-        segmentLength: 18 * 60
-      }
-    };
+/* ================= HELPERS ================= */
+function format(sec){
+  const m=Math.floor(sec/60);
+  const s=sec%60;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+/* ================= RENDER ================= */
+function chip(id){
+  const p=state.players[id];
+  const div=document.createElement("div");
+  div.className="player-chip";
+  div.innerHTML=`
+    <div class="number-pill">${id}</div>
+    <div>
+      <div class="player-name">${p.name}</div>
+      <div class="player-role">${p.pos}</div>
+      <div class="player-mins">${format(state.minutes[id]||0)}</div>
+    </div>
+  `;
+  return div;
+}
+
+function render(){
+  const top=document.getElementById("courtTop");
+  const mid=document.getElementById("courtMid");
+  const bot=document.getElementById("courtBot");
+
+  top.innerHTML="";
+  mid.innerHTML="";
+  bot.innerHTML="";
+
+  state.onCourt.slice(0,2).forEach(id=>top.appendChild(chip(id)));
+  state.onCourt.slice(2,4).forEach(id=>mid.appendChild(chip(id)));
+  bot.appendChild(chip(state.onCourt[4]));
+
+  const bench=document.getElementById("benchGrid");
+  bench.innerHTML="";
+  state.bench.forEach(id=>{
+    const div=document.createElement("div");
+    div.className="bench-card";
+    div.textContent=state.players[id].name;
+    bench.appendChild(div);
+  });
+
+  const list=document.getElementById("minutesList");
+  list.innerHTML="";
+  Object.keys(state.players).forEach(id=>{
+    const row=document.createElement("div");
+    row.className="minutes-row";
+    row.innerHTML=`
+      <div>${state.players[id].name}</div>
+      <div>${format(state.minutes[id]||0)}</div>
+    `;
+    list.appendChild(row);
+  });
+}
+
+/* ================= CLOCK ================= */
+setInterval(()=>{
+  state.onCourt.forEach(id=>{
+    state.minutes[id]=(state.minutes[id]||0)+1;
+  });
+  render();
+},1000);
+
+/* INIT */
+render();
+
+</script>
 
-    const TOTAL_GAME_SECONDS = {
-      rep: MODES.rep.segmentLength * MODES.rep.segmentLabels.length,
-      domestic: MODES.domestic.segmentLength * MODES.domestic.segmentLabels.length
-    };
-
-    // how far through the game we are in seconds
-    function getElapsedGameSeconds() {
-      const modeCfg = MODES[state.mode];
-      if (!modeCfg) return 0;
-
-      const labels = modeCfg.segmentLabels;
-      const segIndex = labels.indexOf(state.currentSegment);
-
-      const completedSegments = Math.max(0, segIndex);
-      const elapsedCompleted = completedSegments * modeCfg.segmentLength;
-      const elapsedCurrent = modeCfg.segmentLength - state.clockSeconds;
-
-      const total = elapsedCompleted + elapsedCurrent;
-      const maxTotal =
-        TOTAL_GAME_SECONDS[state.mode] ||
-        (modeCfg.segmentLength * modeCfg.segmentLabels.length);
-
-      return Math.max(0, Math.min(maxTotal, total));
-    }
-
-    // ---------- STATE ----------
-    const state = {
-      teamId: 'rep_u14',
-      mode: 'rep',
-      currentSegment: 'Q1',
-      clockSeconds: MODES.rep.segmentLength,
-      running: false,
-      onCourt: [...TEAM_CONFIGS.rep_u14.initialOn],
-      bench: [...TEAM_CONFIGS.rep_u14.initialBench],
-      minutes: {},
-      fouls: {},
-      subMode: false,
-      selectedOn: [],
-      selectedBench: [],
-      segments: [],
-
-      // NEW: track when each player was subbed to the bench (elapsed game seconds)
-      lastWentBenchAt: {}
-    };
-
-    // suggested sub DOM refs
-    const suggestionCard = document.getElementById('suggestionCard');
-    const suggestPairsEl = document.getElementById('suggestPairs');
-    const suggestTagEl = document.getElementById('suggestTag');
-
-    function currentTeam() {
-      return TEAM_CONFIGS[state.teamId];
-    }
-    function allPlayers() {
-      return currentTeam().players;
-    }
-    function findPlayer(id) {
-      return allPlayers().find(p => p.id === id);
-    }
-
-    function formatTime(sec) {
-      const safe = Number.isFinite(sec) ? sec : 0;
-      const s = Math.max(0, Math.floor(safe));
-      const m = Math.floor(s / 60);
-      const r = s % 60;
-      return `${String(m).padStart(2, '0')}:${String(r).padStart(2, '0')}`;
-    }
-
-    function initPlayerStats() {
-      state.minutes = {};
-      state.fouls = {};
-      allPlayers().forEach(p => {
-        state.minutes[p.id] = 0;
-        state.fouls[p.id] = false;
-      });
-    }
-
-    // NEW: initialise bench timers (bench players show sat time from game start, starters are null)
-    function initBenchTimers() {
-      const elapsed = getElapsedGameSeconds(); // should be 0 at load/reset
-      state.lastWentBenchAt = {};
-      allPlayers().forEach(p => state.lastWentBenchAt[p.id] = null);
-      state.bench.forEach(id => state.lastWentBenchAt[id] = elapsed);
-    }
-
-    initPlayerStats();
-    initBenchTimers();
-
-    function fatigueBarHTML(id) {
-      const sec = state.minutes[id] || 0;
-      const maxSec = TOTAL_GAME_SECONDS[state.mode] || (40 * 60);
-      const ratio = Math.max(0, Math.min(1, sec / maxSec));
-      const pct = (ratio * 100).toFixed(0);
-
-      let levelClass = 'fatigue-low';
-      if (ratio > 0.66) levelClass = 'fatigue-high';
-      else if (ratio > 0.33) levelClass = 'fatigue-med';
-
-      return `
-        <div class="fatigue-wrap">
-          <div class="fatigue-bar-bg">
-            <div class="fatigue-bar-inner ${levelClass}" style="width:${pct}%;"></div>
-          </div>
-        </div>
-      `;
-    }
-
-    function flashElement(el, cls, duration = 250) {
-      if (!el) return;
-      el.classList.add(cls);
-      setTimeout(() => el.classList.remove(cls), duration);
-    }
-
-    // NEW: compute “sat since” string for bench players
-    function satSinceText(id) {
-      if (state.onCourt.includes(id)) return '';
-      const t0 = state.lastWentBenchAt?.[id];
-      if (t0 == null) return '';
-      const elapsed = getElapsedGameSeconds();
-      const satSecs = Math.max(0, elapsed - t0);
-      return `Sat: ${formatTime(satSecs)}`;
-    }
-
-    // NEW: pick a single “Next Up” bench player (uses your existing suggested sub logic)
-    function getNextUpId() {
-      // Don’t nag during Sub Mode
-      if (state.subMode) return null;
-      // Only show once some game time has elapsed
-      const elapsed = getElapsedGameSeconds();
-      if (elapsed < 60) return null;
-      const suggestion = computeSuggestedSubPairs();
-      if (!suggestion || !suggestion.pairs?.length) return null;
-      return suggestion.pairs[0].onId; // most under-played bench player
-    }
-
-    function renderTeamSelect() {
-      const select = document.getElementById('teamSelect');
-      select.innerHTML = '';
-      Object.entries(TEAM_CONFIGS).forEach(([id, cfg]) => {
-        const opt = document.createElement('option');
-        opt.value = id;
-        opt.textContent = cfg.name;
-        if (id === state.teamId) opt.selected = true;
-        select.appendChild(opt);
-      });
-    }
-
-    function renderClock() {
-      document.getElementById('clockDisplay').textContent = formatTime(state.clockSeconds);
-      const status = document.getElementById('runningStatus');
-      status.textContent = state.running
-        ? 'Clock running · minutes updating live'
-        : 'Clock paused · tap Start to begin';
-    }
-
-    function renderModeToggle() {
-      document.querySelectorAll('#modeToggle .mode-pill').forEach(btn => {
-        const mode = btn.dataset.mode;
-        btn.classList.toggle('active', mode === state.mode);
-      });
-    }
-
-    function renderSubMode() {
-      const btn = document.getElementById('subModeBtn');
-      if (state.subMode) {
-        btn.classList.add('on');
-        btn.textContent = '🧩 Sub Mode · ON';
-      } else {
-        btn.classList.remove('on');
-        btn.textContent = '🧩 Sub Mode';
-      }
-    }
-
-    function moveOnCourt(id, dir) {
-      const idx = state.onCourt.indexOf(id);
-      if (idx === -1) return;
-      const newIdx = idx + (dir === 'up' ? -1 : 1);
-      if (newIdx < 0 || newIdx >= state.onCourt.length) return;
-      const arr = state.onCourt;
-      const tmp = arr[idx];
-      arr[idx] = arr[newIdx];
-      arr[newIdx] = tmp;
-      renderCourt();
-      renderMinutes();
-    }
-
-    function createCourtChip(id) {
-      const p = findPlayer(id);
-      if (!p) return document.createElement('div');
-      const chip = document.createElement('div');
-      chip.className = 'player-chip';
-      chip.dataset.id = String(id);
-
-      if (state.subMode && state.selectedOn.includes(id)) {
-        chip.classList.add('selected');
-      }
-
-      if (state.running && !state.subMode) {
-        chip.classList.add('on-court-active');
-      }
-
-      const num = document.createElement('div');
-      num.className = 'number-pill';
-      num.textContent = p.number;
-      chip.appendChild(num);
-
-      const meta = document.createElement('div');
-      meta.className = 'player-meta';
-      meta.innerHTML = `
-        <div class="player-name">${p.name}</div>
-        <div class="player-role">${p.short}</div>
-        <div class="player-mins">${formatTime(state.minutes[id])} mins</div>
-        ${fatigueBarHTML(id)}
-      `;
-      chip.appendChild(meta);
-
-      const side = document.createElement('div');
-      side.className = 'bench-controls';
-
-      const foulBtn = document.createElement('button');
-      foulBtn.className = 'foul-btn' + (state.fouls[id] ? ' on' : '');
-      foulBtn.textContent = state.fouls[id] ? 'Foul ⚠︎' : 'Mark Foul';
-      foulBtn.dataset.foul = 'true';
-      side.appendChild(foulBtn);
-
-      const up = document.createElement('button');
-      up.className = 'bench-arrow court-arrow';
-      up.textContent = '▲';
-      up.dataset.dir = 'up';
-      side.appendChild(up);
-
-      const down = document.createElement('button');
-      down.className = 'bench-arrow court-arrow';
-      down.textContent = '▼';
-      down.dataset.dir = 'down';
-      side.appendChild(down);
-
-      chip.appendChild(side);
-
-      return chip;
-    }
-
-    function renderCourt() {
-      const top = document.getElementById('courtTop');
-      const mid = document.getElementById('courtMid');
-      const bot = document.getElementById('courtBot');
-      top.innerHTML = '';
-      mid.innerHTML = '';
-      bot.innerHTML = '';
-
-      const ids = state.onCourt;
-      [ids[0], ids[1]].forEach(id => id != null && top.appendChild(createCourtChip(id)));
-      [ids[2], ids[3]].forEach(id => id != null && mid.appendChild(createCourtChip(id)));
-      if (ids[4] != null) bot.appendChild(createCourtChip(ids[4]));
-    }
-
-    function renderBench() {
-      const grid = document.getElementById('benchGrid');
-      grid.innerHTML = '';
-
-      const nextUpId = getNextUpId();
-
-      state.bench.forEach(id => {
-        const p = findPlayer(id);
-        if (!p) return;
-        const card = document.createElement('div');
-        card.className = 'bench-card';
-        card.dataset.id = String(id);
-
-        if (state.subMode && state.selectedBench.includes(id)) {
-          card.classList.add('selected');
-        }
-
-        // NEW: Next Up nudge
-        if (nextUpId != null && id === nextUpId) {
-          card.classList.add('nextup');
-          const pill = document.createElement('div');
-          pill.className = 'nextup-pill';
-          pill.textContent = 'NEXT UP';
-          card.appendChild(pill);
-        }
-
-        const main = document.createElement('div');
-        main.className = 'bench-main';
-        const num = document.createElement('div');
-        num.className = 'bench-number';
-        num.textContent = p.number;
-        main.appendChild(num);
-
-        const labels = document.createElement('div');
-        labels.className = 'bench-labels';
-        const satText = satSinceText(id);
-        labels.innerHTML = `
-          <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name}</div>
-          <div class="bench-mins">${formatTime(state.minutes[id])}</div>
-          ${satText ? `<div class="bench-sat">${satText}</div>` : ``}
-          ${fatigueBarHTML(id)}
-        `;
-        main.appendChild(labels);
-
-        const foulBtn = document.createElement('button');
-        foulBtn.className = 'foul-btn small' + (state.fouls[id] ? ' on' : '');
-        foulBtn.textContent = state.fouls[id] ? 'Foul ⚠︎' : 'Foul';
-        foulBtn.dataset.foul = 'true';
-        main.appendChild(foulBtn);
-
-        card.appendChild(main);
-
-        const ctrls = document.createElement('div');
-        ctrls.className = 'bench-controls';
-
-        const up = document.createElement('button');
-        up.className = 'bench-arrow';
-        up.textContent = '▲';
-        up.dataset.dir = 'up';
-        ctrls.appendChild(up);
-
-        const down = document.createElement('button');
-        down.className = 'bench-arrow';
-        down.textContent = '▼';
-        down.dataset.dir = 'down';
-        ctrls.appendChild(down);
-
-        card.appendChild(ctrls);
-        grid.appendChild(card);
-      });
-    }
-
-    function renderMinutes() {
-      const list = document.getElementById('minutesList');
-      list.innerHTML = '';
-
-      const nextUpId = getNextUpId();
-      const allIds = state.onCourt.concat(state.bench);
-
-      allIds.forEach(id => {
-        const p = findPlayer(id);
-        if (!p) return;
-
-        const row = document.createElement('div');
-        row.className = 'minutes-row';
-        if (state.onCourt.includes(id)) row.classList.add('on');
-
-        const info = document.createElement('div');
-        info.className = 'minutes-info';
-
-        const num = document.createElement('div');
-        num.className = 'minutes-number';
-        num.textContent = p.number;
-        info.appendChild(num);
-
-        const nb = document.createElement('div');
-        nb.className = 'minutes-name-block';
-
-        const satText = satSinceText(id);
-
-        nb.innerHTML = `
-          <div style="display:flex; align-items:center; gap:6px; min-width:0;">
-            <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name}</div>
-            ${(!state.onCourt.includes(id) && nextUpId != null && id === nextUpId) ? `<div class="minutes-nextup">NEXT UP</div>` : ``}
-          </div>
-          <div class="minutes-role">${p.long}</div>
-          <div class="minutes-status ${state.onCourt.includes(id) ? '' : 'bench'}">
-            ${state.onCourt.includes(id) ? 'On Court' : 'Bench'}
-          </div>
-          ${(!state.onCourt.includes(id) && satText) ? `<div class="minutes-sat">${satText}</div>` : ``}
-          ${fatigueBarHTML(id)}
-        `;
-        info.appendChild(nb);
-
-        if (state.fouls[id]) {
-          const foul = document.createElement('div');
-          foul.className = 'minutes-foul-pill';
-          foul.textContent = 'Foul Trouble';
-          info.appendChild(foul);
-        }
-
-        row.appendChild(info);
-
-        const time = document.createElement('div');
-        time.className = 'minutes-time';
-        time.textContent = formatTime(state.minutes[id]);
-        row.appendChild(time);
-
-        list.appendChild(row);
-      });
-    }
-
-    function renderAlerts() {
-      const container = document.getElementById('alerts');
-      container.innerHTML = '';
-      const ids = state.onCourt.concat(state.bench);
-      if (!ids.length) return;
-
-      let total = 0;
-      ids.forEach(id => total += state.minutes[id] || 0);
-      if (total === 0) return;
-      const avg = total / ids.length;
-
-      let over = null, under = null;
-      ids.forEach(id => {
-        const diff = (state.minutes[id] || 0) - avg;
-        if (diff > 120 && (!over || diff > over.diff)) over = { id, diff };
-        if (diff < -120 && (!under || diff < under.diff)) under = { id, diff };
-      });
-
-      if (over) {
-        const p = findPlayer(over.id);
-        const line = document.createElement('div');
-        line.className = 'alert-line warn';
-        line.textContent = `${p.name} is ${formatTime(over.diff)} above team average minutes.`;
-        container.appendChild(line);
-      }
-      if (under) {
-        const p = findPlayer(under.id);
-        const line = document.createElement('div');
-        line.className = 'alert-line';
-        line.textContent = `${p.name} is ${formatTime(-under.diff)} below team average minutes.`;
-        container.appendChild(line);
-      }
-    }
-
-    function renderSegments() {
-      const container = document.getElementById('segments');
-      container.innerHTML = '';
-      state.segments.forEach(seg => {
-        const card = document.createElement('div');
-        card.className = 'segment-card';
-
-        const title = document.createElement('div');
-        title.className = 'segment-card-title';
-        title.textContent = `${seg.segment} · ${seg.modeLabel}`;
-        card.appendChild(title);
-
-        seg.top.forEach(item => {
-          const line = document.createElement('div');
-          line.textContent = `${item.name}: ${formatTime(item.seconds)}`;
-          card.appendChild(line);
-        });
-
-        container.appendChild(card);
-      });
-    }
-
-    function renderSegmentControls() {
-      const container = document.getElementById('segmentButtons');
-      container.innerHTML = '';
-      const modeCfg = MODES[state.mode];
-      modeCfg.segmentLabels.forEach(label => {
-        const btn = document.createElement('button');
-        btn.className = 'segment-btn' + (label === state.currentSegment ? ' active' : '');
-        btn.dataset.seg = label;
-        btn.textContent = label;
-        container.appendChild(btn);
-      });
-      const segLabel = document.getElementById('segmentLabel');
-      segLabel.textContent = `${state.currentSegment} · ${modeCfg.label}`;
-    }
-
-    function renderAll() {
-      renderTeamSelect();
-      renderClock();
-      renderModeToggle();
-      renderSubMode();
-      renderCourt();
-      renderBench();
-      renderMinutes();
-      renderAlerts();
-      renderSegments();
-      renderSegmentControls();
-    }
-
-    function tick() {
-      if (!state.running) return;
-      if (state.clockSeconds <= 0) {
-        state.clockSeconds = 0;
-        state.running = false;
-        renderClock();
-        return;
-      }
-      state.clockSeconds -= 1;
-      state.onCourt.forEach(id => {
-        if (state.minutes[id] == null) state.minutes[id] = 0;
-        state.minutes[id] += 1;
-      });
-
-      renderClock();
-      renderCourt();
-      renderBench();
-      renderMinutes();
-      renderAlerts();
-    }
-    setInterval(tick, 1000);
-
-    function setMode(newMode) {
-      if (!MODES[newMode]) return;
-      state.mode = newMode;
-      const cfg = MODES[newMode];
-      state.currentSegment = cfg.segmentLabels[0];
-      state.clockSeconds = cfg.segmentLength;
-
-      // NEW: reset bench timers for new mode
-      initBenchTimers();
-
-      renderModeToggle();
-      renderSegmentControls();
-      renderClock();
-      renderMinutes();
-      renderBench();
-      renderCourt();
-    }
-
-    function loadTeam(teamId) {
-      const cfg = TEAM_CONFIGS[teamId];
-      if (!cfg) return;
-      state.teamId = teamId;
-      state.onCourt = [...cfg.initialOn];
-      state.bench = [...cfg.initialBench];
-      state.subMode = false;
-      state.selectedOn = [];
-      state.selectedBench = [];
-      state.segments = [];
-      initPlayerStats();
-
-      // NEW: reset bench timers for new team
-      initBenchTimers();
-
-      renderAll();
-    }
-
-    function toggleSubMode() {
-      state.subMode = !state.subMode;
-      state.selectedOn = [];
-      state.selectedBench = [];
-      renderSubMode();
-      renderCourt();
-      renderBench();
-      renderMinutes();
-    }
-
-    function toggleFoul(id) {
-      if (state.fouls[id] == null) return;
-      state.fouls[id] = !state.fouls[id];
-      renderCourt();
-      renderBench();
-      renderMinutes();
-    }
-
-    function toggleOnSelection(id) {
-      if (!state.subMode) return;
-      const idx = state.selectedOn.indexOf(id);
-      if (idx >= 0) state.selectedOn.splice(idx, 1);
-      else state.selectedOn.push(id);
-      renderCourt();
-    }
-
-    function toggleBenchSelection(id) {
-      if (!state.subMode) return;
-      const idx = state.selectedBench.indexOf(id);
-      if (idx >= 0) state.selectedBench.splice(idx, 1);
-      else state.selectedBench.push(id);
-      renderBench();
-    }
-
-    function moveBench(id, dir) {
-      const idx = state.bench.indexOf(id);
-      if (idx === -1) return;
-      const newIdx = idx + (dir === 'up' ? -1 : 1);
-      if (newIdx < 0 || newIdx >= state.bench.length) return;
-      const arr = state.bench;
-      const tmp = arr[idx];
-      arr[idx] = arr[newIdx];
-      arr[newIdx] = tmp;
-      renderBench();
-    }
-
-    function confirmSubs() {
-      if (!state.subMode) return;
-      if (state.selectedOn.length === 0 && state.selectedBench.length === 0) return;
-      if (state.selectedOn.length !== state.selectedBench.length) {
-        alert('Select the same number of players to sub off and on.');
-        return;
-      }
-
-      const elapsed = getElapsedGameSeconds();
-
-      for (let i = 0; i < state.selectedOn.length; i++) {
-        const offId = state.selectedOn[i];
-        const onId = state.selectedBench[i];
-        const offIdx = state.onCourt.indexOf(offId);
-        const benchIdx = state.bench.indexOf(onId);
-        if (offIdx === -1 || benchIdx === -1) continue;
-
-        // NEW: record "went to bench" time for the player subbed OFF
-        state.lastWentBenchAt[offId] = elapsed;
-
-        // NEW: clear bench time for the player coming ON (they're no longer sitting)
-        state.lastWentBenchAt[onId] = null;
-
-        state.onCourt[offIdx] = onId;
-        state.bench[benchIdx] = offId;
-      }
-
-      state.selectedOn = [];
-      state.selectedBench = [];
-      renderCourt();
-      renderBench();
-      renderMinutes();
-      flashElement(document.getElementById('confirmSubBtn'), 'btn-haptic', 150);
-      flashElement(document.getElementById('benchWrapper'), 'panel-flash', 350);
-    }
-
-    function cancelSubs() {
-      state.selectedOn = [];
-      state.selectedBench = [];
-      renderCourt();
-      renderBench();
-      renderMinutes();
-    }
-
-    function resetGame() {
-      const teamCfg = TEAM_CONFIGS[state.teamId];
-      const modeCfg = MODES[state.mode];
-      state.running = false;
-      state.clockSeconds = modeCfg.segmentLength;
-      state.currentSegment = modeCfg.segmentLabels[0];
-      state.onCourt = [...teamCfg.initialOn];
-      state.bench = [...teamCfg.initialBench];
-      state.subMode = false;
-      state.selectedOn = [];
-      state.selectedBench = [];
-      state.segments = [];
-      initPlayerStats();
-
-      // NEW: reset bench timers
-      initBenchTimers();
-
-      renderAll();
-      document.getElementById('startBtn').textContent = 'Start';
-    }
-
-    function saveSegmentSnapshot() {
-      const allIds = state.onCourt.concat(state.bench);
-      if (!allIds.length) return;
-      const snapshot = allIds.map(id => ({
-        id,
-        name: findPlayer(id)?.name || 'Player',
-        seconds: state.minutes[id] || 0
-      }));
-      snapshot.sort((a, b) => b.seconds - a.seconds);
-      const top = snapshot.slice(0, 3);
-      state.segments.push({
-        segment: state.currentSegment,
-        modeLabel: MODES[state.mode].label,
-        top
-      });
-      renderSegments();
-      const segmentsContainer = document.getElementById('segments');
-      const lastCard = segmentsContainer.lastElementChild;
-      flashElement(lastCard, 'segment-flash', 450);
-      flashElement(document.getElementById('saveSegmentBtn'), 'btn-haptic', 150);
-    }
-
-    // ----- multi-pair suggested subs based on even minutes over full game -----
-    function computeSuggestedSubPairs() {
-      const totalPlayers = state.onCourt.length + state.bench.length;
-      if (!state.onCourt.length || !state.bench.length || totalPlayers === 0) return null;
-
-      const elapsed = getElapsedGameSeconds();
-      if (elapsed < 60) return null; // don’t suggest in first minute
-
-      const idealPerPlayer = elapsed / totalPlayers;
-      const diffMap = {};
-      const allIds = state.onCourt.concat(state.bench);
-      allIds.forEach(id => {
-        diffMap[id] = (state.minutes[id] || 0) - idealPerPlayer;
-      });
-
-      const onSorted = [...state.onCourt].sort((a, b) => diffMap[b] - diffMap[a]); // most over-played first
-      const benchSorted = [...state.bench].sort((a, b) => diffMap[a] - diffMap[b]); // most under-played first
-
-      const maxPairs = Math.min(3, onSorted.length, benchSorted.length);
-      const pairs = [];
-      for (let i = 0; i < maxPairs; i++) {
-        const offId = onSorted[i];
-        const onId = benchSorted[i];
-        const offSecs = state.minutes[offId] || 0;
-        const onSecs = state.minutes[onId] || 0;
-        const gapMinutes = (offSecs - onSecs) / 60;
-
-        // only include meaningful gaps
-        if (gapMinutes <= 1) continue;
-
-        pairs.push({
-          offId,
-          onId,
-          offSecs,
-          onSecs,
-          gapMinutes
-        });
-      }
-
-      if (!pairs.length) return null;
-
-      let tag;
-      const biggestGap = pairs[0].gapMinutes;
-      if (biggestGap > 4) {
-        tag = 'Big minutes spread – this rotation will drag everyone back towards even by full time.';
-      } else if (biggestGap > 2.5) {
-        tag = 'Perfect 3-minute rep window – rotate this group to keep minutes balanced.';
-      } else {
-        tag = 'Small but useful edge – these subs will tidy up minute balance.';
-      }
-
-      return { pairs, tag };
-    }
-
-    function showSuggestedSub() {
-      const suggestion = computeSuggestedSubPairs();
-      if (!suggestion) {
-        suggestionCard.classList.add('hidden');
-        return;
-      }
-
-      suggestPairsEl.innerHTML = '';
-      suggestion.pairs.forEach((p, idx) => {
-        const off = findPlayer(p.offId);
-        const on = findPlayer(p.onId);
-        const pairDiv = document.createElement('div');
-        pairDiv.className = 'suggestion-pair';
-
-        const main = document.createElement('div');
-        main.className = 'suggestion-pair-main';
-
-        const offBlock = document.createElement('div');
-        offBlock.className = 'suggestion-off';
-        offBlock.innerHTML = `
-          <div class="suggestion-label">Off ${idx + 1}</div>
-          <div class="suggestion-player">${off.name} (#${off.number}) · ${formatTime(p.offSecs)}</div>
-        `;
-
-        const onBlock = document.createElement('div');
-        onBlock.className = 'suggestion-on';
-        onBlock.innerHTML = `
-          <div class="suggestion-label">On ${idx + 1}</div>
-          <div class="suggestion-player">${on.name} (#${on.number}) · ${formatTime(p.onSecs)}</div>
-        `;
-
-        main.appendChild(offBlock);
-        main.appendChild(onBlock);
-        pairDiv.appendChild(main);
-
-        const gap = document.createElement('div');
-        gap.className = 'suggestion-gap';
-        gap.textContent = `Minutes gap: ${p.gapMinutes.toFixed(1)} mins`;
-        pairDiv.appendChild(gap);
-
-        suggestPairsEl.appendChild(pairDiv);
-      });
-
-      suggestTagEl.textContent = suggestion.tag;
-
-      suggestionCard.classList.remove('hidden');
-      flashElement(suggestionCard, 'panel-flash', 350);
-    }
-
-    // ---------- EVENT LISTENERS ----------
-    document.getElementById('startBtn').addEventListener('click', () => {
-      state.running = !state.running;
-      const startBtn = document.getElementById('startBtn');
-      startBtn.textContent = state.running ? 'Pause' : 'Start';
-      flashElement(startBtn, 'btn-haptic', 150);
-      renderClock();
-      renderCourt();
-      renderBench();
-      renderMinutes();
-    });
-
-    document.getElementById('resetBtn').addEventListener('click', resetGame);
-
-    document.getElementById('subModeBtn').addEventListener('click', () => {
-      flashElement(document.getElementById('subModeBtn'), 'btn-haptic', 150);
-      toggleSubMode();
-    });
-
-    document.getElementById('confirmSubBtn').addEventListener('click', confirmSubs);
-    document.getElementById('cancelSubBtn').addEventListener('click', cancelSubs);
-
-    document.getElementById('teamSelect').addEventListener('change', e => {
-      loadTeam(e.target.value);
-    });
-
-    document.getElementById('modeToggle').addEventListener('click', e => {
-      const btn = e.target.closest('.mode-pill');
-      if (!btn) return;
-      flashElement(btn, 'btn-haptic', 150);
-      setMode(btn.dataset.mode);
-    });
-
-    document.getElementById('courtArea').addEventListener('click', e => {
-      const chip = e.target.closest('.player-chip');
-      if (!chip) return;
-      const id = parseInt(chip.dataset.id, 10);
-
-      const arrow = e.target.closest('.court-arrow');
-      if (arrow) {
-        moveOnCourt(id, arrow.dataset.dir);
-        return;
-      }
-
-      if (e.target.closest('[data-foul]')) {
-        toggleFoul(id);
-        return;
-      }
-
-      toggleOnSelection(id);
-    });
-
-    document.getElementById('benchGrid').addEventListener('click', e => {
-      const card = e.target.closest('.bench-card');
-      if (!card) return;
-      const id = parseInt(card.dataset.id, 10);
-      if (e.target.closest('[data-foul]')) {
-        toggleFoul(id);
-        return;
-      }
-      const arrow = e.target.closest('.bench-arrow');
-      if (arrow) {
-        moveBench(id, arrow.dataset.dir);
-        return;
-      }
-      toggleBenchSelection(id);
-    });
-
-    document.getElementById('segmentButtons').addEventListener('click', e => {
-      const btn = e.target.closest('.segment-btn');
-      if (!btn) return;
-      state.currentSegment = btn.dataset.seg;
-      state.clockSeconds = MODES[state.mode].segmentLength;
-
-      // Note: bench sat time is based on elapsed game time across segments, so no reset needed here.
-
-      renderSegmentControls();
-      renderClock();
-      renderBench();
-      renderMinutes();
-    });
-
-    document.getElementById('saveSegmentBtn').addEventListener('click', saveSegmentSnapshot);
-
-    document.getElementById('suggestSubBtn').addEventListener('click', () => {
-      flashElement(document.getElementById('suggestSubBtn'), 'btn-haptic', 150);
-      showSuggestedSub();
-    });
-
-    // ---------- INIT ----------
-    renderAll();
-  </script>
 </body>
 </html>
