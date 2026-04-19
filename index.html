@@ -790,14 +790,477 @@
           <button class="sub-mode-btn" id="subModeBtn">🧩 Sub Mode</button>
         </div>
 
-        <div class="court-wrapper">
-          <div class="court-label">Half Court</div>
-          <div class="court-rows" id="courtArea">
-            <div class="court-row" id="courtTop"></div>
-            <div class="court-row" id="courtMid"></div>
-            <div class="court-row" id="courtBot"></div>
+        <<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Professional Basketball Half Court UI</title>
+<style>
+  :root{
+    --bg:#020617;
+    --panel:#06102a;
+    --panel2:rgba(7,16,42,0.78);
+    --line:rgba(255,255,255,0.14);
+    --line-soft:rgba(255,255,255,0.08);
+    --text:#f8fafc;
+    --muted:rgba(226,232,240,0.72);
+    --accent:#f97316;
+    --border:rgba(255,255,255,0.10);
+    --glow:0 0 0 1px rgba(255,255,255,0.04), 0 24px 60px rgba(0,0,0,0.48);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at top, rgba(37,99,235,0.18), transparent 28%),
+      radial-gradient(circle at bottom, rgba(15,23,42,0.65), transparent 35%),
+      #020617;
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    padding:24px;
+  }
+
+  .app-shell{
+    max-width:760px;
+    margin:0 auto;
+    background:linear-gradient(180deg, rgba(2,6,23,0.94), rgba(2,6,23,0.88));
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:28px;
+    padding:18px;
+    box-shadow:0 30px 80px rgba(0,0,0,0.5);
+  }
+
+  .section-card{
+    border:1px solid var(--border);
+    border-radius:26px;
+    padding:18px;
+    background:linear-gradient(180deg, rgba(2,6,23,0.55), rgba(2,6,23,0.82));
+    box-shadow:var(--glow);
+  }
+
+  .section-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    margin-bottom:14px;
+  }
+
+  .eyebrow{
+    font-size:12px;
+    letter-spacing:0.26em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.62);
+    margin-bottom:4px;
+  }
+
+  .help-text{
+    font-size:13px;
+    line-height:1.35;
+    color:rgba(255,255,255,0.46);
+    max-width:340px;
+  }
+
+  .sub-btn{
+    border:1px solid rgba(255,255,255,0.22);
+    color:var(--text);
+    background:rgba(255,255,255,0.03);
+    border-radius:999px;
+    padding:12px 18px;
+    font-size:14px;
+    line-height:1.1;
+    min-width:118px;
+    text-align:center;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+
+  .court-wrap{
+    border:1px solid rgba(255,255,255,0.14);
+    border-radius:24px;
+    padding:18px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01)),
+      linear-gradient(180deg, rgba(2,6,23,0.18), rgba(2,6,23,0.30));
+    position:relative;
+    overflow:hidden;
+  }
+
+  .court-label{
+    text-align:center;
+    font-size:11px;
+    letter-spacing:0.32em;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.34);
+    margin-bottom:14px;
+  }
+
+  .court{
+    position:relative;
+    min-height:560px;
+    border-radius:20px;
+    overflow:hidden;
+    border:1px solid rgba(255,255,255,0.08);
+    background:
+      linear-gradient(90deg,
+        rgba(255,255,255,0.02) 0%,
+        rgba(255,255,255,0.00) 8%,
+        rgba(255,255,255,0.00) 92%,
+        rgba(255,255,255,0.02) 100%
+      ),
+      repeating-linear-gradient(
+        90deg,
+        rgba(255,255,255,0.028) 0px,
+        rgba(255,255,255,0.028) 2px,
+        rgba(0,0,0,0.00) 2px,
+        rgba(0,0,0,0.00) 46px
+      ),
+      linear-gradient(180deg,
+        rgba(89,48,20,0.30) 0%,
+        rgba(120,66,30,0.38) 24%,
+        rgba(131,76,39,0.42) 48%,
+        rgba(96,54,29,0.36) 72%,
+        rgba(32,23,18,0.55) 100%
+      ),
+      linear-gradient(180deg, #071126 0%, #06102a 100%);
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,0.03),
+      inset 0 80px 160px rgba(2,6,23,0.34),
+      inset 0 -120px 160px rgba(2,6,23,0.46);
+  }
+
+  /* subtle outer glow vignette */
+  .court::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:
+      radial-gradient(circle at center, rgba(255,255,255,0.03), transparent 45%),
+      radial-gradient(circle at center, transparent 52%, rgba(2,6,23,0.62) 100%);
+  }
+
+  /* half-court lines */
+  .court-lines{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    opacity:0.9;
+  }
+
+  /* sidelines / baseline */
+  .court-lines .boundary{
+    position:absolute;
+    inset:18px;
+    border:1.5px solid var(--line);
+    border-radius:18px;
+  }
+
+  /* paint */
+  .court-lines .key{
+    position:absolute;
+    left:50%;
+    top:52px;
+    transform:translateX(-50%);
+    width:170px;
+    height:170px;
+    border:2px solid var(--line);
+    border-top:none;
+    border-radius:0 0 90px 90px;
+  }
+
+  /* free throw circle */
+  .court-lines .ft-circle{
+    position:absolute;
+    left:50%;
+    top:128px;
+    transform:translateX(-50%);
+    width:128px;
+    height:128px;
+    border:2px solid var(--line-soft);
+    border-radius:50%;
+  }
+
+  .court-lines .ft-circle::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:50%;
+    border:2px dashed rgba(255,255,255,0.10);
+    clip-path:inset(50% 0 0 0);
+  }
+
+  /* rim */
+  .court-lines .rim{
+    position:absolute;
+    left:50%;
+    top:68px;
+    transform:translateX(-50%);
+    width:52px;
+    height:52px;
+    border:2px solid rgba(255,255,255,0.18);
+    border-radius:50%;
+  }
+
+  /* backboard */
+  .court-lines .backboard{
+    position:absolute;
+    left:50%;
+    top:50px;
+    transform:translateX(-50%);
+    width:96px;
+    height:0;
+    border-top:2px solid rgba(255,255,255,0.14);
+  }
+
+  /* restricted arc */
+  .court-lines .restricted{
+    position:absolute;
+    left:50%;
+    top:88px;
+    transform:translateX(-50%);
+    width:88px;
+    height:44px;
+    border:2px solid rgba(255,255,255,0.11);
+    border-bottom:none;
+    border-radius:88px 88px 0 0;
+  }
+
+  /* 3 point arc */
+  .court-lines .arc{
+    position:absolute;
+    left:50%;
+    top:68px;
+    transform:translateX(-50%);
+    width:480px;
+    height:480px;
+    border:2px solid rgba(255,255,255,0.11);
+    border-top:none;
+    border-radius:0 0 480px 480px;
+    clip-path:inset(0 0 45% 0);
+  }
+
+  .court-lines .corner-left,
+  .court-lines .corner-right{
+    position:absolute;
+    top:68px;
+    width:0;
+    height:172px;
+    border-left:2px solid rgba(255,255,255,0.11);
+  }
+
+  .court-lines .corner-left{ left:108px; }
+  .court-lines .corner-right{ right:108px; }
+
+  /* player cards */
+  .player{
+    position:absolute;
+    width:200px;
+    min-height:112px;
+    border-radius:999px;
+    background:
+      linear-gradient(180deg, rgba(4,13,36,0.96), rgba(2,8,24,0.96));
+    border:1px solid rgba(255,255,255,0.11);
+    box-shadow:
+      0 14px 28px rgba(0,0,0,0.34),
+      inset 0 1px 0 rgba(255,255,255,0.03);
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:14px 16px;
+    z-index:3;
+  }
+
+  .player.pg{ top:78px; left:26px; }
+  .player.sg{ top:78px; right:26px; }
+  .player.sf{ top:260px; left:26px; }
+  .player.pf{ top:260px; right:26px; }
+  .player.c{
+    left:50%;
+    bottom:36px;
+    transform:translateX(-50%);
+    width:220px;
+  }
+
+  .num{
+    width:52px;
+    height:52px;
+    min-width:52px;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    background:var(--accent);
+    color:white;
+    font-weight:800;
+    font-size:18px;
+    box-shadow:0 10px 20px rgba(249,115,22,0.22);
+  }
+
+  .meta{
+    min-width:0;
+    flex:1;
+  }
+
+  .name{
+    font-size:17px;
+    line-height:1.05;
+    font-weight:700;
+    letter-spacing:-0.02em;
+    margin-bottom:4px;
+  }
+
+  .pos{
+    font-size:14px;
+    color:rgba(255,255,255,0.62);
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    margin-bottom:4px;
+  }
+
+  .mins{
+    font-size:14px;
+    color:rgba(255,255,255,0.86);
+    margin-bottom:8px;
+  }
+
+  .bar{
+    width:100%;
+    height:7px;
+    border-radius:999px;
+    background:rgba(255,255,255,0.05);
+    overflow:hidden;
+  }
+
+  .bar > span{
+    display:block;
+    height:100%;
+    width:0%;
+    border-radius:inherit;
+    background:linear-gradient(90deg, rgba(249,115,22,0.68), rgba(249,115,22,0.28));
+  }
+
+  @media (max-width: 640px){
+    body{ padding:12px; }
+
+    .court{
+      min-height:540px;
+    }
+
+    .player{
+      width:170px;
+      min-height:102px;
+      padding:12px 14px;
+      gap:12px;
+    }
+
+    .player.c{ width:190px; }
+
+    .name{ font-size:15px; }
+    .pos,.mins{ font-size:13px; }
+
+    .num{
+      width:46px;
+      height:46px;
+      min-width:46px;
+      font-size:17px;
+    }
+
+    .court-lines .arc{
+      width:400px;
+      height:400px;
+    }
+
+    .court-lines .corner-left{ left:84px; }
+    .court-lines .corner-right{ right:84px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="app-shell">
+    <div class="section-card">
+      <div class="section-top">
+        <div>
+          <div class="eyebrow">On Court</div>
+          <div class="help-text">Use ▲ / ▼ to arrange spots · Sub Mode to mark on/off</div>
+        </div>
+        <button class="sub-btn">🧩 Sub<br>Mode</button>
+      </div>
+
+      <div class="court-wrap">
+        <div class="court-label">Half Court</div>
+
+        <div class="court">
+          <div class="court-lines">
+            <div class="boundary"></div>
+            <div class="backboard"></div>
+            <div class="rim"></div>
+            <div class="restricted"></div>
+            <div class="key"></div>
+            <div class="ft-circle"></div>
+            <div class="arc"></div>
+            <div class="corner-left"></div>
+            <div class="corner-right"></div>
+          </div>
+
+          <div class="player pg">
+            <div class="num">22</div>
+            <div class="meta">
+              <div class="name">Thomas<br>O'Sullivan</div>
+              <div class="pos">PG</div>
+              <div class="mins">00:00 mins</div>
+              <div class="bar"><span style="width: 0%"></span></div>
+            </div>
+          </div>
+
+          <div class="player sg">
+            <div class="num">72</div>
+            <div class="meta">
+              <div class="name">Tate<br>Power</div>
+              <div class="pos">SG</div>
+              <div class="mins">00:00 mins</div>
+              <div class="bar"><span style="width: 0%"></span></div>
+            </div>
+          </div>
+
+          <div class="player sf">
+            <div class="num">16</div>
+            <div class="meta">
+              <div class="name">Archer<br>Kenny</div>
+              <div class="pos">SF</div>
+              <div class="mins">00:00 mins</div>
+              <div class="bar"><span style="width: 0%"></span></div>
+            </div>
+          </div>
+
+          <div class="player pf">
+            <div class="num">94</div>
+            <div class="meta">
+              <div class="name">Rodion<br>Prystupa</div>
+              <div class="pos">PF</div>
+              <div class="mins">00:00 mins</div>
+              <div class="bar"><span style="width: 0%"></span></div>
+            </div>
+          </div>
+
+          <div class="player c">
+            <div class="num">36</div>
+            <div class="meta">
+              <div class="name">Jacob<br>Nguyen</div>
+              <div class="pos">C</div>
+              <div class="mins">00:00 mins</div>
+              <div class="bar"><span style="width: 0%"></span></div>
+            </div>
           </div>
         </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>
 
         <div class="bench-wrapper" id="benchWrapper">
           <div class="bench-header-row">
