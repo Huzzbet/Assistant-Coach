@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -965,7 +965,7 @@
       const s = Math.max(0, Math.floor(safe));
       const m = Math.floor(s / 60);
       const r = s % 60;
-      return ${String(m).padStart(2, '0')}:${String(r).padStart(2, '0')};
+      return `${String(m).padStart(2, '0')}:${String(r).padStart(2, '0')}`;
     }
 
     function initPlayerStats() {
@@ -998,13 +998,13 @@
       if (ratio > 0.66) levelClass = 'fatigue-high';
       else if (ratio > 0.33) levelClass = 'fatigue-med';
 
-      return 
+      return `
         <div class="fatigue-wrap">
           <div class="fatigue-bar-bg">
             <div class="fatigue-bar-inner ${levelClass}" style="width:${pct}%;"></div>
           </div>
         </div>
-      ;
+      `;
     }
 
     function flashElement(el, cls, duration = 250) {
@@ -1020,7 +1020,7 @@
       if (t0 == null) return '';
       const elapsed = getElapsedGameSeconds();
       const satSecs = Math.max(0, elapsed - t0);
-      return Sat: ${formatTime(satSecs)};
+      return `Sat: ${formatTime(satSecs)}`;
     }
 
     // NEW: pick a single “Next Up” bench player (uses your existing suggested sub logic)
@@ -1108,12 +1108,12 @@
 
       const meta = document.createElement('div');
       meta.className = 'player-meta';
-      meta.innerHTML = 
+      meta.innerHTML = `
         <div class="player-name">${p.name}</div>
         <div class="player-role">${p.short}</div>
         <div class="player-mins">${formatTime(state.minutes[id])} mins</div>
         ${fatigueBarHTML(id)}
-      ;
+      `;
       chip.appendChild(meta);
 
       const side = document.createElement('div');
@@ -1192,12 +1192,12 @@
         const labels = document.createElement('div');
         labels.className = 'bench-labels';
         const satText = satSinceText(id);
-        labels.innerHTML = 
+        labels.innerHTML = `
           <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name}</div>
           <div class="bench-mins">${formatTime(state.minutes[id])}</div>
-          ${satText ? <div class="bench-sat">${satText}</div> : }
+          ${satText ? `<div class="bench-sat">${satText}</div>` : ``}
           ${fatigueBarHTML(id)}
-        ;
+        `;
         main.appendChild(labels);
 
         const foulBtn = document.createElement('button');
@@ -1256,18 +1256,18 @@
 
         const satText = satSinceText(id);
 
-        nb.innerHTML = 
+        nb.innerHTML = `
           <div style="display:flex; align-items:center; gap:6px; min-width:0;">
             <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name}</div>
-            ${(!state.onCourt.includes(id) && nextUpId != null && id === nextUpId) ? <div class="minutes-nextup">NEXT UP</div> : }
+            ${(!state.onCourt.includes(id) && nextUpId != null && id === nextUpId) ? `<div class="minutes-nextup">NEXT UP</div>` : ``}
           </div>
           <div class="minutes-role">${p.long}</div>
           <div class="minutes-status ${state.onCourt.includes(id) ? '' : 'bench'}">
             ${state.onCourt.includes(id) ? 'On Court' : 'Bench'}
           </div>
-          ${(!state.onCourt.includes(id) && satText) ? <div class="minutes-sat">${satText}</div> : }
+          ${(!state.onCourt.includes(id) && satText) ? `<div class="minutes-sat">${satText}</div>` : ``}
           ${fatigueBarHTML(id)}
-        ;
+        `;
         info.appendChild(nb);
 
         if (state.fouls[id]) {
@@ -1310,14 +1310,14 @@
         const p = findPlayer(over.id);
         const line = document.createElement('div');
         line.className = 'alert-line warn';
-        line.textContent = ${p.name} is ${formatTime(over.diff)} above team average minutes.;
+        line.textContent = `${p.name} is ${formatTime(over.diff)} above team average minutes.`;
         container.appendChild(line);
       }
       if (under) {
         const p = findPlayer(under.id);
         const line = document.createElement('div');
         line.className = 'alert-line';
-        line.textContent = ${p.name} is ${formatTime(-under.diff)} below team average minutes.;
+        line.textContent = `${p.name} is ${formatTime(-under.diff)} below team average minutes.`;
         container.appendChild(line);
       }
     }
@@ -1331,12 +1331,12 @@
 
         const title = document.createElement('div');
         title.className = 'segment-card-title';
-        title.textContent = ${seg.segment} · ${seg.modeLabel};
+        title.textContent = `${seg.segment} · ${seg.modeLabel}`;
         card.appendChild(title);
 
         seg.top.forEach(item => {
           const line = document.createElement('div');
-          line.textContent = ${item.name}: ${formatTime(item.seconds)};
+          line.textContent = `${item.name}: ${formatTime(item.seconds)}`;
           card.appendChild(line);
         });
 
@@ -1356,7 +1356,7 @@
         container.appendChild(btn);
       });
       const segLabel = document.getElementById('segmentLabel');
-      segLabel.textContent = ${state.currentSegment} · ${modeCfg.label};
+      segLabel.textContent = `${state.currentSegment} · ${modeCfg.label}`;
     }
 
     function renderAll() {
@@ -1636,17 +1636,17 @@
 
         const offBlock = document.createElement('div');
         offBlock.className = 'suggestion-off';
-        offBlock.innerHTML = 
+        offBlock.innerHTML = `
           <div class="suggestion-label">Off ${idx + 1}</div>
           <div class="suggestion-player">${off.name} (#${off.number}) · ${formatTime(p.offSecs)}</div>
-        ;
+        `;
 
         const onBlock = document.createElement('div');
         onBlock.className = 'suggestion-on';
-        onBlock.innerHTML = 
+        onBlock.innerHTML = `
           <div class="suggestion-label">On ${idx + 1}</div>
           <div class="suggestion-player">${on.name} (#${on.number}) · ${formatTime(p.onSecs)}</div>
-        ;
+        `;
 
         main.appendChild(offBlock);
         main.appendChild(onBlock);
@@ -1654,7 +1654,7 @@
 
         const gap = document.createElement('div');
         gap.className = 'suggestion-gap';
-        gap.textContent = Minutes gap: ${p.gapMinutes.toFixed(1)} mins;
+        gap.textContent = `Minutes gap: ${p.gapMinutes.toFixed(1)} mins`;
         pairDiv.appendChild(gap);
 
         suggestPairsEl.appendChild(pairDiv);
