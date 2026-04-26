@@ -761,24 +761,40 @@
 #fullCourt{
   position:relative;
   width:100%;
-  height:520px;
-  border-radius:16px;
+  height:650px;
+  border-radius:20px;
   overflow:hidden;
+
   background:
-    linear-gradient(to bottom, rgba(255,255,255,0.08) 2px, transparent 2px) 0 50%/100% 50% no-repeat,
-    radial-gradient(circle at center, rgba(255,255,255,0.08) 2px, transparent 2px) center/120px 120px no-repeat,
+    /* halfway line */
+    linear-gradient(to bottom, rgba(255,255,255,0.18) 2px, transparent 2px) 0 50%/100% 50% no-repeat,
+
+    /* centre circle */
+    radial-gradient(circle at center, transparent 58px, rgba(255,255,255,0.25) 60px, transparent 62px),
+
+    /* top key */
+    radial-gradient(circle at 50% 10%, rgba(255,255,255,0.15) 120px, transparent 122px),
+
+    /* bottom key */
+    radial-gradient(circle at 50% 90%, rgba(255,255,255,0.15) 120px, transparent 122px),
+
     linear-gradient(#1e3a1e,#0b1f0b);
 }
 
 .fc-player{
   position:absolute;
   transform:translate(-50%,-50%);
-  padding:8px 10px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+
+  padding:6px 10px;
   border-radius:999px;
-  background:radial-gradient(circle at 30% 20%, #f97316, #ea580c 70%);
-  color:#fff;
-  font-size:12px;
-  font-weight:600;
+
+  background:#020617;
+  border:1px solid rgba(55,65,81,0.9);
+
+  box-shadow:0 10px 25px rgba(0,0,0,0.8);
   cursor:grab;
 }
 
@@ -886,7 +902,6 @@
           Tap Sub Mode to make changes safely, then Confirm Sub. The app handles the timing for you so you can stay locked into the game.
         </div>
       </div>
-    </div>
    </div>   <!-- layout-grid -->
  
 <!-- 🔥 FULL COURT GOES HERE -->
@@ -900,20 +915,6 @@
 
   <div class="fullcourt-wrapper">
     <div id="fullCourt">
-
-      <!-- OUR PLAYERS -->
-      <div class="fc-player" style="top:75%; left:50%;">PG</div>
-      <div class="fc-player" style="top:70%; left:25%;">SG</div>
-      <div class="fc-player" style="top:70%; left:75%;">SF</div>
-      <div class="fc-player" style="top:60%; left:35%;">PF</div>
-      <div class="fc-player" style="top:60%; left:65%;">C</div>
-
-      <!-- OPPONENT -->
-      <div class="fc-player opp" style="top:25%; left:50%;">1</div>
-      <div class="fc-player opp" style="top:30%; left:25%;">2</div>
-      <div class="fc-player opp" style="top:30%; left:75%;">3</div>
-      <div class="fc-player opp" style="top:40%; left:35%;">4</div>
-      <div class="fc-player opp" style="top:40%; left:65%;">5</div>
 
     </div>
   </div>
