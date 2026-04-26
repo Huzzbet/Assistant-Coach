@@ -762,25 +762,30 @@
   position:relative;
   width:100%;
   height:650px;
-  border-radius:20px;
+  border-radius:22px;
   overflow:hidden;
 
   background:
-    /* halfway line */
-    linear-gradient(to bottom, rgba(255,255,255,0.18) 2px, transparent 2px) 0 50%/100% 50% no-repeat,
+    /* centre line */
+    linear-gradient(to bottom, rgba(148,163,184,0.25) 2px, transparent 2px) 0 50%/100% 50% no-repeat,
 
-    /* centre circle */
-    radial-gradient(circle at center, transparent 58px, rgba(255,255,255,0.25) 60px, transparent 62px),
+    /* centre circle outline */
+    radial-gradient(circle at center, transparent 58px, rgba(148,163,184,0.35) 60px, transparent 62px),
+
+    /* centre fill glow */
+    radial-gradient(circle at center, rgba(148,163,184,0.08) 120px, transparent 140px),
 
     /* top key */
-    radial-gradient(circle at 50% 10%, rgba(255,255,255,0.15) 120px, transparent 122px),
+    radial-gradient(circle at 50% 8%, rgba(148,163,184,0.12) 140px, transparent 142px),
 
     /* bottom key */
-    radial-gradient(circle at 50% 90%, rgba(255,255,255,0.15) 120px, transparent 122px),
+    radial-gradient(circle at 50% 92%, rgba(148,163,184,0.12) 140px, transparent 142px),
 
-    linear-gradient(#1e3a1e,#0b1f0b);
+    /* subtle court grain */
+    linear-gradient(#0f2a1a,#07140c);
+
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.6);
 }
-
 .fc-player{
   position:absolute;
   transform:translate(-50%,-50%);
@@ -795,6 +800,8 @@
   border:1px solid rgba(55,65,81,0.9);
 
   box-shadow:0 10px 25px rgba(0,0,0,0.8);
+  backdrop-filter: blur(6px);
+
   cursor:grab;
 }
 
@@ -1442,6 +1449,7 @@
       renderAlerts();
       renderSegments();
       renderSegmentControls();
+     renderFullCourt();
     }
 
     function tick() {
@@ -1829,6 +1837,45 @@
 
     // ---------- INIT ----------
     renderAll();
+   // your existing code...
+
+// 🔥 ADD THIS HERE (just above </script>)
+function renderFullCourt(){
+  const court = document.getElementById('fullCourt');
+  if(!court) return;
+
+  court.innerHTML = '';
+
+  const positions = [
+    {top:'78%', left:'50%'},
+    {top:'70%', left:'25%'},
+    {top:'70%', left:'75%'},
+    {top:'60%', left:'35%'},
+    {top:'60%', left:'65%'},
+  ];
+
+  state.onCourt.forEach((id, i) => {
+    const p = findPlayer(id);
+
+    const el = document.createElement('div');
+    el.className = 'fc-player';
+    el.style.top = positions[i].top;
+    el.style.left = positions[i].left;
+
+    el.innerHTML = `
+      <div class="number-pill">${p.number}</div>
+      <div>
+        <div style="font-size:12px;font-weight:600;">${p.name}</div>
+        <div style="font-size:10px;color:#9ca3af;">${p.short}</div>
+        <div style="font-size:10px;color:#cbd5f5;">
+          ${formatTime(state.minutes[id])}
+        </div>
+      </div>
+    `;
+
+    court.appendChild(el);
+  });
+}
   </script>
 </body>
 </html>
