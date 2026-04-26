@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -146,8 +146,6 @@
       grid-template-columns: 1.2fr 1fr;
       gap: 16px;
     }
-   .full-width-panel {
-  width: 100%;
     @media (max-width: 800px) {
       .layout-grid {
         grid-template-columns: 1fr;
@@ -750,69 +748,6 @@
         border-color: rgba(55, 65, 81, 0.9);
       }
     }
-
-/* 🔥 PASTE FULL COURT CSS HERE */
-.fullcourt-wrapper{
-  border-radius:20px;
-  padding:12px;
-  background:radial-gradient(circle at top,#020617 0,#000 100%);
-  border:1px solid rgba(75,85,99,0.9);
-}
-
-#fullCourt{
-  position:relative;
-  width:100%;
-  height:520px;
-  border-radius:22px;
-  overflow:hidden;
-
-  background:
-    /* centre line */
-    linear-gradient(to bottom, rgba(148,163,184,0.25) 2px, transparent 2px) 0 50%/100% 50% no-repeat,
-
-    /* centre circle outline */
-    radial-gradient(circle at center, transparent 58px, rgba(148,163,184,0.35) 60px, transparent 62px),
-
-    /* centre fill glow */
-    radial-gradient(circle at center, rgba(148,163,184,0.08) 120px, transparent 140px),
-
-    /* top key */
-    radial-gradient(circle at 50% 8%, rgba(148,163,184,0.12) 140px, transparent 142px),
-
-    /* bottom key */
-    radial-gradient(circle at 50% 92%, rgba(148,163,184,0.12) 140px, transparent 142px),
-
-    /* subtle court grain */
-    linear-gradient(#0f2a1a,#07140c);
-
-  box-shadow: inset 0 0 60px rgba(0,0,0,0.6);
-}
-.fc-player{
-  position:absolute;
-  transform:translate(-50%,-50%);
-  display:flex;
-  align-items:center;
-  gap:8px;
-
-  padding:8px 12px;
-  border-radius:999px;
-
-  background: radial-gradient(circle at 15% 0, #020617, #020617 70%);
-  border:1px solid rgba(55,65,81,0.9);
-
-  box-shadow:0 12px 30px rgba(0,0,0,0.9);
-
-  font-size:12px;
-
- animation: glowPulse 2.2s ease-in-out infinite;
- 
-}
-
-.fc-player.opp{
-  background:#111827;
-  font-size:10px;
-  opacity:0.8;
-}
   </style>
 </head>
 <body>
@@ -912,26 +847,9 @@
           Tap Sub Mode to make changes safely, then Confirm Sub. The app handles the timing for you so you can stay locked into the game.
         </div>
       </div>
-   </div>   <!-- layout-grid -->
- 
-<!-- 🔥 FULL COURT GOES HERE -->
-<div class="panel full-width-panel" style="margin-top:16px;">
-  <div class="panel-header">
-    <div>
-      <div class="panel-title">Full Court Tactical Board</div>
-      <div class="panel-sub">Drag players to position · Includes opposition setup</div>
     </div>
   </div>
 
-  <div class="fullcourt-wrapper">
-    <div id="fullCourt">
-
-    </div>
-  </div>
-</div>
-
-</div>   <!-- app-shell --> 
- 
   <script>
     // ---------- CONFIG ----------
     const TEAM_CONFIGS = {
@@ -1452,7 +1370,6 @@
       renderAlerts();
       renderSegments();
       renderSegmentControls();
-     renderFullCourt();
     }
 
     function tick() {
@@ -1474,7 +1391,6 @@
       renderBench();
       renderMinutes();
       renderAlerts();
-     renderFullCourt();
     }
     setInterval(tick, 1000);
 
@@ -1838,42 +1754,9 @@
       flashElement(document.getElementById('suggestSubBtn'), 'btn-haptic', 150);
       showSuggestedSub();
     });
-function renderFullCourt(){
-  const court = document.getElementById('fullCourt');
-  if(!court) return;
 
-  court.innerHTML = '';
-
-  const positions = [
-    {top:'78%', left:'50%'},
-    {top:'70%', left:'25%'},
-    {top:'70%', left:'75%'},
-    {top:'60%', left:'35%'},
-    {top:'60%', left:'65%'},
-  ];
-
-  state.onCourt.forEach((id, i) => {
-    const p = findPlayer(id);
-
-    const el = document.createElement('div');
-    el.className = 'fc-player';
-    el.style.top = positions[i].top;
-    el.style.left = positions[i].left;
-
-    el.innerHTML = `
-      <div class="number-pill">${p.number}</div>
-      <div>
-        <div style="font-size:12px;font-weight:600;">${p.name}</div>
-        <div style="font-size:10px;color:#9ca3af;">${p.short}</div>
-        <div style="font-size:10px;color:#cbd5f5;">
-          ${formatTime(state.minutes[id])}
-        </div>
-      </div>
-    `;
-
-    court.appendChild(el);
-  });
-}
+    // ---------- INIT ----------
+    renderAll();
   </script>
 </body>
 </html>
