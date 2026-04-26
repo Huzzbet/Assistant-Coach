@@ -1836,12 +1836,6 @@
       flashElement(document.getElementById('suggestSubBtn'), 'btn-haptic', 150);
       showSuggestedSub();
     });
-
-    // ---------- INIT ----------
-    renderAll();
-   // your existing code...
-
-// 🔥 ADD THIS HERE (just above </script>)
 function renderFullCourt(){
   const court = document.getElementById('fullCourt');
   if(!court) return;
@@ -1880,4 +1874,10 @@ function renderFullCourt(){
 }
   </script>
 </body>
+   
+    // ---------- INIT ----------
+ renderAll();
+   // your existing code...
+
+
 </html>
