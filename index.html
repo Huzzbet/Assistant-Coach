@@ -748,10 +748,61 @@
         border-color: rgba(55, 65, 81, 0.9);
       }
     }
+    @keyframes panelFlash {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+/* 👇 PASTE FULL COURT CSS HERE */
+.full-court {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  border-radius: 20px;
+  background: radial-gradient(circle at center, #111827, #020617 70%);
+  border: 1px solid rgba(75, 85, 99, 0.9);
+  overflow: hidden;
+}
+
+.half-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: rgba(148,163,184,0.5);
+}
+
+.center-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80px;
+  height: 80px;
+  border: 2px solid rgba(148,163,184,0.5);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.draggable-player {
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 20%, #f97316, #ea580c 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  cursor: grab;
+  user-select: none;
+}
   </style>
 </head>
 <body>
   <div class="app-shell">
+    <div id="rotationPage">
     <div class="top-row">
       <div style="display:flex; align-items:flex-start;">
         <div class="title-block">
@@ -774,6 +825,11 @@
           <button class="btn" id="resetBtn">Reset</button>
         </div>
         <div class="mode-toggle" id="modeToggle">
+          <div class="mode-toggle" id="pageToggle">
+  <button class="mode-pill active" data-page="rotation">Rotation</button>
+  <button class="mode-pill" data-page="court">Full Court</button>
+</div>
+          
           <button class="mode-pill active" data-mode="rep">Rep · 4×10</button>
           <button class="mode-pill" data-mode="domestic">Domestic · 2×18</button>
         </div>
@@ -849,7 +905,28 @@
       </div>
     </div>
   </div>
+</div> <!-- END rotationPage -->
+<div id="courtPage" class="hidden">
+  <div class="panel">
+    <div class="panel-header">
+      <div>
+        <div class="panel-title">Full Court Board</div>
+        <div class="panel-sub">Drag players to positions</div>
+      </div>
+    </div>
 
+    <div class="full-court" id="fullCourt">
+      <div class="half-line"></div>
+      <div class="center-circle"></div>
+
+      <div class="draggable-player" style="top:70%; left:50%;">1</div>
+      <div class="draggable-player" style="top:65%; left:30%;">2</div>
+      <div class="draggable-player" style="top:65%; left:70%;">3</div>
+      <div class="draggable-player" style="top:80%; left:35%;">4</div>
+      <div class="draggable-player" style="top:80%; left:65%;">5</div>
+    </div>
+  </div>
+</div>
   <script>
     // ---------- CONFIG ----------
     const TEAM_CONFIGS = {
@@ -1757,6 +1834,50 @@
 
     // ---------- INIT ----------
     renderAll();
+
+document.getElementById('pageToggle').addEventListener('click', e=>{
+  const btn = e.target.closest('.mode-pill');
+  if(!btn) return;
+
+  document.querySelectorAll('#pageToggle .mode-pill')
+    .forEach(b=>b.classList.remove('active'));
+
+  btn.classList.add('active');
+
+  const page = btn.dataset.page;
+
+  document.getElementById('rotationPage').classList.toggle('hidden', page !== 'rotation');
+  document.getElementById('courtPage').classList.toggle('hidden', page !== 'court');
+});
+
+
+// 🔥 PASTE DRAG CODE RIGHT HERE 👇
+document.querySelectorAll('.draggable-player').forEach(player => {
+  let isDragging = false;
+
+  player.addEventListener('mousedown', () => {
+    isDragging = true;
+    player.style.cursor = 'grabbing';
+  });
+
+  document.addEventListener('mouseup', () => {
+    isDragging = false;
+    player.style.cursor = 'grab';
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+
+    const court = document.getElementById('fullCourt');
+    const rect = court.getBoundingClientRect();
+
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+    player.style.left = x + '%';
+    player.style.top = y + '%';
+  });
+});
   </script>
 </body>
 </html>
