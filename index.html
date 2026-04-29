@@ -1,14 +1,16 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rotation Tracker</title>
+
   <style>
     * {
       box-sizing: border-box;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
+
     body {
       margin: 0;
       padding: 16px;
@@ -17,6 +19,7 @@
       display: flex;
       justify-content: center;
     }
+
     .app-shell {
       width: 100%;
       max-width: 980px;
@@ -26,6 +29,7 @@
       box-shadow: 0 26px 70px rgba(0, 0, 0, 0.85);
       border: 1px solid rgba(148, 163, 184, 0.35);
     }
+
     .top-row {
       display: flex;
       justify-content: space-between;
@@ -34,11 +38,13 @@
       gap: 12px;
       flex-wrap: wrap;
     }
+
     .title-block {
       display: flex;
       align-items: center;
       gap: 10px;
     }
+
     .app-icon {
       width: 42px;
       height: 42px;
@@ -50,19 +56,23 @@
       box-shadow: 0 12px 24px rgba(249, 115, 22, 0.5);
       font-size: 20px;
     }
+
     .title-text h1 {
       margin: 0;
       font-size: 20px;
       letter-spacing: 0.16em;
       text-transform: uppercase;
     }
+
     .title-text span {
       font-size: 12px;
       color: #9ca3af;
     }
+
     .team-select-wrap {
       margin-left: 8px;
     }
+
     .team-select-label {
       font-size: 10px;
       color: #9ca3af;
@@ -70,6 +80,7 @@
       letter-spacing: 0.16em;
       margin-bottom: 3px;
     }
+
     .team-select {
       font-size: 12px;
       border-radius: 999px;
@@ -78,10 +89,12 @@
       background: #020617;
       color: #e5e7eb;
     }
+
     .clock-block {
       text-align: right;
       min-width: 240px;
     }
+
     .clock-label {
       font-size: 10px;
       letter-spacing: 0.2em;
@@ -89,12 +102,14 @@
       color: #9ca3af;
       margin-bottom: 4px;
     }
+
     .clock-display {
       font-size: 26px;
       font-weight: 600;
       font-variant-numeric: tabular-nums;
       margin-bottom: 6px;
     }
+
     .btn {
       border-radius: 999px;
       padding: 6px 14px;
@@ -108,18 +123,22 @@
       gap: 6px;
       transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
     }
+
     .btn.primary {
       background: radial-gradient(circle at 15% 0, #2563eb, #1d4ed8 55%, #1e40af 100%);
       border-color: transparent;
       box-shadow: 0 10px 24px rgba(37, 99, 235, 0.6);
     }
+
     .btn.small {
       padding: 4px 10px;
       font-size: 11px;
     }
+
     .btn:active {
       transform: translateY(1px);
     }
+
     .mode-toggle {
       margin-top: 6px;
       display: flex;
@@ -127,6 +146,17 @@
       gap: 6px;
       flex-wrap: wrap;
     }
+
+    .page-toggle {
+      justify-content: flex-start;
+      margin: 0 0 14px;
+      padding: 6px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      width: fit-content;
+    }
+
     .mode-pill {
       border-radius: 999px;
       border: 1px solid rgba(148, 163, 184, 0.7);
@@ -137,20 +167,29 @@
       cursor: pointer;
       transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, background 0.15s ease-out;
     }
+
     .mode-pill.active {
       background: radial-gradient(circle at 15% 0, #1d4ed8, #1e40af 70%);
       border-color: transparent;
+      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.35);
     }
+
     .layout-grid {
       display: grid;
       grid-template-columns: 1.2fr 1fr;
       gap: 16px;
     }
+
     @media (max-width: 800px) {
       .layout-grid {
         grid-template-columns: 1fr;
       }
+
+      .clock-block {
+        text-align: left;
+      }
     }
+
     .panel {
       background: radial-gradient(circle at top, #020617 0, #020617 55%, #000 100%);
       border-radius: 22px;
@@ -160,22 +199,27 @@
       position: relative;
       overflow: hidden;
     }
+
     .panel-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 8px;
+      gap: 10px;
     }
+
     .panel-title {
       font-size: 11px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
       color: #9ca3af;
     }
+
     .panel-sub {
       font-size: 11px;
       color: #6b7280;
     }
+
     .sub-mode-btn {
       font-size: 11px;
       border-radius: 999px;
@@ -189,12 +233,14 @@
       gap: 6px;
       transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, background 0.15s ease-out;
     }
+
     .sub-mode-btn.on {
       border-color: rgba(34, 197, 94, 0.9);
       background: radial-gradient(circle at 20% 0, #16a34a, #14532d 70%);
       color: #ecfdf5;
       box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.8);
     }
+
     .court-wrapper {
       border-radius: 20px;
       padding: 16px 12px 12px;
@@ -202,6 +248,7 @@
       border: 1px solid rgba(75, 85, 99, 0.9);
       margin-bottom: 10px;
     }
+
     .court-label {
       text-align: center;
       font-size: 10px;
@@ -210,15 +257,18 @@
       color: #4b5563;
       margin-bottom: 6px;
     }
+
     .court-rows {
       display: grid;
       row-gap: 10px;
     }
+
     .court-row {
       display: flex;
       justify-content: space-around;
       gap: 10px;
     }
+
     .player-chip {
       min-width: 130px;
       max-width: 190px;
@@ -234,11 +284,13 @@
       position: relative;
       transition: box-shadow 0.18s ease-out, border-color 0.18s ease-out, transform 0.18s ease-out;
     }
+
     .player-chip.selected {
       border-color: #22c55e;
       box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.9), 0 14px 28px rgba(34, 197, 94, 0.45);
       transform: translateY(-1px) scale(1.01);
     }
+
     .number-pill {
       width: 28px;
       height: 28px;
@@ -252,24 +304,29 @@
       color: #fefce8;
       flex-shrink: 0;
     }
+
     .player-meta {
       flex: 1;
     }
+
     .player-name {
       font-size: 13px;
       font-weight: 600;
     }
+
     .player-role {
       font-size: 11px;
       color: #9ca3af;
       text-transform: uppercase;
       letter-spacing: 0.14em;
     }
+
     .player-mins {
       font-size: 11px;
       color: #cbd5f5;
       font-variant-numeric: tabular-nums;
     }
+
     .foul-btn {
       border-radius: 999px;
       border: 1px solid rgba(148, 163, 184, 0.7);
@@ -280,31 +337,41 @@
       cursor: pointer;
       transition: background 0.12s ease-out, transform 0.12s ease-out;
     }
+
     .foul-btn.on {
       background: radial-gradient(circle at 15% 0, #f97316, #c2410c 70%);
       border-color: transparent;
       color: #fefce8;
     }
+
     .bench-wrapper {
       margin-top: 8px;
       position: relative;
     }
+
     .bench-header-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 6px;
     }
+
     .bench-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 8px;
     }
+
     @media (max-width: 640px) {
       .bench-grid {
         grid-template-columns: 1fr;
       }
+
+      .player-chip {
+        min-width: 120px;
+      }
     }
+
     .bench-card {
       display: flex;
       align-items: center;
@@ -319,11 +386,13 @@
       transition: box-shadow 0.18s ease-out, border-color 0.18s ease-out, transform 0.18s ease-out;
       position: relative;
     }
+
     .bench-card.selected {
       border-color: #22c55e;
       box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.9), 0 12px 24px rgba(34, 197, 94, 0.45);
       transform: translateY(-1px) scale(1.01);
     }
+
     .bench-main {
       display: flex;
       align-items: center;
@@ -331,6 +400,7 @@
       flex: 1;
       min-width: 0;
     }
+
     .bench-number {
       width: 26px;
       height: 26px;
@@ -343,18 +413,19 @@
       color: #e5e7eb;
       flex-shrink: 0;
     }
+
     .bench-labels {
       font-size: 12px;
       flex: 1;
       min-width: 0;
     }
+
     .bench-mins {
       font-size: 11px;
       color: #9ca3af;
       font-variant-numeric: tabular-nums;
     }
 
-    /* NEW: time since last sub (bench only) */
     .bench-sat {
       font-size: 10px;
       color: #6b7280;
@@ -367,6 +438,7 @@
       flex-direction: column;
       gap: 2px;
     }
+
     .bench-arrow {
       border-radius: 999px;
       border: 1px solid rgba(148, 163, 184, 0.8);
@@ -377,11 +449,11 @@
       cursor: pointer;
       transition: background 0.12s ease-out, transform 0.12s ease-out;
     }
+
     .bench-arrow:active {
       transform: translateY(1px);
     }
 
-    /* NEW: Next Up nudge */
     .nextup-pill {
       position: absolute;
       right: 44px;
@@ -398,6 +470,7 @@
       pointer-events: none;
       white-space: nowrap;
     }
+
     .bench-card.nextup {
       border-color: rgba(56, 189, 248, 0.75);
       box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.25), 0 10px 22px rgba(8, 47, 73, 0.55);
@@ -408,22 +481,27 @@
       color: #6b7280;
       margin-top: 4px;
     }
+
     .sub-actions {
       margin-top: 8px;
       display: flex;
       justify-content: flex-end;
       gap: 8px;
     }
+
     .minutes-header {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
       margin-bottom: 6px;
+      gap: 8px;
     }
+
     .minutes-sub {
       font-size: 11px;
       color: #9ca3af;
     }
+
     .segment-row {
       display: flex;
       justify-content: space-between;
@@ -432,15 +510,18 @@
       margin-bottom: 6px;
       flex-wrap: wrap;
     }
+
     .segment-label {
       font-size: 11px;
       color: #9ca3af;
     }
+
     .segment-buttons {
       display: flex;
       gap: 6px;
       flex-wrap: wrap;
     }
+
     .segment-btn {
       border-radius: 999px;
       border: 1px solid rgba(148, 163, 184, 0.7);
@@ -451,11 +532,13 @@
       cursor: pointer;
       transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, background 0.15s ease-out;
     }
+
     .segment-btn.active {
       background: radial-gradient(circle at 15% 0, #1d4ed8, #1e40af 70%);
       border-color: transparent;
       animation: segmentPulse 2.4s ease-in-out infinite;
     }
+
     .minutes-list {
       max-height: none;
       overflow-y: visible;
@@ -465,6 +548,7 @@
       padding: 6px 8px;
       background: radial-gradient(circle at top, #020617 0, #020617 60%, #020617 100%);
     }
+
     .minutes-row {
       display: flex;
       justify-content: space-between;
@@ -474,14 +558,15 @@
       transition: background 0.15s ease-out, transform 0.15s ease-out;
       position: relative;
     }
+
     .minutes-row + .minutes-row {
       border-top: 1px dashed rgba(55, 65, 81, 0.9);
     }
+
     .minutes-row.on {
       background: radial-gradient(circle at left, rgba(34, 197, 94, 0.14), transparent 70%);
     }
 
-    /* NEW: subtle Next Up badge in minutes list too */
     .minutes-nextup {
       font-size: 9px;
       letter-spacing: 0.14em;
@@ -502,6 +587,7 @@
       flex: 1;
       min-width: 0;
     }
+
     .minutes-number {
       width: 22px;
       height: 22px;
@@ -514,6 +600,7 @@
       color: #e5e7eb;
       flex-shrink: 0;
     }
+
     .minutes-name-block {
       display: flex;
       flex-direction: column;
@@ -521,23 +608,25 @@
       flex: 1;
       min-width: 0;
     }
+
     .minutes-role {
       font-size: 10px;
       color: #6b7280;
       text-transform: uppercase;
       letter-spacing: 0.14em;
     }
+
     .minutes-status {
       font-size: 10px;
       color: #22c55e;
       text-transform: uppercase;
       letter-spacing: 0.16em;
     }
+
     .minutes-status.bench {
       color: #9ca3af;
     }
 
-    /* NEW: sat time in minutes list (bench only) */
     .minutes-sat {
       font-size: 10px;
       color: #6b7280;
@@ -551,6 +640,7 @@
       margin-left: 8px;
       flex-shrink: 0;
     }
+
     .minutes-foul-pill {
       font-size: 10px;
       border-radius: 999px;
@@ -558,10 +648,12 @@
       background: radial-gradient(circle at 10% 0, #f97316, #b45309 80%);
       color: #fefce8;
     }
+
     .alerts {
       margin-top: 8px;
       font-size: 11px;
     }
+
     .alert-line {
       padding: 5px 6px;
       border-radius: 10px;
@@ -569,12 +661,12 @@
       border: 1px solid rgba(59, 130, 246, 0.6);
       background: radial-gradient(circle at left, rgba(59, 130, 246, 0.14), transparent 70%);
     }
+
     .alert-line.warn {
       border-color: rgba(234, 179, 8, 0.8);
       background: radial-gradient(circle at left, rgba(234, 179, 8, 0.18), transparent 70%);
     }
 
-    /* Suggested sub card */
     .suggestion-card {
       margin-top: 6px;
       font-size: 11px;
@@ -584,6 +676,7 @@
       background: radial-gradient(circle at top left, rgba(8, 47, 73, 0.9), #020617 70%);
       box-shadow: 0 14px 30px rgba(8, 47, 73, 0.8);
     }
+
     .suggestion-title {
       font-size: 10px;
       text-transform: uppercase;
@@ -591,6 +684,7 @@
       color: #7dd3fc;
       margin-bottom: 3px;
     }
+
     .suggestion-pair {
       margin-bottom: 3px;
       padding: 3px 4px;
@@ -600,39 +694,46 @@
       flex-direction: column;
       gap: 1px;
     }
+
     .suggestion-pair-main {
       display: flex;
       justify-content: space-between;
       gap: 4px;
     }
+
     .suggestion-off,
     .suggestion-on {
       font-size: 11px;
       display: flex;
       flex-direction: column;
     }
+
     .suggestion-label {
       font-size: 9px;
       text-transform: uppercase;
       letter-spacing: 0.14em;
       color: #9ca3af;
     }
+
     .suggestion-player {
       color: #e5e7eb;
       font-weight: 500;
     }
+
     .suggestion-gap {
       font-size: 9px;
       color: #a5b4fc;
       margin-top: 1px;
     }
+
     .suggestion-tag {
       margin-top: 4px;
       color: #bae6fd;
       font-size: 10px;
     }
+
     .hidden {
-      display: none;
+      display: none !important;
     }
 
     .segments {
@@ -641,6 +742,7 @@
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 8px;
     }
+
     .segment-card {
       border-radius: 14px;
       border: 1px solid rgba(55, 65, 81, 0.9);
@@ -649,6 +751,7 @@
       background: radial-gradient(circle at top left, #020617 0, #000 80%);
       transition: box-shadow 0.2s ease-out, transform 0.2s ease-out, border-color 0.2s ease-out;
     }
+
     .segment-card-title {
       font-size: 11px;
       text-transform: uppercase;
@@ -656,16 +759,17 @@
       color: #9ca3af;
       margin-bottom: 3px;
     }
+
     .footnote {
       font-size: 10px;
       color: #6b7280;
       margin-top: 6px;
     }
 
-    /* Fatigue bar */
     .fatigue-wrap {
       margin-top: 2px;
     }
+
     .fatigue-bar-bg {
       width: 100%;
       height: 4px;
@@ -673,25 +777,29 @@
       background: rgba(15, 23, 42, 0.9);
       overflow: hidden;
     }
+
     .fatigue-bar-inner {
       height: 100%;
       border-radius: 999px;
       transition: width 0.25s ease-out;
     }
+
     .fatigue-low {
       background: linear-gradient(to right, #22c55e, #15803d);
     }
+
     .fatigue-med {
       background: linear-gradient(to right, #eab308, #ca8a04);
     }
+
     .fatigue-high {
       background: linear-gradient(to right, #f97316, #b91c1c);
     }
 
-    /* Micro animations */
     .on-court-active {
       animation: glowPulse 2.2s ease-in-out infinite;
     }
+
     @keyframes glowPulse {
       0% {
         box-shadow: 0 10px 22px rgba(34, 197, 94, 0.10);
@@ -706,6 +814,7 @@
         border-color: rgba(55, 65, 81, 0.9);
       }
     }
+
     @keyframes segmentPulse {
       0% {
         transform: translateY(0);
@@ -720,20 +829,22 @@
         box-shadow: 0 0 0 rgba(37, 99, 235, 0);
       }
     }
+
     .btn-haptic {
       animation: hapticTap 0.12s ease-out;
     }
+
     @keyframes hapticTap {
       0% { transform: scale(1); }
       50% { transform: scale(0.96); }
       100% { transform: scale(1); }
     }
-    .panel-flash {
+
+    .panel-flash,
+    .segment-flash {
       animation: panelFlash 0.35s ease-out;
     }
-    .segment-flash {
-      animation: panelFlash 0.45s ease-out;
-    }
+
     @keyframes panelFlash {
       0% {
         box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.0);
@@ -748,75 +859,299 @@
         border-color: rgba(55, 65, 81, 0.9);
       }
     }
-    @keyframes panelFlash {
-  0% { opacity: 0.6; }
-  100% { opacity: 1; }
-}
 
-/* 👇 PASTE FULL COURT CSS HERE */
-.full-court {
-  position: relative;
-  width: 100%;
-  height: 500px;
-  border-radius: 20px;
-  background: radial-gradient(circle at center, #111827, #020617 70%);
-  border: 1px solid rgba(75, 85, 99, 0.9);
-  overflow: hidden;
-}
+    /* FULL COURT BOARD */
 
-.half-line {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: rgba(148,163,184,0.5);
-}
+    .full-court-wrap {
+      margin-top: 2px;
+    }
 
-.center-circle {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 80px;
-  height: 80px;
-  border: 2px solid rgba(148,163,184,0.5);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-}
+    .full-court-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
 
-.draggable-player {
-  position: absolute;
-  width: 42px;
-  height: 42px;
-  border-radius: 999px;
-  background: radial-gradient(circle at 30% 20%, #f97316, #ea580c 70%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: bold;
-  cursor: grab;
-  user-select: none;
-}
+    .full-court-note {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    .full-court {
+      position: relative;
+      width: 100%;
+      height: 560px;
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(30, 64, 175, 0.18), transparent 22%),
+        radial-gradient(circle at 20% 10%, rgba(56, 189, 248, 0.10), transparent 30%),
+        linear-gradient(180deg, #0f172a 0%, #020617 48%, #020617 100%);
+      border: 1px solid rgba(75, 85, 99, 0.95);
+      overflow: hidden;
+      box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.75), 0 18px 42px rgba(0, 0, 0, 0.55);
+      touch-action: none;
+    }
+
+    .court-line {
+      position: absolute;
+      border-color: rgba(148, 163, 184, 0.34);
+      pointer-events: none;
+    }
+
+    .full-half-line {
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: rgba(148, 163, 184, 0.45);
+    }
+
+    .full-center-circle {
+      top: 50%;
+      left: 50%;
+      width: 104px;
+      height: 104px;
+      border: 2px solid rgba(148, 163, 184, 0.35);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .full-center-dot {
+      top: 50%;
+      left: 50%;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(148, 163, 184, 0.55);
+      transform: translate(-50%, -50%);
+    }
+
+    .key {
+      left: 50%;
+      width: 150px;
+      height: 92px;
+      border: 2px solid rgba(148, 163, 184, 0.28);
+      transform: translateX(-50%);
+    }
+
+    .key.top {
+      top: 0;
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+    }
+
+    .key.bottom {
+      bottom: 0;
+      border-bottom: none;
+      border-radius: 12px 12px 0 0;
+    }
+
+    .free-throw-circle {
+      left: 50%;
+      width: 96px;
+      height: 96px;
+      border: 2px solid rgba(148, 163, 184, 0.24);
+      border-radius: 50%;
+      transform: translateX(-50%);
+    }
+
+    .free-throw-circle.top {
+      top: 42px;
+    }
+
+    .free-throw-circle.bottom {
+      bottom: 42px;
+    }
+
+    .hoop {
+      left: 50%;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid rgba(249, 115, 22, 0.85);
+      transform: translateX(-50%);
+      box-shadow: 0 0 14px rgba(249, 115, 22, 0.45);
+    }
+
+    .hoop.top {
+      top: 18px;
+    }
+
+    .hoop.bottom {
+      bottom: 18px;
+    }
+
+    .three-arc {
+      left: 50%;
+      width: 420px;
+      height: 220px;
+      border: 2px solid rgba(148, 163, 184, 0.22);
+      transform: translateX(-50%);
+    }
+
+    .three-arc.top {
+      top: -95px;
+      border-radius: 0 0 220px 220px;
+      border-top: none;
+    }
+
+    .three-arc.bottom {
+      bottom: -95px;
+      border-radius: 220px 220px 0 0;
+      border-bottom: none;
+    }
+
+    .full-court-label {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(148, 163, 184, 0.35);
+      pointer-events: none;
+    }
+
+    .full-court-label.top {
+      top: 126px;
+    }
+
+    .full-court-label.bottom {
+      bottom: 126px;
+    }
+
+    .court-player {
+      position: absolute;
+      width: 58px;
+      height: 58px;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 30% 20%, #f97316, #ea580c 62%, #9a3412 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff7ed;
+      font-weight: 800;
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 14px 28px rgba(249, 115, 22, 0.48);
+      border: 2px solid rgba(254, 215, 170, 0.8);
+      z-index: 5;
+    }
+
+    .court-player:active {
+      cursor: grabbing;
+    }
+
+    .court-player-number {
+      font-size: 17px;
+      line-height: 1;
+    }
+
+    .court-player-name {
+      position: absolute;
+      top: 62px;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      font-size: 10px;
+      font-weight: 600;
+      color: #e5e7eb;
+      background: rgba(2, 6, 23, 0.78);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      border-radius: 999px;
+      padding: 3px 7px;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
+    }
+
+    .court-player-role {
+      position: absolute;
+      bottom: -6px;
+      right: -6px;
+      min-width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: #020617;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      color: #bae6fd;
+      font-size: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 5px;
+    }
+
+    .full-court-legend {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 8px;
+    }
+
+    .legend-card {
+      border-radius: 14px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: radial-gradient(circle at top left, #020617 0, #000 80%);
+      padding: 8px 10px;
+      font-size: 11px;
+    }
+
+    .legend-card strong {
+      color: #e5e7eb;
+    }
+
+    .legend-card span {
+      color: #9ca3af;
+      display: block;
+      margin-top: 2px;
+    }
+
+    @media (max-width: 640px) {
+      .full-court {
+        height: 520px;
+      }
+
+      .three-arc {
+        width: 330px;
+      }
+
+      .court-player {
+        width: 52px;
+        height: 52px;
+      }
+
+      .court-player-name {
+        font-size: 9px;
+        top: 56px;
+      }
+    }
   </style>
 </head>
+
 <body>
   <div class="app-shell">
-    <div id="rotationPage">
+
     <div class="top-row">
-      <div style="display:flex; align-items:flex-start;">
+      <div style="display:flex; align-items:flex-start; flex-wrap:wrap; gap:10px;">
         <div class="title-block">
           <div class="app-icon">⏱</div>
           <div class="title-text">
             <h1>ROTATION TRACKER</h1>
-            <span>Live minutes & substitutions for rep hoops</span>
+            <span>Live minutes, substitutions & magnetic full-court board</span>
           </div>
         </div>
+
         <div class="team-select-wrap">
           <div class="team-select-label">Team</div>
           <select id="teamSelect" class="team-select"></select>
         </div>
       </div>
+
       <div class="clock-block">
         <div class="clock-label">Game Clock</div>
         <div class="clock-display" id="clockDisplay">10:00</div>
@@ -824,109 +1159,134 @@
           <button class="btn primary" id="startBtn">Start</button>
           <button class="btn" id="resetBtn">Reset</button>
         </div>
+
         <div class="mode-toggle" id="modeToggle">
-          <div class="mode-toggle" id="pageToggle">
-  <button class="mode-pill active" data-page="rotation">Rotation</button>
-  <button class="mode-pill" data-page="court">Full Court</button>
-</div>
-          
           <button class="mode-pill active" data-mode="rep">Rep · 4×10</button>
           <button class="mode-pill" data-mode="domestic">Domestic · 2×18</button>
         </div>
       </div>
     </div>
 
-    <div class="layout-grid">
-      <div class="panel" id="leftPanel">
+    <div class="mode-toggle page-toggle" id="pageToggle">
+      <button class="mode-pill active" data-page="rotation">Rotation</button>
+      <button class="mode-pill" data-page="court">Full Court</button>
+    </div>
+
+    <div id="rotationPage">
+      <div class="layout-grid">
+        <div class="panel" id="leftPanel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">On Court</div>
+              <div class="panel-sub">Use ▲ / ▼ to arrange spots · Sub Mode to mark on/off</div>
+            </div>
+            <button class="sub-mode-btn" id="subModeBtn">🧩 Sub Mode</button>
+          </div>
+
+          <div class="court-wrapper">
+            <div class="court-label">Half Court</div>
+            <div class="court-rows" id="courtArea">
+              <div class="court-row" id="courtTop"></div>
+              <div class="court-row" id="courtMid"></div>
+              <div class="court-row" id="courtBot"></div>
+            </div>
+          </div>
+
+          <div class="bench-wrapper" id="benchWrapper">
+            <div class="bench-header-row">
+              <div class="panel-title">Bench</div>
+            </div>
+            <div class="bench-grid" id="benchGrid"></div>
+            <div class="bench-tip">
+              Tip: use the ▲ / ▼ buttons on each bench player to reorder them to match how they’re sitting.
+            </div>
+            <div class="sub-actions">
+              <button class="btn small primary" id="confirmSubBtn">Confirm Sub</button>
+              <button class="btn small" id="cancelSubBtn">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" id="rightPanel">
+          <div class="minutes-header">
+            <div>
+              <div class="panel-title">Player Minutes</div>
+              <div class="minutes-sub">Total court time across the game</div>
+            </div>
+            <div class="minutes-sub" id="runningStatus">Clock paused · tap Start to begin</div>
+          </div>
+
+          <div class="segment-row">
+            <div class="segment-label">Segment: <span id="segmentLabel">Q1 · Rep</span></div>
+            <div class="segment-buttons" id="segmentButtons"></div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button class="btn small" id="saveSegmentBtn">Save Snapshot</button>
+              <button class="btn small primary" id="suggestSubBtn">Suggest Sub</button>
+            </div>
+          </div>
+
+          <div class="minutes-list" id="minutesList"></div>
+          <div class="alerts" id="alerts"></div>
+
+          <div class="suggestion-card hidden" id="suggestionCard">
+            <div class="suggestion-title">Suggested Subs</div>
+            <div id="suggestPairs"></div>
+            <div class="suggestion-tag" id="suggestTag"></div>
+          </div>
+
+          <div class="segments" id="segments"></div>
+
+          <div class="footnote">
+            Tap Sub Mode to make changes safely, then Confirm Sub. The app handles the timing for you so you can stay locked into the game.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="courtPage" class="hidden">
+      <div class="panel">
         <div class="panel-header">
           <div>
-            <div class="panel-title">On Court</div>
-            <div class="panel-sub">Use ▲ / ▼ to arrange spots · Sub Mode to mark on/off</div>
+            <div class="panel-title">Full Court Board</div>
+            <div class="panel-sub">Drag the current five into position. Updates automatically after subs.</div>
           </div>
-          <button class="sub-mode-btn" id="subModeBtn">🧩 Sub Mode</button>
+          <button class="btn small" id="resetCourtPositionsBtn">Reset Spots</button>
         </div>
 
-        <div class="court-wrapper">
-          <div class="court-label">Half Court</div>
-          <div class="court-rows" id="courtArea">
-            <div class="court-row" id="courtTop"></div>
-            <div class="court-row" id="courtMid"></div>
-            <div class="court-row" id="courtBot"></div>
+        <div class="full-court-wrap">
+          <div class="full-court-toolbar">
+            <div class="full-court-note">
+              Magnetic board view · use for press break, sideline inbound, spacing and match-ups.
+            </div>
           </div>
-        </div>
 
-        <div class="bench-wrapper" id="benchWrapper">
-          <div class="bench-header-row">
-            <div class="panel-title">Bench</div>
+          <div class="full-court" id="fullCourt">
+            <div class="court-line full-half-line"></div>
+            <div class="court-line full-center-circle"></div>
+            <div class="court-line full-center-dot"></div>
+
+            <div class="court-line key top"></div>
+            <div class="court-line key bottom"></div>
+            <div class="court-line free-throw-circle top"></div>
+            <div class="court-line free-throw-circle bottom"></div>
+            <div class="court-line hoop top"></div>
+            <div class="court-line hoop bottom"></div>
+            <div class="court-line three-arc top"></div>
+            <div class="court-line three-arc bottom"></div>
+
+            <div class="full-court-label top">Opponent Basket</div>
+            <div class="full-court-label bottom">Our Basket</div>
+
+            <div id="fullCourtPlayers"></div>
           </div>
-          <div class="bench-grid" id="benchGrid"></div>
-          <div class="bench-tip">
-            Tip: use the ▲ / ▼ buttons on each bench player to reorder them to match how they’re sitting.
-          </div>
-          <div class="sub-actions">
-            <button class="btn small primary" id="confirmSubBtn">Confirm Sub</button>
-            <button class="btn small" id="cancelSubBtn">Cancel</button>
-          </div>
-        </div>
-      </div>
 
-      <div class="panel" id="rightPanel">
-        <div class="minutes-header">
-          <div>
-            <div class="panel-title">Player Minutes</div>
-            <div class="minutes-sub">Total court time across the game</div>
-          </div>
-          <div class="minutes-sub" id="runningStatus">Clock paused · tap Start to begin</div>
-        </div>
-
-        <div class="segment-row">
-          <div class="segment-label">Segment: <span id="segmentLabel">Q1 · Rep</span></div>
-          <div class="segment-buttons" id="segmentButtons"></div>
-          <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button class="btn small" id="saveSegmentBtn">Save Snapshot</button>
-            <button class="btn small primary" id="suggestSubBtn">Suggest Sub</button>
-          </div>
-        </div>
-
-        <div class="minutes-list" id="minutesList"></div>
-        <div class="alerts" id="alerts"></div>
-
-        <div class="suggestion-card hidden" id="suggestionCard">
-          <div class="suggestion-title">Suggested Subs</div>
-          <div id="suggestPairs"></div>
-          <div class="suggestion-tag" id="suggestTag"></div>
-        </div>
-
-        <div class="segments" id="segments"></div>
-
-        <div class="footnote">
-          Tap Sub Mode to make changes safely, then Confirm Sub. The app handles the timing for you so you can stay locked into the game.
+          <div class="full-court-legend" id="fullCourtLegend"></div>
         </div>
       </div>
     </div>
+
   </div>
-</div> <!-- END rotationPage -->
-<div id="courtPage" class="hidden">
-  <div class="panel">
-    <div class="panel-header">
-      <div>
-        <div class="panel-title">Full Court Board</div>
-        <div class="panel-sub">Drag players to positions</div>
-      </div>
-    </div>
 
-    <div class="full-court" id="fullCourt">
-      <div class="half-line"></div>
-      <div class="center-circle"></div>
-
-      <div class="draggable-player" style="top:70%; left:50%;">1</div>
-      <div class="draggable-player" style="top:65%; left:30%;">2</div>
-      <div class="draggable-player" style="top:65%; left:70%;">3</div>
-      <div class="draggable-player" style="top:80%; left:35%;">4</div>
-      <div class="draggable-player" style="top:80%; left:65%;">5</div>
-    </div>
-  </div>
-</div>
   <script>
     // ---------- CONFIG ----------
     const TEAM_CONFIGS = {
@@ -947,6 +1307,7 @@
         initialOn: [13, 14, 23, 24, 40],
         initialBench: [44, 51, 89, 0, 12]
       },
+
       domestic_u14: {
         name: 'Domestic U14',
         players: [
@@ -982,25 +1343,13 @@
       domestic: MODES.domestic.segmentLength * MODES.domestic.segmentLabels.length
     };
 
-    // how far through the game we are in seconds
-    function getElapsedGameSeconds() {
-      const modeCfg = MODES[state.mode];
-      if (!modeCfg) return 0;
-
-      const labels = modeCfg.segmentLabels;
-      const segIndex = labels.indexOf(state.currentSegment);
-
-      const completedSegments = Math.max(0, segIndex);
-      const elapsedCompleted = completedSegments * modeCfg.segmentLength;
-      const elapsedCurrent = modeCfg.segmentLength - state.clockSeconds;
-
-      const total = elapsedCompleted + elapsedCurrent;
-      const maxTotal =
-        TOTAL_GAME_SECONDS[state.mode] ||
-        (modeCfg.segmentLength * modeCfg.segmentLabels.length);
-
-      return Math.max(0, Math.min(maxTotal, total));
-    }
+    const DEFAULT_COURT_POSITIONS = [
+      { x: 50, y: 72 },
+      { x: 28, y: 66 },
+      { x: 72, y: 66 },
+      { x: 36, y: 82 },
+      { x: 64, y: 82 }
+    ];
 
     // ---------- STATE ----------
     const state = {
@@ -1017,22 +1366,20 @@
       selectedOn: [],
       selectedBench: [],
       segments: [],
-
-      // NEW: track when each player was subbed to the bench (elapsed game seconds)
-      lastWentBenchAt: {}
+      lastWentBenchAt: {},
+      currentPage: 'rotation',
+      fullCourtPositions: {}
     };
 
-    // suggested sub DOM refs
-    const suggestionCard = document.getElementById('suggestionCard');
-    const suggestPairsEl = document.getElementById('suggestPairs');
-    const suggestTagEl = document.getElementById('suggestTag');
-
+    // ---------- HELPERS ----------
     function currentTeam() {
       return TEAM_CONFIGS[state.teamId];
     }
+
     function allPlayers() {
       return currentTeam().players;
     }
+
     function findPlayer(id) {
       return allPlayers().find(p => p.id === id);
     }
@@ -1045,6 +1392,23 @@
       return `${String(m).padStart(2, '0')}:${String(r).padStart(2, '0')}`;
     }
 
+    function getElapsedGameSeconds() {
+      const modeCfg = MODES[state.mode];
+      if (!modeCfg) return 0;
+
+      const labels = modeCfg.segmentLabels;
+      const segIndex = labels.indexOf(state.currentSegment);
+
+      const completedSegments = Math.max(0, segIndex);
+      const elapsedCompleted = completedSegments * modeCfg.segmentLength;
+      const elapsedCurrent = modeCfg.segmentLength - state.clockSeconds;
+
+      const total = elapsedCompleted + elapsedCurrent;
+      const maxTotal = TOTAL_GAME_SECONDS[state.mode] || modeCfg.segmentLength * modeCfg.segmentLabels.length;
+
+      return Math.max(0, Math.min(maxTotal, total));
+    }
+
     function initPlayerStats() {
       state.minutes = {};
       state.fouls = {};
@@ -1054,16 +1418,36 @@
       });
     }
 
-    // NEW: initialise bench timers (bench players show sat time from game start, starters are null)
     function initBenchTimers() {
-      const elapsed = getElapsedGameSeconds(); // should be 0 at load/reset
+      const elapsed = getElapsedGameSeconds();
       state.lastWentBenchAt = {};
       allPlayers().forEach(p => state.lastWentBenchAt[p.id] = null);
       state.bench.forEach(id => state.lastWentBenchAt[id] = elapsed);
     }
 
-    initPlayerStats();
-    initBenchTimers();
+    function resetFullCourtPositions() {
+      state.fullCourtPositions = {};
+      state.onCourt.forEach((id, index) => {
+        state.fullCourtPositions[id] = { ...DEFAULT_COURT_POSITIONS[index] };
+      });
+      renderFullCourt();
+    }
+
+    function ensureFullCourtPositions() {
+      const activeIds = new Set(state.onCourt);
+
+      Object.keys(state.fullCourtPositions).forEach(id => {
+        if (!activeIds.has(Number(id))) {
+          delete state.fullCourtPositions[id];
+        }
+      });
+
+      state.onCourt.forEach((id, index) => {
+        if (!state.fullCourtPositions[id]) {
+          state.fullCourtPositions[id] = { ...DEFAULT_COURT_POSITIONS[index] };
+        }
+      });
+    }
 
     function fatigueBarHTML(id) {
       const sec = state.minutes[id] || 0;
@@ -1090,7 +1474,6 @@
       setTimeout(() => el.classList.remove(cls), duration);
     }
 
-    // NEW: compute “sat since” string for bench players
     function satSinceText(id) {
       if (state.onCourt.includes(id)) return '';
       const t0 = state.lastWentBenchAt?.[id];
@@ -1100,21 +1483,22 @@
       return `Sat: ${formatTime(satSecs)}`;
     }
 
-    // NEW: pick a single “Next Up” bench player (uses your existing suggested sub logic)
     function getNextUpId() {
-      // Don’t nag during Sub Mode
       if (state.subMode) return null;
-      // Only show once some game time has elapsed
       const elapsed = getElapsedGameSeconds();
       if (elapsed < 60) return null;
+
       const suggestion = computeSuggestedSubPairs();
       if (!suggestion || !suggestion.pairs?.length) return null;
-      return suggestion.pairs[0].onId; // most under-played bench player
+
+      return suggestion.pairs[0].onId;
     }
 
+    // ---------- RENDER ----------
     function renderTeamSelect() {
       const select = document.getElementById('teamSelect');
       select.innerHTML = '';
+
       Object.entries(TEAM_CONFIGS).forEach(([id, cfg]) => {
         const opt = document.createElement('option');
         opt.value = id;
@@ -1126,6 +1510,7 @@
 
     function renderClock() {
       document.getElementById('clockDisplay').textContent = formatTime(state.clockSeconds);
+
       const status = document.getElementById('runningStatus');
       status.textContent = state.running
         ? 'Clock running · minutes updating live'
@@ -1139,6 +1524,15 @@
       });
     }
 
+    function renderPageToggle() {
+      document.querySelectorAll('#pageToggle .mode-pill').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.page === state.currentPage);
+      });
+
+      document.getElementById('rotationPage').classList.toggle('hidden', state.currentPage !== 'rotation');
+      document.getElementById('courtPage').classList.toggle('hidden', state.currentPage !== 'court');
+    }
+
     function renderSubMode() {
       const btn = document.getElementById('subModeBtn');
       if (state.subMode) {
@@ -1150,22 +1544,10 @@
       }
     }
 
-    function moveOnCourt(id, dir) {
-      const idx = state.onCourt.indexOf(id);
-      if (idx === -1) return;
-      const newIdx = idx + (dir === 'up' ? -1 : 1);
-      if (newIdx < 0 || newIdx >= state.onCourt.length) return;
-      const arr = state.onCourt;
-      const tmp = arr[idx];
-      arr[idx] = arr[newIdx];
-      arr[newIdx] = tmp;
-      renderCourt();
-      renderMinutes();
-    }
-
     function createCourtChip(id) {
       const p = findPlayer(id);
       if (!p) return document.createElement('div');
+
       const chip = document.createElement('div');
       chip.className = 'player-chip';
       chip.dataset.id = String(id);
@@ -1215,7 +1597,6 @@
       side.appendChild(down);
 
       chip.appendChild(side);
-
       return chip;
     }
 
@@ -1223,11 +1604,13 @@
       const top = document.getElementById('courtTop');
       const mid = document.getElementById('courtMid');
       const bot = document.getElementById('courtBot');
+
       top.innerHTML = '';
       mid.innerHTML = '';
       bot.innerHTML = '';
 
       const ids = state.onCourt;
+
       [ids[0], ids[1]].forEach(id => id != null && top.appendChild(createCourtChip(id)));
       [ids[2], ids[3]].forEach(id => id != null && mid.appendChild(createCourtChip(id)));
       if (ids[4] != null) bot.appendChild(createCourtChip(ids[4]));
@@ -1242,6 +1625,7 @@
       state.bench.forEach(id => {
         const p = findPlayer(id);
         if (!p) return;
+
         const card = document.createElement('div');
         card.className = 'bench-card';
         card.dataset.id = String(id);
@@ -1250,7 +1634,6 @@
           card.classList.add('selected');
         }
 
-        // NEW: Next Up nudge
         if (nextUpId != null && id === nextUpId) {
           card.classList.add('nextup');
           const pill = document.createElement('div');
@@ -1261,6 +1644,7 @@
 
         const main = document.createElement('div');
         main.className = 'bench-main';
+
         const num = document.createElement('div');
         num.className = 'bench-number';
         num.textContent = p.number;
@@ -1268,13 +1652,16 @@
 
         const labels = document.createElement('div');
         labels.className = 'bench-labels';
+
         const satText = satSinceText(id);
+
         labels.innerHTML = `
           <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name}</div>
           <div class="bench-mins">${formatTime(state.minutes[id])}</div>
           ${satText ? `<div class="bench-sat">${satText}</div>` : ``}
           ${fatigueBarHTML(id)}
         `;
+
         main.appendChild(labels);
 
         const foulBtn = document.createElement('button');
@@ -1345,6 +1732,7 @@
           ${(!state.onCourt.includes(id) && satText) ? `<div class="minutes-sat">${satText}</div>` : ``}
           ${fatigueBarHTML(id)}
         `;
+
         info.appendChild(nb);
 
         if (state.fouls[id]) {
@@ -1368,15 +1756,19 @@
     function renderAlerts() {
       const container = document.getElementById('alerts');
       container.innerHTML = '';
+
       const ids = state.onCourt.concat(state.bench);
       if (!ids.length) return;
 
       let total = 0;
       ids.forEach(id => total += state.minutes[id] || 0);
       if (total === 0) return;
+
       const avg = total / ids.length;
 
-      let over = null, under = null;
+      let over = null;
+      let under = null;
+
       ids.forEach(id => {
         const diff = (state.minutes[id] || 0) - avg;
         if (diff > 120 && (!over || diff > over.diff)) over = { id, diff };
@@ -1390,6 +1782,7 @@
         line.textContent = `${p.name} is ${formatTime(over.diff)} above team average minutes.`;
         container.appendChild(line);
       }
+
       if (under) {
         const p = findPlayer(under.id);
         const line = document.createElement('div');
@@ -1402,6 +1795,7 @@
     function renderSegments() {
       const container = document.getElementById('segments');
       container.innerHTML = '';
+
       state.segments.forEach(seg => {
         const card = document.createElement('div');
         card.className = 'segment-card';
@@ -1424,7 +1818,9 @@
     function renderSegmentControls() {
       const container = document.getElementById('segmentButtons');
       container.innerHTML = '';
+
       const modeCfg = MODES[state.mode];
+
       modeCfg.segmentLabels.forEach(label => {
         const btn = document.createElement('button');
         btn.className = 'segment-btn' + (label === state.currentSegment ? ' active' : '');
@@ -1432,14 +1828,57 @@
         btn.textContent = label;
         container.appendChild(btn);
       });
+
       const segLabel = document.getElementById('segmentLabel');
       segLabel.textContent = `${state.currentSegment} · ${modeCfg.label}`;
+    }
+
+    function renderFullCourt() {
+      ensureFullCourtPositions();
+
+      const holder = document.getElementById('fullCourtPlayers');
+      const legend = document.getElementById('fullCourtLegend');
+
+      holder.innerHTML = '';
+      legend.innerHTML = '';
+
+      state.onCourt.forEach(id => {
+        const p = findPlayer(id);
+        if (!p) return;
+
+        const pos = state.fullCourtPositions[id] || { x: 50, y: 50 };
+
+        const marker = document.createElement('div');
+        marker.className = 'court-player';
+        marker.dataset.id = String(id);
+        marker.style.left = `${pos.x}%`;
+        marker.style.top = `${pos.y}%`;
+
+        marker.innerHTML = `
+          <div class="court-player-number">${p.number}</div>
+          <div class="court-player-role">${p.short}</div>
+          <div class="court-player-name">${p.name.split(' ')[0]}</div>
+        `;
+
+        holder.appendChild(marker);
+
+        const card = document.createElement('div');
+        card.className = 'legend-card';
+        card.innerHTML = `
+          <strong>#${p.number} ${p.name}</strong>
+          <span>${p.long} · ${formatTime(state.minutes[id])} played</span>
+        `;
+        legend.appendChild(card);
+      });
+
+      initFullCourtDrag();
     }
 
     function renderAll() {
       renderTeamSelect();
       renderClock();
       renderModeToggle();
+      renderPageToggle();
       renderSubMode();
       renderCourt();
       renderBench();
@@ -1447,17 +1886,27 @@
       renderAlerts();
       renderSegments();
       renderSegmentControls();
+      renderFullCourt();
     }
 
+    // ---------- GAME LOGIC ----------
     function tick() {
       if (!state.running) return;
+
       if (state.clockSeconds <= 0) {
         state.clockSeconds = 0;
         state.running = false;
+        document.getElementById('startBtn').textContent = 'Start';
         renderClock();
+        renderCourt();
+        renderBench();
+        renderMinutes();
+        renderFullCourt();
         return;
       }
+
       state.clockSeconds -= 1;
+
       state.onCourt.forEach(id => {
         if (state.minutes[id] == null) state.minutes[id] = 0;
         state.minutes[id] += 1;
@@ -1468,17 +1917,23 @@
       renderBench();
       renderMinutes();
       renderAlerts();
+
+      if (state.currentPage === 'court') {
+        renderFullCourt();
+      }
     }
+
     setInterval(tick, 1000);
 
     function setMode(newMode) {
       if (!MODES[newMode]) return;
+
       state.mode = newMode;
       const cfg = MODES[newMode];
+
       state.currentSegment = cfg.segmentLabels[0];
       state.clockSeconds = cfg.segmentLength;
 
-      // NEW: reset bench timers for new mode
       initBenchTimers();
 
       renderModeToggle();
@@ -1487,11 +1942,13 @@
       renderMinutes();
       renderBench();
       renderCourt();
+      renderFullCourt();
     }
 
     function loadTeam(teamId) {
       const cfg = TEAM_CONFIGS[teamId];
       if (!cfg) return;
+
       state.teamId = teamId;
       state.onCourt = [...cfg.initialOn];
       state.bench = [...cfg.initialBench];
@@ -1499,10 +1956,11 @@
       state.selectedOn = [];
       state.selectedBench = [];
       state.segments = [];
-      initPlayerStats();
+      state.fullCourtPositions = {};
 
-      // NEW: reset bench timers for new team
+      initPlayerStats();
       initBenchTimers();
+      resetFullCourtPositions();
 
       renderAll();
     }
@@ -1511,6 +1969,7 @@
       state.subMode = !state.subMode;
       state.selectedOn = [];
       state.selectedBench = [];
+
       renderSubMode();
       renderCourt();
       renderBench();
@@ -1519,43 +1978,71 @@
 
     function toggleFoul(id) {
       if (state.fouls[id] == null) return;
+
       state.fouls[id] = !state.fouls[id];
+
       renderCourt();
       renderBench();
       renderMinutes();
+      renderFullCourt();
     }
 
     function toggleOnSelection(id) {
       if (!state.subMode) return;
+
       const idx = state.selectedOn.indexOf(id);
       if (idx >= 0) state.selectedOn.splice(idx, 1);
       else state.selectedOn.push(id);
+
       renderCourt();
     }
 
     function toggleBenchSelection(id) {
       if (!state.subMode) return;
+
       const idx = state.selectedBench.indexOf(id);
       if (idx >= 0) state.selectedBench.splice(idx, 1);
       else state.selectedBench.push(id);
+
       renderBench();
+    }
+
+    function moveOnCourt(id, dir) {
+      const idx = state.onCourt.indexOf(id);
+      if (idx === -1) return;
+
+      const newIdx = idx + (dir === 'up' ? -1 : 1);
+      if (newIdx < 0 || newIdx >= state.onCourt.length) return;
+
+      const arr = state.onCourt;
+      const temp = arr[idx];
+      arr[idx] = arr[newIdx];
+      arr[newIdx] = temp;
+
+      renderCourt();
+      renderMinutes();
+      renderFullCourt();
     }
 
     function moveBench(id, dir) {
       const idx = state.bench.indexOf(id);
       if (idx === -1) return;
+
       const newIdx = idx + (dir === 'up' ? -1 : 1);
       if (newIdx < 0 || newIdx >= state.bench.length) return;
+
       const arr = state.bench;
-      const tmp = arr[idx];
+      const temp = arr[idx];
       arr[idx] = arr[newIdx];
-      arr[newIdx] = tmp;
+      arr[newIdx] = temp;
+
       renderBench();
     }
 
     function confirmSubs() {
       if (!state.subMode) return;
       if (state.selectedOn.length === 0 && state.selectedBench.length === 0) return;
+
       if (state.selectedOn.length !== state.selectedBench.length) {
         alert('Select the same number of players to sub off and on.');
         return;
@@ -1566,25 +2053,32 @@
       for (let i = 0; i < state.selectedOn.length; i++) {
         const offId = state.selectedOn[i];
         const onId = state.selectedBench[i];
+
         const offIdx = state.onCourt.indexOf(offId);
         const benchIdx = state.bench.indexOf(onId);
+
         if (offIdx === -1 || benchIdx === -1) continue;
 
-        // NEW: record "went to bench" time for the player subbed OFF
         state.lastWentBenchAt[offId] = elapsed;
-
-        // NEW: clear bench time for the player coming ON (they're no longer sitting)
         state.lastWentBenchAt[onId] = null;
+
+        const offPosition = state.fullCourtPositions[offId] || { ...DEFAULT_COURT_POSITIONS[offIdx] };
 
         state.onCourt[offIdx] = onId;
         state.bench[benchIdx] = offId;
+
+        delete state.fullCourtPositions[offId];
+        state.fullCourtPositions[onId] = offPosition;
       }
 
       state.selectedOn = [];
       state.selectedBench = [];
+
       renderCourt();
       renderBench();
       renderMinutes();
+      renderFullCourt();
+
       flashElement(document.getElementById('confirmSubBtn'), 'btn-haptic', 150);
       flashElement(document.getElementById('benchWrapper'), 'panel-flash', 350);
     }
@@ -1592,6 +2086,7 @@
     function cancelSubs() {
       state.selectedOn = [];
       state.selectedBench = [];
+
       renderCourt();
       renderBench();
       renderMinutes();
@@ -1600,6 +2095,7 @@
     function resetGame() {
       const teamCfg = TEAM_CONFIGS[state.teamId];
       const modeCfg = MODES[state.mode];
+
       state.running = false;
       state.clockSeconds = modeCfg.segmentLength;
       state.currentSegment = modeCfg.segmentLabels[0];
@@ -1609,10 +2105,11 @@
       state.selectedOn = [];
       state.selectedBench = [];
       state.segments = [];
-      initPlayerStats();
+      state.fullCourtPositions = {};
 
-      // NEW: reset bench timers
+      initPlayerStats();
       initBenchTimers();
+      resetFullCourtPositions();
 
       renderAll();
       document.getElementById('startBtn').textContent = 'Start';
@@ -1621,45 +2118,54 @@
     function saveSegmentSnapshot() {
       const allIds = state.onCourt.concat(state.bench);
       if (!allIds.length) return;
+
       const snapshot = allIds.map(id => ({
         id,
         name: findPlayer(id)?.name || 'Player',
         seconds: state.minutes[id] || 0
       }));
+
       snapshot.sort((a, b) => b.seconds - a.seconds);
+
       const top = snapshot.slice(0, 3);
+
       state.segments.push({
         segment: state.currentSegment,
         modeLabel: MODES[state.mode].label,
         top
       });
+
       renderSegments();
+
       const segmentsContainer = document.getElementById('segments');
       const lastCard = segmentsContainer.lastElementChild;
+
       flashElement(lastCard, 'segment-flash', 450);
       flashElement(document.getElementById('saveSegmentBtn'), 'btn-haptic', 150);
     }
 
-    // ----- multi-pair suggested subs based on even minutes over full game -----
+    // ---------- SUGGESTED SUBS ----------
     function computeSuggestedSubPairs() {
       const totalPlayers = state.onCourt.length + state.bench.length;
       if (!state.onCourt.length || !state.bench.length || totalPlayers === 0) return null;
 
       const elapsed = getElapsedGameSeconds();
-      if (elapsed < 60) return null; // don’t suggest in first minute
+      if (elapsed < 60) return null;
 
       const idealPerPlayer = elapsed / totalPlayers;
       const diffMap = {};
       const allIds = state.onCourt.concat(state.bench);
+
       allIds.forEach(id => {
         diffMap[id] = (state.minutes[id] || 0) - idealPerPlayer;
       });
 
-      const onSorted = [...state.onCourt].sort((a, b) => diffMap[b] - diffMap[a]); // most over-played first
-      const benchSorted = [...state.bench].sort((a, b) => diffMap[a] - diffMap[b]); // most under-played first
+      const onSorted = [...state.onCourt].sort((a, b) => diffMap[b] - diffMap[a]);
+      const benchSorted = [...state.bench].sort((a, b) => diffMap[a] - diffMap[b]);
 
       const maxPairs = Math.min(3, onSorted.length, benchSorted.length);
       const pairs = [];
+
       for (let i = 0; i < maxPairs; i++) {
         const offId = onSorted[i];
         const onId = benchSorted[i];
@@ -1667,7 +2173,6 @@
         const onSecs = state.minutes[onId] || 0;
         const gapMinutes = (offSecs - onSecs) / 60;
 
-        // only include meaningful gaps
         if (gapMinutes <= 1) continue;
 
         pairs.push({
@@ -1683,6 +2188,7 @@
 
       let tag;
       const biggestGap = pairs[0].gapMinutes;
+
       if (biggestGap > 4) {
         tag = 'Big minutes spread – this rotation will drag everyone back towards even by full time.';
       } else if (biggestGap > 2.5) {
@@ -1695,16 +2201,23 @@
     }
 
     function showSuggestedSub() {
+      const suggestionCard = document.getElementById('suggestionCard');
+      const suggestPairsEl = document.getElementById('suggestPairs');
+      const suggestTagEl = document.getElementById('suggestTag');
+
       const suggestion = computeSuggestedSubPairs();
+
       if (!suggestion) {
         suggestionCard.classList.add('hidden');
         return;
       }
 
       suggestPairsEl.innerHTML = '';
-      suggestion.pairs.forEach((p, idx) => {
-        const off = findPlayer(p.offId);
-        const on = findPlayer(p.onId);
+
+      suggestion.pairs.forEach((pair, idx) => {
+        const off = findPlayer(pair.offId);
+        const on = findPlayer(pair.onId);
+
         const pairDiv = document.createElement('div');
         pairDiv.className = 'suggestion-pair';
 
@@ -1715,14 +2228,14 @@
         offBlock.className = 'suggestion-off';
         offBlock.innerHTML = `
           <div class="suggestion-label">Off ${idx + 1}</div>
-          <div class="suggestion-player">${off.name} (#${off.number}) · ${formatTime(p.offSecs)}</div>
+          <div class="suggestion-player">${off.name} (#${off.number}) · ${formatTime(pair.offSecs)}</div>
         `;
 
         const onBlock = document.createElement('div');
         onBlock.className = 'suggestion-on';
         onBlock.innerHTML = `
           <div class="suggestion-label">On ${idx + 1}</div>
-          <div class="suggestion-player">${on.name} (#${on.number}) · ${formatTime(p.onSecs)}</div>
+          <div class="suggestion-player">${on.name} (#${on.number}) · ${formatTime(pair.onSecs)}</div>
         `;
 
         main.appendChild(offBlock);
@@ -1731,9 +2244,9 @@
 
         const gap = document.createElement('div');
         gap.className = 'suggestion-gap';
-        gap.textContent = `Minutes gap: ${p.gapMinutes.toFixed(1)} mins`;
-        pairDiv.appendChild(gap);
+        gap.textContent = `Minutes gap: ${pair.gapMinutes.toFixed(1)} mins`;
 
+        pairDiv.appendChild(gap);
         suggestPairsEl.appendChild(pairDiv);
       });
 
@@ -1743,16 +2256,72 @@
       flashElement(suggestionCard, 'panel-flash', 350);
     }
 
+    // ---------- FULL COURT DRAG ----------
+    function initFullCourtDrag() {
+      const court = document.getElementById('fullCourt');
+      if (!court) return;
+
+      document.querySelectorAll('.court-player').forEach(player => {
+        if (player.dataset.dragReady === 'true') return;
+        player.dataset.dragReady = 'true';
+
+        player.addEventListener('pointerdown', e => {
+          e.preventDefault();
+
+          const id = Number(player.dataset.id);
+          player.setPointerCapture(e.pointerId);
+          player.style.cursor = 'grabbing';
+          player.style.zIndex = '20';
+
+          function movePlayer(ev) {
+            const rect = court.getBoundingClientRect();
+
+            let x = ((ev.clientX - rect.left) / rect.width) * 100;
+            let y = ((ev.clientY - rect.top) / rect.height) * 100;
+
+            x = Math.max(6, Math.min(94, x));
+            y = Math.max(6, Math.min(94, y));
+
+            state.fullCourtPositions[id] = { x, y };
+
+            player.style.left = `${x}%`;
+            player.style.top = `${y}%`;
+          }
+
+          function stopDrag(ev) {
+            try {
+              player.releasePointerCapture(ev.pointerId);
+            } catch (err) {}
+
+            player.style.cursor = 'grab';
+            player.style.zIndex = '5';
+
+            player.removeEventListener('pointermove', movePlayer);
+            player.removeEventListener('pointerup', stopDrag);
+            player.removeEventListener('pointercancel', stopDrag);
+          }
+
+          player.addEventListener('pointermove', movePlayer);
+          player.addEventListener('pointerup', stopDrag);
+          player.addEventListener('pointercancel', stopDrag);
+        });
+      });
+    }
+
     // ---------- EVENT LISTENERS ----------
     document.getElementById('startBtn').addEventListener('click', () => {
       state.running = !state.running;
+
       const startBtn = document.getElementById('startBtn');
       startBtn.textContent = state.running ? 'Pause' : 'Start';
+
       flashElement(startBtn, 'btn-haptic', 150);
+
       renderClock();
       renderCourt();
       renderBench();
       renderMinutes();
+      renderFullCourt();
     });
 
     document.getElementById('resetBtn').addEventListener('click', resetGame);
@@ -1771,14 +2340,27 @@
 
     document.getElementById('modeToggle').addEventListener('click', e => {
       const btn = e.target.closest('.mode-pill');
-      if (!btn) return;
+      if (!btn || !btn.dataset.mode) return;
+
       flashElement(btn, 'btn-haptic', 150);
       setMode(btn.dataset.mode);
+    });
+
+    document.getElementById('pageToggle').addEventListener('click', e => {
+      const btn = e.target.closest('.mode-pill');
+      if (!btn || !btn.dataset.page) return;
+
+      state.currentPage = btn.dataset.page;
+
+      flashElement(btn, 'btn-haptic', 150);
+      renderPageToggle();
+      renderFullCourt();
     });
 
     document.getElementById('courtArea').addEventListener('click', e => {
       const chip = e.target.closest('.player-chip');
       if (!chip) return;
+
       const id = parseInt(chip.dataset.id, 10);
 
       const arrow = e.target.closest('.court-arrow');
@@ -1798,31 +2380,35 @@
     document.getElementById('benchGrid').addEventListener('click', e => {
       const card = e.target.closest('.bench-card');
       if (!card) return;
+
       const id = parseInt(card.dataset.id, 10);
+
       if (e.target.closest('[data-foul]')) {
         toggleFoul(id);
         return;
       }
+
       const arrow = e.target.closest('.bench-arrow');
       if (arrow) {
         moveBench(id, arrow.dataset.dir);
         return;
       }
+
       toggleBenchSelection(id);
     });
 
     document.getElementById('segmentButtons').addEventListener('click', e => {
       const btn = e.target.closest('.segment-btn');
       if (!btn) return;
+
       state.currentSegment = btn.dataset.seg;
       state.clockSeconds = MODES[state.mode].segmentLength;
-
-      // Note: bench sat time is based on elapsed game time across segments, so no reset needed here.
 
       renderSegmentControls();
       renderClock();
       renderBench();
       renderMinutes();
+      renderFullCourt();
     });
 
     document.getElementById('saveSegmentBtn').addEventListener('click', saveSegmentSnapshot);
@@ -1832,52 +2418,16 @@
       showSuggestedSub();
     });
 
+    document.getElementById('resetCourtPositionsBtn').addEventListener('click', () => {
+      resetFullCourtPositions();
+      flashElement(document.getElementById('resetCourtPositionsBtn'), 'btn-haptic', 150);
+    });
+
     // ---------- INIT ----------
+    initPlayerStats();
+    initBenchTimers();
+    resetFullCourtPositions();
     renderAll();
-
-document.getElementById('pageToggle').addEventListener('click', e=>{
-  const btn = e.target.closest('.mode-pill');
-  if(!btn) return;
-
-  document.querySelectorAll('#pageToggle .mode-pill')
-    .forEach(b=>b.classList.remove('active'));
-
-  btn.classList.add('active');
-
-  const page = btn.dataset.page;
-
-  document.getElementById('rotationPage').classList.toggle('hidden', page !== 'rotation');
-  document.getElementById('courtPage').classList.toggle('hidden', page !== 'court');
-});
-
-
-// 🔥 PASTE DRAG CODE RIGHT HERE 👇
-document.querySelectorAll('.draggable-player').forEach(player => {
-  let isDragging = false;
-
-  player.addEventListener('mousedown', () => {
-    isDragging = true;
-    player.style.cursor = 'grabbing';
-  });
-
-  document.addEventListener('mouseup', () => {
-    isDragging = false;
-    player.style.cursor = 'grab';
-  });
-
-  document.addEventListener('mousemove', (e) => {
-    if (!isDragging) return;
-
-    const court = document.getElementById('fullCourt');
-    const rect = court.getBoundingClientRect();
-
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-
-    player.style.left = x + '%';
-    player.style.top = y + '%';
-  });
-});
   </script>
 </body>
 </html>
