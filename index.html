@@ -1289,45 +1289,42 @@
 
   <script>
     // ---------- CONFIG ----------
-    const TEAM_CONFIGS = {
-      rep_u14: {
-        name: 'Under 12 Rep',
-        players: [
-          { id: 13, number: 13, name: 'Archie Stone',     short: 'PG', long: 'Guard' },
-          { id: 14, number: 14, name: 'Ethan Lieberthal', short: 'SG', long: 'Guard' },
-          { id: 23, number: 23, name: 'Lucas Nguyen',     short: 'SF', long: 'Wing'  },
-          { id: 24, number: 24, name: 'Jediah Rayer',     short: 'PF', long: 'Wing'  },
-          { id: 40, number: 40, name: 'Lenny McArthur',   short: 'C',  long: 'Big'   },
-          { id: 44, number: 44, name: 'James Sullivan',   short: 'G',  long: 'Guard' },
-          { id: 51, number: 51, name: 'Brooks Hurren',    short: 'B',  long: 'Big'   },
-          { id: 89, number: 89, name: 'Max Arden',        short: 'W',  long: 'Wing'  },
-          { id: 0,  number: 0,  name: 'Jax',              short: 'G',  long: 'Guard' },
-          { id: 12, number: 12, name: 'Ty Rosen',         short: 'G',  long: 'Guard' }
-        ],
-        initialOn: [13, 14, 23, 24, 40],
-        initialBench: [44, 51, 89, 0, 12]
-      },
+const TEAM_CONFIGS = {
+  rep_u14: {
+    name: 'Under 12 Rep',
+    players: [
+      { id: 13, number: 13, name: 'Archie Stone',     short: 'PG', long: 'Guard' },
+      { id: 14, number: 14, name: 'Ethan Lieberthal', short: 'SG', long: 'Guard' },
+      { id: 23, number: 23, name: 'Lucas Nguyen',     short: 'SF', long: 'Wing'  },
+      { id: 24, number: 24, name: 'Jediah Rayer',     short: 'PF', long: 'Wing'  },
+      { id: 40, number: 40, name: 'Lenny McArthur',   short: 'C',  long: 'Big'   },
+      { id: 44, number: 44, name: 'James Sullivan',   short: 'G',  long: 'Guard' },
+      { id: 51, number: 51, name: 'Brooks Hurren',    short: 'B',  long: 'Big'   },
+      { id: 89, number: 89, name: 'Max Arden',        short: 'W',  long: 'Wing'  },
+      { id: 0,  number: 0,  name: 'Jax',              short: 'G',  long: 'Guard' },
+      { id: 12, number: 12, name: 'Ty Rosen',         short: 'G',  long: 'Guard' }
+    ],
+    initialOn: [13, 14, 23, 24, 40],
+    initialBench: [44, 51, 89, 0, 12]
+  },
 
-            domestic_u14: {
-        name: 'Domestic U14',
-        players: [
-          { id: 16, number: 16, name: 'Archer Kenny',      short: 'G', long: 'Guard' },
-          { id: 20, number: 20, name: 'Bill Pham',         short: 'G', long: 'Guard' },
-          { id: 22, number: 22, name: "Thomas O'Sullivan", short: 'G', long: 'Guard' },
-          { id: 36, number: 36, name: 'Jacob Nguyen',      short: 'G', long: 'Guard' },
-          { id: 72, number: 72, name: 'Tate Power',        short: 'G', long: 'Guard' },
-          { id: 90, number: 90, name: 'Ethan Poon',        short: 'G', long: 'Guard' },
-          { id: 94, number: 94, name: 'Rodion Prystupa',   short: 'G', long: 'Guard' },
-          { id: 95, number: 95, name: 'Alvin Chen',        short: 'G', long: 'Guard' },
-          { id: 96, number: 96, name: 'Max Payne',         short: 'G', long: 'Guard' }
-        ],
-        initialOn: [16, 20, 22, 36, 72],
-        initialBench: [90, 94, 95, 96]
-      }
-        initialOn: [16, 20, 22, 36, 72],
-        initialBench: [90, 93, 94]
-      }
-    };
+  domestic_u14: {
+    name: 'Domestic U14',
+    players: [
+      { id: 16, number: 16, name: 'Archer Kenny',      short: 'G', long: 'Guard' },
+      { id: 20, number: 20, name: 'Bill Pham',         short: 'G', long: 'Guard' },
+      { id: 22, number: 22, name: "Thomas O'Sullivan", short: 'G', long: 'Guard' },
+      { id: 36, number: 36, name: 'Jacob Nguyen',      short: 'G', long: 'Guard' },
+      { id: 72, number: 72, name: 'Tate Power',        short: 'G', long: 'Guard' },
+      { id: 90, number: 90, name: 'Ethan Poon',        short: 'G', long: 'Guard' },
+      { id: 94, number: 94, name: 'Rodion Prystupa',   short: 'G', long: 'Guard' },
+      { id: 95, number: 95, name: 'Alvin Chen',        short: 'G', long: 'Guard' },
+      { id: 96, number: 96, name: 'Max Payne',         short: 'G', long: 'Guard' }
+    ],
+    initialOn: [16, 20, 22, 36, 72],
+    initialBench: [90, 94, 95, 96]
+  }
+};
 
     const MODES = {
       rep: {
