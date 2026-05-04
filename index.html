@@ -1373,6 +1373,32 @@ const TEAM_CONFIGS = {
     };
 
     // ---------- HELPERS ----------
+    function saveState() {
+  try {
+    localStorage.setItem('rotationTrackerState', JSON.stringify(state));
+  } catch (err) {
+    console.warn('Could not save rotation tracker state', err);
+  }
+}
+
+function loadSavedState() {
+  const saved = localStorage.getItem('rotationTrackerState');
+  if (!saved) return false;
+
+  try {
+    const parsed = JSON.parse(saved);
+    Object.assign(state, parsed);
+    return true;
+  } catch (err) {
+    console.warn('Could not load saved rotation tracker state', err);
+    return false;
+  }
+}
+
+function clearSavedState() {
+  localStorage.removeItem('rotationTrackerState');
+}
+    
     function currentTeam() {
       return TEAM_CONFIGS[state.teamId];
     }
@@ -1876,19 +1902,20 @@ const TEAM_CONFIGS = {
     }
 
     function renderAll() {
-      renderTeamSelect();
-      renderClock();
-      renderModeToggle();
-      renderPageToggle();
-      renderSubMode();
-      renderCourt();
-      renderBench();
-      renderMinutes();
-      renderAlerts();
-      renderSegments();
-      renderSegmentControls();
-      renderFullCourt();
-    }
+  renderTeamSelect();
+  renderClock();
+  renderModeToggle();
+  renderPageToggle();
+  renderSubMode();
+  renderCourt();
+  renderBench();
+  renderMinutes();
+  renderAlerts();
+  renderSegments();
+  renderSegmentControls();
+  renderFullCourt();
+  saveState();
+}
 
     // ---------- GAME LOGIC ----------
     function tick() {
@@ -2425,10 +2452,13 @@ const TEAM_CONFIGS = {
     });
 
     // ---------- INIT ----------
-    initPlayerStats();
-    initBenchTimers();
-    resetFullCourtPositions();
-    renderAll();
+if (!loadSavedState()) {
+  initPlayerStats();
+  initBenchTimers();
+  resetFullCourtPositions();
+}
+
+renderAll();
   </script>
 </body>
 </html>
