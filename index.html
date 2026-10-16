@@ -963,13 +963,13 @@
 }
 .restricted-circle.top {
   top: 4.8%;
-  border-bottom: 0;
-  border-radius: 50% 50% 0 0;
+  border-top: 0;
+  border-radius: 0 0 50% 50%;
 }
 .restricted-circle.bottom {
   bottom: 4.8%;
-  border-top: 0;
-  border-radius: 0 0 50% 50%;
+  border-bottom: 0;
+  border-radius: 50% 50% 0 0;
 }
 .full-center-circle {
   top: 50%;
@@ -1049,17 +1049,7 @@
   border-bottom: 0;
   border-radius: 50% 50% 0 0;
 }
-.three-line-left,
-.three-line-right {
-  position: absolute;
-  width: 1.5px;
-  height: 30.2%;
-  background: rgba(203,213,225,.36);
-}
-.three-line-left.top { top: 0; left: 6%; }
-.three-line-right.top { top: 0; right: 6%; }
-.three-line-left.bottom { bottom: 0; left: 6%; }
-.three-line-right.bottom { bottom: 0; right: 6%; }
+/* Corner-line artifacts removed: the three-point boundary is shown by the arc. */
     .full-court-label {
       position: absolute;
       left: 50%;
@@ -1336,11 +1326,7 @@
             <div class="court-line hoop bottom"></div>
             <div class="court-line three-arc top"></div>
             <div class="court-line three-arc bottom"></div>
-<div class="three-line-left top"></div>
-<div class="three-line-right top"></div>
 
-<div class="three-line-left bottom"></div>
-<div class="three-line-right bottom"></div>
             <div class="full-court-label top">Opponent Basket</div>
             <div class="full-court-label bottom">Our Basket</div>
 
