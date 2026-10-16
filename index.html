@@ -941,62 +941,54 @@
   right:0;
 }
 
-.backboard{
-  position:absolute;
-  width:70px;
-  height:3px;
-  background:rgba(255,255,255,.35);
-  left:50%;
-  transform:translateX(-50%);
+.backboard {
+  position: absolute;
+  width: 12%;
+  height: 0;
+  border-top: 2px solid rgba(226,232,240,.48);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
 }
+.backboard.top { top: 4.25%; }
+.backboard.bottom { bottom: 4.25%; }
 
-.backboard.top{
-  top:40px;
+.restricted-circle {
+  position: absolute;
+  width: 16%;
+  height: 8.5%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 1.5px solid rgba(203,213,225,.3);
 }
-
-.backboard.bottom{
-  bottom:40px;
+.restricted-circle.top {
+  top: 4.8%;
+  border-bottom: 0;
+  border-radius: 50% 50% 0 0;
 }
-
-.restricted-circle{
-  position:absolute;
-  width:80px;
-  height:40px;
-  left:50%;
-  transform:translateX(-50%);
-  border:2px solid rgba(148,163,184,.25);
+.restricted-circle.bottom {
+  bottom: 4.8%;
+  border-top: 0;
+  border-radius: 0 0 50% 50%;
 }
-
-.restricted-circle.top{
-  top:40px;
-  border-bottom:none;
-  border-radius:80px 80px 0 0;
+.full-center-circle {
+  top: 50%;
+  left: 50%;
+  width: 24%;
+  height: 12.8%;
+  border: 1.5px solid rgba(203,213,225,.4);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
 }
-
-.restricted-circle.bottom{
-  bottom:40px;
-  border-top:none;
-  border-radius:0 0 80px 80px;
+.full-center-dot {
+  top: 50%;
+  left: 50%;
+  width: 1%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgba(203,213,225,.6);
+  transform: translate(-50%, -50%);
 }
-    .full-center-circle {
-      top: 50%;
-      left: 50%;
-      width: 82px;
-      height: 82px;
-      border: 2px solid rgba(148, 163, 184, 0.35);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    .full-center-dot {
-      top: 50%;
-      left: 50%;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: rgba(148, 163, 184, 0.55);
-      transform: translate(-50%, -50%);
-    }
 
    .key {
   left: 50%;
