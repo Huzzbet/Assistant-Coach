@@ -1514,13 +1514,49 @@ function loadSavedState() {
   try {
     const parsed = JSON.parse(saved);
     Object.assign(state, parsed);
+
+    // Recover cleanly when a saved browser session contains an older roster.
+    if (!TEAM_CONFIGS[state.teamId]) state.teamId = 'rep_u14';
+    const cfg = TEAM_CONFIGS[state.teamId];
+    const rosterIds = cfg.players.map(p => p.id);
+    const savedIds = [...(state.onCourt || []), ...(state.bench || [])];
+    const rosterMatches = rosterIds.length === savedIds.length &&
+      rosterIds.every(id => savedIds.includes(id)) &&
+      savedIds.every(id => rosterIds.includes(id));
+
+    if (!rosterMatches) {
+      state.onCourt = [...cfg.initialOn];
+      state.bench = [...cfg.initialBench];
+      state.minutes = {};
+      state.fouls = {};
+      state.segments = [];
+      state.lastWentBenchAt = {};
+      state.selectedOn = [];
+      state.selectedBench = [];
+      state.running = false;
+      state.currentSegment = cfg.segmentLabels
+        ? cfg.segmentLabels[0]
+        : (state.mode === 'domestic' ? 'H1' : 'Q1');
+      state.clockSeconds = (MODES[state.mode] || MODES.rep).segmentLength;
+      rosterIds.forEach(id => {
+        state.minutes[id] = 0;
+        state.fouls[id] = 0;
+        state.lastWentBenchAt[id] = null;
+      });
+      resetFullCourtPositions();
+    } else {
+      rosterIds.forEach(id => {
+        if (typeof state.minutes[id] !== 'number') state.minutes[id] = 0;
+        if (typeof state.fouls[id] !== 'number') state.fouls[id] = 0;
+        if (!(id in state.lastWentBenchAt)) state.lastWentBenchAt[id] = null;
+      });
+    }
     return true;
   } catch (err) {
-    console.warn('Could not load saved rotation tracker state', err);
+    console.warn('Could not load rotation tracker state', err);
     return false;
   }
 }
-
 function clearSavedState() {
   localStorage.removeItem('rotationTrackerState');
 }
