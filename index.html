@@ -1674,7 +1674,7 @@ function clearSavedState() {
         state.fullCourtPositions[id] = { ...fiveOutPositions[index % fiveOutPositions.length] };
       });
       // Offset the ball slightly so it remains visible beside the centre player.
-      state.fullCourtBallPosition = { x: 55, y: 50 };
+      state.fullCourtBallPosition = { x: 59, y: 50 };
       renderFullCourt();
       saveState();
     }
