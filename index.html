@@ -1265,7 +1265,7 @@
               <div class="panel-title">On Court</div>
               <div class="panel-sub">Use ▲ / ▼ to arrange spots · Sub Mode to mark on/off</div>
             </div>
-            <button class="sub-mode-btn" id="subModeBtn">🧩 Sub Mode</button>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;"><button class="btn small" id="earlySetupBtn">Early</button><button class="sub-mode-btn" id="subModeBtn">🧩 Sub Mode</button></div>
           </div>
 
           <div class="court-wrapper">
@@ -2810,6 +2810,15 @@ function clearSavedState() {
     document.getElementById('fiveOutSetupBtn').addEventListener('click', () => {
       setupFiveOut();
       flashElement(document.getElementById('fiveOutSetupBtn'), 'btn-haptic', 150);
+    });
+
+    document.getElementById('earlySetupBtn').addEventListener('click', () => {
+      setupFiveOut();
+      state.currentPage = 'court';
+      renderPageToggle();
+      renderFullCourt();
+      saveState();
+      flashElement(document.getElementById('earlySetupBtn'), 'btn-haptic', 150);
     });
 
     document.getElementById('resetCourtPositionsBtn').addEventListener('click', () => {
