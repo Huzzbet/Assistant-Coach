@@ -1074,20 +1074,54 @@
       width: 58px;
       height: 58px;
       border-radius: 999px;
-      background:
-        radial-gradient(circle at 30% 20%, #f97316, #ea580c 62%, #9a3412 100%);
+      background: linear-gradient(145deg, #60a5fa 0%, #2563eb 48%, #1e40af 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #fff7ed;
+      color: #ffffff;
       font-weight: 800;
       cursor: grab;
       user-select: none;
       touch-action: none;
       transform: translate(-50%, -50%);
-      box-shadow: 0 14px 28px rgba(249, 115, 22, 0.48);
-      border: 2px solid rgba(254, 215, 170, 0.8);
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.38), inset 0 1px 0 rgba(255,255,255,.32);
+      border: 2px solid rgba(219, 234, 254, 0.95);
       z-index: 5;
+      transition: box-shadow .16s ease, border-color .16s ease;
+    }
+
+    .court-player:hover {
+      box-shadow: 0 0 0 4px rgba(96,165,250,.16), 0 12px 28px rgba(37,99,235,.46);
+    }
+
+    .court-ball {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 36px;
+      height: 36px;
+      display: block;
+      padding: 0;
+      border: 2px solid rgba(255, 237, 213, .95);
+      border-radius: 50%;
+      background: radial-gradient(circle at 28% 22%, #fb923c 0%, #f97316 42%, #c2410c 100%);
+      box-shadow: 0 7px 16px rgba(124,45,18,.42), inset -3px -4px 7px rgba(124,45,18,.3), inset 2px 2px 5px rgba(255,255,255,.25);
+      transform: translate(-50%, -50%);
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+      z-index: 12;
+      overflow: hidden;
+    }
+
+    .court-ball:active { cursor: grabbing; }
+    .court-ball svg { display: block; width: 100%; height: 100%; }
+    .court-ball path, .court-ball ellipse {
+      fill: none;
+      stroke: #7c2d12;
+      stroke-width: 2.1;
+      stroke-linecap: round;
+      pointer-events: none;
     }
 
     .court-player:active {
@@ -1294,7 +1328,10 @@
             <div class="panel-title">Full Court Board</div>
             <div class="panel-sub">Drag the current five into position. Updates automatically after subs.</div>
           </div>
-          <button class="btn small" id="resetCourtPositionsBtn">Reset Spots</button>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn small" id="resetCourtPositionsBtn">Reset Spots</button>
+            <button class="btn small" id="resetBallBtn">Reset Ball</button>
+          </div>
         </div>
 
         <div class="full-court-wrap">
@@ -1424,7 +1461,8 @@ const TEAM_CONFIGS = {
       segments: [],
       lastWentBenchAt: {},
       currentPage: 'rotation',
-      fullCourtPositions: {}
+      fullCourtPositions: {},
+      fullCourtBallPosition: { x: 50, y: 50 }
     };
 
     // ---------- HELPERS ----------
@@ -1612,7 +1650,22 @@ function clearSavedState() {
       renderFullCourt();
     }
 
+    function resetFullCourtBall() {
+      state.fullCourtBallPosition = { x: 50, y: 50 };
+      renderFullCourt();
+      saveState();
+    }
+
     function ensureFullCourtPositions() {
+      if (!state.fullCourtBallPosition ||
+          !Number.isFinite(Number(state.fullCourtBallPosition.x)) ||
+          !Number.isFinite(Number(state.fullCourtBallPosition.y))) {
+        state.fullCourtBallPosition = { x: 50, y: 50 };
+      }
+      state.fullCourtBallPosition = {
+        x: Math.max(5, Math.min(95, Number(state.fullCourtBallPosition.x))),
+        y: Math.max(5, Math.min(95, Number(state.fullCourtBallPosition.y)))
+      };
       const activeIds = new Set(state.onCourt);
 
       Object.keys(state.fullCourtPositions).forEach(id => {
@@ -2032,6 +2085,7 @@ function clearSavedState() {
         marker.dataset.id = String(id);
         marker.style.left = `${pos.x}%`;
         marker.style.top = `${pos.y}%`;
+        marker.setAttribute('aria-label', `Player ${p.number}, ${p.name}`);
 
         marker.innerHTML = `
           <div class="court-player-number">${p.number}</div>
@@ -2050,7 +2104,27 @@ function clearSavedState() {
         legend.appendChild(card);
       });
 
+      const ballPos = state.fullCourtBallPosition;
+      const ball = document.createElement('button');
+      ball.type = 'button';
+      ball.className = 'court-ball';
+      ball.id = 'fullCourtBall';
+      ball.style.left = `${ballPos.x}%`;
+      ball.style.top = `${ballPos.y}%`;
+      ball.setAttribute('aria-label', 'Basketball. Drag to reposition.');
+      ball.title = 'Drag to move the ball';
+      ball.innerHTML = `
+        <svg viewBox="0 0 36 36" aria-hidden="true">
+          <path d="M18 1.5 C10 8,10 28,18 34.5"></path>
+          <path d="M18 1.5 C26 8,26 28,18 34.5"></path>
+          <path d="M1.5 18 C9 12,27 12,34.5 18"></path>
+          <path d="M1.5 18 C9 24,27 24,34.5 18"></path>
+        </svg>
+      `;
+      holder.appendChild(ball);
+
       initFullCourtDrag();
+      initFullCourtBallDrag();
     }
 
     function renderAll() {
@@ -2512,6 +2586,42 @@ function clearSavedState() {
       });
     }
 
+    function initFullCourtBallDrag() {
+      const court = document.getElementById('fullCourt');
+      const ball = document.getElementById('fullCourtBall');
+      if (!court || !ball || ball.dataset.dragReady === 'true') return;
+      ball.dataset.dragReady = 'true';
+
+      ball.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        ball.setPointerCapture(e.pointerId);
+        ball.style.zIndex = '30';
+
+        function moveBall(ev) {
+          const rect = court.getBoundingClientRect();
+          const x = Math.max(5, Math.min(95, ((ev.clientX - rect.left) / rect.width) * 100));
+          const y = Math.max(5, Math.min(95, ((ev.clientY - rect.top) / rect.height) * 100));
+          state.fullCourtBallPosition = { x, y };
+          ball.style.left = `${x}%`;
+          ball.style.top = `${y}%`;
+        }
+
+        function stopBall(ev) {
+          try { ball.releasePointerCapture(ev.pointerId); } catch (err) {}
+          ball.style.zIndex = '12';
+          ball.removeEventListener('pointermove', moveBall);
+          ball.removeEventListener('pointerup', stopBall);
+          ball.removeEventListener('pointercancel', stopBall);
+          saveState();
+        }
+
+        ball.addEventListener('pointermove', moveBall);
+        ball.addEventListener('pointerup', stopBall);
+        ball.addEventListener('pointercancel', stopBall);
+      });
+    }
+
     // ---------- EVENT LISTENERS ----------
     document.getElementById('startBtn').addEventListener('click', () => {
       if (!state.running && state.clockSeconds <= 0) return;
@@ -2670,6 +2780,11 @@ function clearSavedState() {
     document.getElementById('resetCourtPositionsBtn').addEventListener('click', () => {
       resetFullCourtPositions();
       flashElement(document.getElementById('resetCourtPositionsBtn'), 'btn-haptic', 150);
+    });
+
+    document.getElementById('resetBallBtn').addEventListener('click', () => {
+      resetFullCourtBall();
+      flashElement(document.getElementById('resetBallBtn'), 'btn-haptic', 150);
     });
 
     // ---------- INIT ----------
