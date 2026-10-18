@@ -1105,8 +1105,8 @@
       border: 1.5px solid #7c2d12;
       border-radius: 50%;
       background:
-        radial-gradient(ellipse at 27% 20%, rgba(255,226,170,.85) 0%, rgba(255,226,170,0) 24%),
-        radial-gradient(circle at 34% 30%, #fb923c 0%, #f97316 48%, #c2410c 82%, #7c2d12 100%);
+        radial-gradient(ellipse at 28% 18%, rgba(255,238,190,.9) 0%, rgba(255,220,150,.38) 13%, rgba(255,220,150,0) 27%),
+        radial-gradient(circle at 32% 28%, #ffb04a 0%, #f58220 38%, #e66a12 68%, #9a3d10 100%);
       box-shadow: 0 5px 12px rgba(0,0,0,.32), 0 2px 5px rgba(124,45,18,.4), inset -3px -4px 7px rgba(124,45,18,.38), inset 2px 2px 5px rgba(255,255,255,.25);
       transform: translate(-50%, -50%);
       cursor: grab;
@@ -1123,10 +1123,10 @@
       stroke: rgba(76, 35, 19, .85);
       stroke-width: 1.2;
     }
-    .court-ball path {
+    .court-ball .ball-seams path {
       fill: none;
       stroke: #4b2414;
-      stroke-width: 1.65;
+      stroke-width: 1.8;
       stroke-linecap: round;
       pointer-events: none;
     }
@@ -2145,11 +2145,29 @@ function clearSavedState() {
       ball.title = 'Drag to move the ball';
       ball.innerHTML = `
         <svg viewBox="0 0 36 36" aria-hidden="true">
+          <defs>
+            <clipPath id="basketballClip"><circle cx="18" cy="18" r="16.7"></circle></clipPath>
+            <linearGradient id="basketballLeather" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#ffb34f"></stop>
+              <stop offset="52%" stop-color="#f58220"></stop>
+              <stop offset="100%" stop-color="#a94312"></stop>
+            </linearGradient>
+            <pattern id="basketballGrain" width="2.4" height="2.4" patternUnits="userSpaceOnUse">
+              <circle cx=".7" cy=".7" r=".32" fill="#71320f" opacity=".38"></circle>
+              <circle cx="1.8" cy="1.8" r=".28" fill="#ffe0a3" opacity=".26"></circle>
+            </pattern>
+          </defs>
+          <g clip-path="url(#basketballClip)">
+            <circle cx="18" cy="18" r="16.7" fill="url(#basketballLeather)"></circle>
+            <circle cx="18" cy="18" r="16.7" fill="url(#basketballGrain)"></circle>
+            <g class="ball-seams">
+              <path d="M18 -1 C10 5 10 31 18 37"></path>
+              <path d="M18 -1 C26 5 26 31 18 37"></path>
+              <path d="M-1 18 C6 10 30 10 37 18"></path>
+              <path d="M-1 18 C6 26 30 26 37 18"></path>
+            </g>
+          </g>
           <circle class="ball-outline" cx="18" cy="18" r="16.7"></circle>
-          <path d="M18 1.7 C11.4 7.5 11.4 28.5 18 34.3"></path>
-          <path d="M18 1.7 C24.6 7.5 24.6 28.5 18 34.3"></path>
-          <path d="M1.7 18 C8 11.5 28 11.5 34.3 18"></path>
-          <path d="M1.7 18 C8 24.5 28 24.5 34.3 18"></path>
         </svg>
       `;
       holder.appendChild(ball);
