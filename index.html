@@ -1434,6 +1434,16 @@ const TEAM_CONFIGS = {
   }
 }
 
+function syncStartButton() {
+  const startBtn = document.getElementById('startBtn');
+  if (startBtn) startBtn.textContent = state.running ? 'Pause' : 'Start';
+}
+
+function refreshAfterGameControlChange() {
+  syncStartButton();
+  renderAll();
+}
+
 function loadSavedState() {
   const saved = localStorage.getItem('rotationTrackerState');
   if (!saved) return false;
@@ -2013,12 +2023,13 @@ function clearSavedState() {
       if (state.clockSeconds <= 0) {
         state.clockSeconds = 0;
         state.running = false;
-        document.getElementById('startBtn').textContent = 'Start';
+        syncStartButton();
         renderClock();
         renderCourt();
         renderBench();
         renderMinutes();
         renderFullCourt();
+        saveState();
         return;
       }
 
@@ -2038,28 +2049,30 @@ function clearSavedState() {
       if (state.currentPage === 'court') {
         renderFullCourt();
       }
+
+      // Keep a reload from losing in-progress minutes or the selected half.
+      saveState();
     }
 
     setInterval(tick, 1000);
 
     function setMode(newMode) {
-      if (!MODES[newMode]) return;
+      if (!MODES[newMode] || newMode === state.mode) return;
 
+      // A ruleset change is a deliberate reset to avoid a running clock
+      // continuing under a different segment length.
+      state.running = false;
       state.mode = newMode;
       const cfg = MODES[newMode];
 
       state.currentSegment = cfg.segmentLabels[0];
       state.clockSeconds = cfg.segmentLength;
+      state.subMode = false;
+      state.selectedOn = [];
+      state.selectedBench = [];
 
       initBenchTimers();
-
-      renderModeToggle();
-      renderSegmentControls();
-      renderClock();
-      renderMinutes();
-      renderBench();
-      renderCourt();
-      renderFullCourt();
+      refreshAfterGameControlChange();
     }
 
     function loadTeam(teamId) {
@@ -2195,6 +2208,7 @@ function clearSavedState() {
       renderBench();
       renderMinutes();
       renderFullCourt();
+      saveState();
 
       flashElement(document.getElementById('confirmSubBtn'), 'btn-haptic', 150);
       flashElement(document.getElementById('benchWrapper'), 'panel-flash', 350);
@@ -2228,8 +2242,7 @@ function clearSavedState() {
       initBenchTimers();
       resetFullCourtPositions();
 
-      renderAll();
-      document.getElementById('startBtn').textContent = 'Start';
+      refreshAfterGameControlChange();
     }
 
     function saveSegmentSnapshot() {
@@ -2253,6 +2266,7 @@ function clearSavedState() {
       });
 
       renderSegments();
+      saveState();
 
       const segmentsContainer = document.getElementById('segments');
       const lastCard = segmentsContainer.lastElementChild;
@@ -2427,6 +2441,9 @@ function clearSavedState() {
 
     // ---------- EVENT LISTENERS ----------
     document.getElementById('startBtn').addEventListener('click', () => {
+      if (!state.running && state.clockSeconds <= 0) {
+        state.clockSeconds = MODES[state.mode].segmentLength;
+      }
       state.running = !state.running;
 
       const startBtn = document.getElementById('startBtn');
@@ -2439,6 +2456,7 @@ function clearSavedState() {
       renderBench();
       renderMinutes();
       renderFullCourt();
+      saveState();
     });
 
     document.getElementById('resetBtn').addEventListener('click', resetGame);
@@ -2516,16 +2534,26 @@ function clearSavedState() {
 
     document.getElementById('segmentButtons').addEventListener('click', e => {
       const btn = e.target.closest('.segment-btn');
-      if (!btn) return;
+      if (!btn || !MODES[state.mode].segmentLabels.includes(btn.dataset.seg)) return;
 
+      // Changing segments always pauses the clock first, preserving player minutes.
+      state.running = false;
       state.currentSegment = btn.dataset.seg;
       state.clockSeconds = MODES[state.mode].segmentLength;
+      state.subMode = false;
+      state.selectedOn = [];
+      state.selectedBench = [];
 
+      renderSubMode();
       renderSegmentControls();
       renderClock();
+      renderCourt();
       renderBench();
       renderMinutes();
+      renderAlerts();
       renderFullCourt();
+      syncStartButton();
+      saveState();
     });
 
     document.getElementById('saveSegmentBtn').addEventListener('click', saveSegmentSnapshot);
