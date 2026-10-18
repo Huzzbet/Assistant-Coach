@@ -955,8 +955,8 @@
 
 .restricted-circle {
   position: absolute;
-  width: 16%;
-  height: 8.5%;
+  width: 14.5%;
+  height: 7.7%;
   left: 50%;
   transform: translateX(-50%);
   border: 1.5px solid rgba(203,213,225,.3);
@@ -1007,8 +1007,8 @@
 }
 .free-throw-circle {
   left: 50%;
-  width: 24%;
-  height: 12.8%;
+  width: 22.5%;
+  height: 12%;
   border: 1.5px solid rgba(203,213,225,.38);
   border-radius: 50%;
   transform: translateX(-50%);
@@ -1098,14 +1098,16 @@
       position: absolute;
       left: 50%;
       top: 50%;
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       display: block;
       padding: 0;
-      border: 2px solid rgba(255, 237, 213, .95);
+      border: 1.5px solid #7c2d12;
       border-radius: 50%;
-      background: radial-gradient(circle at 28% 22%, #fb923c 0%, #f97316 42%, #c2410c 100%);
-      box-shadow: 0 7px 16px rgba(124,45,18,.42), inset -3px -4px 7px rgba(124,45,18,.3), inset 2px 2px 5px rgba(255,255,255,.25);
+      background:
+        radial-gradient(ellipse at 27% 20%, rgba(255,226,170,.85) 0%, rgba(255,226,170,0) 24%),
+        radial-gradient(circle at 34% 30%, #fb923c 0%, #f97316 48%, #c2410c 82%, #7c2d12 100%);
+      box-shadow: 0 5px 12px rgba(0,0,0,.32), 0 2px 5px rgba(124,45,18,.4), inset -3px -4px 7px rgba(124,45,18,.38), inset 2px 2px 5px rgba(255,255,255,.25);
       transform: translate(-50%, -50%);
       cursor: grab;
       touch-action: none;
@@ -1116,10 +1118,15 @@
 
     .court-ball:active { cursor: grabbing; }
     .court-ball svg { display: block; width: 100%; height: 100%; }
-    .court-ball path, .court-ball ellipse {
+    .court-ball .ball-outline {
       fill: none;
-      stroke: #7c2d12;
-      stroke-width: 2.1;
+      stroke: rgba(76, 35, 19, .85);
+      stroke-width: 1.2;
+    }
+    .court-ball path {
+      fill: none;
+      stroke: #4b2414;
+      stroke-width: 1.65;
       stroke-linecap: round;
       pointer-events: none;
     }
@@ -2115,10 +2122,11 @@ function clearSavedState() {
       ball.title = 'Drag to move the ball';
       ball.innerHTML = `
         <svg viewBox="0 0 36 36" aria-hidden="true">
-          <path d="M18 1.5 C10 8,10 28,18 34.5"></path>
-          <path d="M18 1.5 C26 8,26 28,18 34.5"></path>
-          <path d="M1.5 18 C9 12,27 12,34.5 18"></path>
-          <path d="M1.5 18 C9 24,27 24,34.5 18"></path>
+          <circle class="ball-outline" cx="18" cy="18" r="16.7"></circle>
+          <path d="M18 1.7 C11.4 7.5 11.4 28.5 18 34.3"></path>
+          <path d="M18 1.7 C24.6 7.5 24.6 28.5 18 34.3"></path>
+          <path d="M1.7 18 C8 11.5 28 11.5 34.3 18"></path>
+          <path d="M1.7 18 C8 24.5 28 24.5 34.3 18"></path>
         </svg>
       `;
       holder.appendChild(ball);
