@@ -1336,6 +1336,7 @@
             <div class="panel-sub">Drag the current five into position. Updates automatically after subs.</div>
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn small" id="fiveOutSetupBtn">5-Out Setup</button>
             <button class="btn small" id="resetCourtPositionsBtn">Reset Spots</button>
             <button class="btn small" id="resetBallBtn">Reset Ball</button>
           </div>
@@ -1655,6 +1656,27 @@ function clearSavedState() {
         state.fullCourtPositions[id] = { ...DEFAULT_COURT_POSITIONS[index] };
       });
       renderFullCourt();
+    }
+
+    function setupFiveOut() {
+      // Centre player starts with the ball at halfway; two diags fill the wings
+      // and two drifts fill the deep corners on the attacking half.
+      const fiveOutPositions = [
+        { x: 50, y: 50 }, // ball handler at centre circle
+        { x: 28, y: 65 }, // left diag
+        { x: 72, y: 65 }, // right diag
+        { x: 12, y: 82 }, // left drift / corner
+        { x: 88, y: 82 }  // right drift / corner
+      ];
+
+      state.fullCourtPositions = {};
+      state.onCourt.forEach((id, index) => {
+        state.fullCourtPositions[id] = { ...fiveOutPositions[index % fiveOutPositions.length] };
+      });
+      // Offset the ball slightly so it remains visible beside the centre player.
+      state.fullCourtBallPosition = { x: 55, y: 50 };
+      renderFullCourt();
+      saveState();
     }
 
     function resetFullCourtBall() {
@@ -2783,6 +2805,11 @@ function clearSavedState() {
     document.getElementById('suggestSubBtn').addEventListener('click', () => {
       flashElement(document.getElementById('suggestSubBtn'), 'btn-haptic', 150);
       showSuggestedSub();
+    });
+
+    document.getElementById('fiveOutSetupBtn').addEventListener('click', () => {
+      setupFiveOut();
+      flashElement(document.getElementById('fiveOutSetupBtn'), 'btn-haptic', 150);
     });
 
     document.getElementById('resetCourtPositionsBtn').addEventListener('click', () => {
