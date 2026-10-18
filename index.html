@@ -1465,12 +1465,31 @@ function refreshAfterGameControlChange() {
 }
 
 function loadSavedState() {
-  const saved = localStorage.getItem('rotationTrackerState');
+  let saved;
+  try {
+    saved = localStorage.getItem('rotationTrackerState');
+  } catch (err) {
+    console.warn('Could not access saved rotation state', err);
+    return false;
+  }
   if (!saved) return false;
 
   try {
     const parsed = JSON.parse(saved);
     Object.assign(state, parsed);
+
+    // Validate persisted mode and segment before the UI uses them.
+    if (!MODES[state.mode]) state.mode = 'rep';
+    const validLabels = MODES[state.mode].segmentLabels;
+    if (!validLabels.includes(state.currentSegment)) state.currentSegment = validLabels[0];
+    state.clockSeconds = Number.isFinite(Number(state.clockSeconds))
+      ? Math.max(0, Math.min(MODES[state.mode].segmentLength, Math.floor(Number(state.clockSeconds))))
+      : MODES[state.mode].segmentLength;
+    // A paused game is restored after reload; never resume a live timer silently.
+    state.running = false;
+    state.subMode = false;
+    state.selectedOn = [];
+    state.selectedBench = [];
 
     // Recover cleanly when a saved browser session contains an older roster.
     if (!TEAM_CONFIGS[state.teamId]) state.teamId = 'rep_u14';
@@ -1503,11 +1522,25 @@ function loadSavedState() {
       resetFullCourtPositions();
     } else {
       rosterIds.forEach(id => {
-        if (typeof state.minutes[id] !== 'number') state.minutes[id] = 0;
+        if (typeof state.minutes[id] !== 'number' || !Number.isFinite(state.minutes[id])) state.minutes[id] = 0;
         if (typeof state.fouls[id] !== 'number') state.fouls[id] = 0;
         if (!(id in state.lastWentBenchAt)) state.lastWentBenchAt[id] = null;
       });
+      // Keep court and bench lists unique and constrained to this roster.
+      state.onCourt = state.onCourt.filter((id, i, arr) => rosterIds.includes(id) && arr.indexOf(id) === i);
+      state.bench = state.bench.filter((id, i, arr) => rosterIds.includes(id) && !state.onCourt.includes(id) && arr.indexOf(id) === i);
+      const assigned = new Set([...state.onCourt, ...state.bench]);
+      rosterIds.forEach(id => {
+        if (!assigned.has(id)) state.bench.push(id);
+      });
+      state.onCourt = state.onCourt.slice(0, 5);
+      if (state.onCourt.length < 5) {
+        const fill = state.bench.splice(0, 5 - state.onCourt.length);
+        state.onCourt.push(...fill);
+      }
     }
+    if (!Array.isArray(state.segments)) state.segments = [];
+    if (!state.fullCourtPositions || typeof state.fullCourtPositions !== 'object') state.fullCourtPositions = {};
     return true;
   } catch (err) {
     console.warn('Could not load rotation tracker state', err);
@@ -2084,8 +2117,8 @@ function clearSavedState() {
     function setMode(newMode) {
       if (!MODES[newMode] || newMode === state.mode) return;
 
-      // A ruleset change is a deliberate reset to avoid a running clock
-      // continuing under a different segment length.
+      // A mode change starts a clean game so quarter/half labels and clock
+      // length can never be mismatched.
       state.running = false;
       state.mode = newMode;
       const cfg = MODES[newMode];
@@ -2095,9 +2128,12 @@ function clearSavedState() {
       state.subMode = false;
       state.selectedOn = [];
       state.selectedBench = [];
-
+      state.segments = [];
+      initPlayerStats();
       initBenchTimers();
-      refreshAfterGameControlChange();
+
+      renderAll();
+      syncStartButton();
     }
 
     function loadTeam(teamId) {
@@ -2107,6 +2143,9 @@ function clearSavedState() {
       state.teamId = teamId;
       state.onCourt = [...cfg.initialOn];
       state.bench = [...cfg.initialBench];
+      state.running = false;
+      state.clockSeconds = MODES[state.mode].segmentLength;
+      state.currentSegment = MODES[state.mode].segmentLabels[0];
       state.subMode = false;
       state.selectedOn = [];
       state.selectedBench = [];
@@ -2118,6 +2157,7 @@ function clearSavedState() {
       resetFullCourtPositions();
 
       renderAll();
+      syncStartButton();
     }
 
     function toggleSubMode() {
@@ -2252,6 +2292,8 @@ function clearSavedState() {
       const teamCfg = TEAM_CONFIGS[state.teamId];
       const modeCfg = MODES[state.mode];
 
+      if (!window.confirm('Reset this game? The current clock, player minutes and quarter snapshots will be cleared.')) return;
+
       state.running = false;
       state.clockSeconds = modeCfg.segmentLength;
       state.currentSegment = modeCfg.segmentLabels[0];
@@ -2292,7 +2334,8 @@ function clearSavedState() {
         segment: state.currentSegment,
         modeLabel: MODES[state.mode].label,
         top,
-        completed: auto || state.clockSeconds <= 0
+        completed: auto || state.clockSeconds <= 0,
+        savedAt: new Date().toISOString()
       };
       if (existingIndex >= 0) state.segments[existingIndex] = savedSnapshot;
       else state.segments.push(savedSnapshot);
@@ -2580,15 +2623,29 @@ function clearSavedState() {
     document.getElementById('segmentButtons').addEventListener('click', e => {
       const btn = e.target.closest('.segment-btn');
       if (!btn || !MODES[state.mode].segmentLabels.includes(btn.dataset.seg)) return;
+      const targetSegment = btn.dataset.seg;
+      if (targetSegment === state.currentSegment) return;
 
-      // Changing segments always pauses the clock first, preserving player minutes.
+      // If the current segment has started, avoid accidentally discarding its
+      // remaining clock time by tapping another quarter button.
+      const currentStarted = state.clockSeconds < MODES[state.mode].segmentLength;
+      const currentComplete = state.clockSeconds <= 0;
+      if (currentStarted && !currentComplete) {
+        const proceed = window.confirm(
+          'Switch from ' + state.currentSegment + ' to ' + targetSegment +
+          '? The current segment clock will be reset if you later return to it.'
+        );
+        if (!proceed) return;
+      }
+
       state.running = false;
-      state.currentSegment = btn.dataset.seg;
+      state.currentSegment = targetSegment;
       state.clockSeconds = MODES[state.mode].segmentLength;
       state.subMode = false;
       state.selectedOn = [];
       state.selectedBench = [];
 
+      initBenchTimers();
       renderSubMode();
       renderSegmentControls();
       renderClock();
@@ -2597,9 +2654,9 @@ function clearSavedState() {
       renderBench();
       renderMinutes();
       renderAlerts();
+      renderSegments();
       renderFullCourt();
       syncStartButton();
-      renderQuarterStatus();
       saveState();
     });
 
