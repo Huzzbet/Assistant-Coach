@@ -1337,6 +1337,7 @@
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
             <button class="btn small" id="fiveOutSetupBtn">5-Out Setup</button>
+            <button class="btn small" id="earlyCourtSetupBtn">Early</button>
             <button class="btn small" id="resetCourtPositionsBtn">Reset Spots</button>
             <button class="btn small" id="resetBallBtn">Reset Ball</button>
           </div>
@@ -2810,6 +2811,11 @@ function clearSavedState() {
     document.getElementById('fiveOutSetupBtn').addEventListener('click', () => {
       setupFiveOut();
       flashElement(document.getElementById('fiveOutSetupBtn'), 'btn-haptic', 150);
+    });
+
+    document.getElementById('earlyCourtSetupBtn').addEventListener('click', () => {
+      setupEarlyOffence();
+      flashElement(document.getElementById('earlyCourtSetupBtn'), 'btn-haptic', 150);
     });
 
     function setupEarlyOffence() {
