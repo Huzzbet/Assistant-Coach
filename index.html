@@ -2812,8 +2812,39 @@ function clearSavedState() {
       flashElement(document.getElementById('fiveOutSetupBtn'), 'btn-haptic', 150);
     });
 
+    function setupEarlyOffence() {
+      // Match the user's reference image: point guard and ball at halfway,
+      // shooting guard on the right diag, forwards in the corners, centre at
+      // the low block beside our basket.
+      const rolePositions = {
+        PG: { x: 50, y: 50 },
+        SG: { x: 82, y: 70 },
+        SF: { x: 91, y: 93 },
+        PF: { x: 10, y: 93 },
+        C:  { x: 33, y: 91 }
+      };
+      const fallbackPositions = [
+        { x: 50, y: 50 },
+        { x: 82, y: 70 },
+        { x: 91, y: 93 },
+        { x: 10, y: 93 },
+        { x: 33, y: 91 }
+      ];
+
+      state.fullCourtPositions = {};
+      state.onCourt.forEach((id, index) => {
+        const player = findPlayer(id);
+        const role = String(player?.short || '').toUpperCase();
+        const pos = rolePositions[role] || fallbackPositions[index % fallbackPositions.length];
+        state.fullCourtPositions[id] = { ...pos };
+      });
+      state.fullCourtBallPosition = { x: 59, y: 50 };
+      renderFullCourt();
+      saveState();
+    }
+
     document.getElementById('earlySetupBtn').addEventListener('click', () => {
-      setupFiveOut();
+      setupEarlyOffence();
       state.currentPage = 'court';
       renderPageToggle();
       renderFullCourt();
