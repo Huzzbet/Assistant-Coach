@@ -1471,7 +1471,7 @@ const TEAM_CONFIGS = {
       lastWentBenchAt: {},
       currentPage: 'rotation',
       fullCourtPositions: {},
-      fullCourtBallPosition: { x: 50, y: 50 }
+      fullCourtBallPosition: { x: 66, y: 50 }
     };
 
     // ---------- HELPERS ----------
@@ -1675,13 +1675,13 @@ function clearSavedState() {
         state.fullCourtPositions[id] = { ...fiveOutPositions[index % fiveOutPositions.length] };
       });
       // Offset the ball slightly so it remains visible beside the centre player.
-      state.fullCourtBallPosition = { x: 59, y: 50 };
+      state.fullCourtBallPosition = { x: 66, y: 50 };
       renderFullCourt();
       saveState();
     }
 
     function resetFullCourtBall() {
-      state.fullCourtBallPosition = { x: 50, y: 50 };
+      state.fullCourtBallPosition = { x: 66, y: 50 };
       renderFullCourt();
       saveState();
     }
@@ -2862,7 +2862,7 @@ function clearSavedState() {
         const pos = rolePositions[role] || fallbackPositions[index % fallbackPositions.length];
         state.fullCourtPositions[id] = { ...pos };
       });
-      state.fullCourtBallPosition = { x: 59, y: 50 };
+      state.fullCourtBallPosition = { x: 66, y: 50 };
       renderFullCourt();
       saveState();
     }
