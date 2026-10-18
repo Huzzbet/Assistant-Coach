@@ -1197,8 +1197,10 @@
       <div class="clock-block">
         <div class="clock-label">Game Clock</div>
         <div class="clock-display" id="clockDisplay">10:00</div>
+        <div class="minutes-sub" id="quarterStatus" role="status" aria-live="polite">Q1 ready · 10:00</div>
         <div>
           <button class="btn primary" id="startBtn">Start</button>
+          <button class="btn" id="nextSegmentBtn" hidden>Prepare Q2</button>
           <button class="btn" id="resetBtn">Reset</button>
         </div>
 
@@ -1436,7 +1438,25 @@ const TEAM_CONFIGS = {
 
 function syncStartButton() {
   const startBtn = document.getElementById('startBtn');
-  if (startBtn) startBtn.textContent = state.running ? 'Pause' : 'Start';
+  if (startBtn) {
+    startBtn.textContent = state.running ? 'Pause' : 'Start';
+    startBtn.disabled = state.clockSeconds <= 0 && !state.running;
+  }
+}
+
+function renderQuarterStatus() {
+  const status = document.getElementById('quarterStatus');
+  const nextBtn = document.getElementById('nextSegmentBtn');
+  if (!status || !nextBtn) return;
+  const labels = MODES[state.mode].segmentLabels;
+  const index = labels.indexOf(state.currentSegment);
+  const expired = state.clockSeconds <= 0 && !state.running;
+  const hasNext = index >= 0 && index < labels.length - 1;
+  status.textContent = expired
+    ? state.currentSegment + ' complete · ' + (hasNext ? 'prepare the next segment' : 'game complete')
+    : state.currentSegment + ' · ' + (state.running ? 'clock running' : 'clock paused') + ' · ' + formatTime(state.clockSeconds) + ' remaining';
+  nextBtn.hidden = !expired || !hasNext;
+  nextBtn.textContent = hasNext ? 'Prepare ' + labels[index + 1] : 'Game complete';
 }
 
 function refreshAfterGameControlChange() {
@@ -2003,6 +2023,7 @@ function clearSavedState() {
     function renderAll() {
   renderTeamSelect();
   renderClock();
+  renderQuarterStatus();
   renderModeToggle();
   renderPageToggle();
   renderSubMode();
@@ -2025,11 +2046,14 @@ function clearSavedState() {
         state.running = false;
         syncStartButton();
         renderClock();
+        renderQuarterStatus();
         renderCourt();
         renderBench();
         renderMinutes();
+        renderAlerts();
         renderFullCourt();
         saveState();
+        saveSegmentSnapshot(true);
         return;
       }
 
@@ -2041,6 +2065,7 @@ function clearSavedState() {
       });
 
       renderClock();
+      renderQuarterStatus();
       renderCourt();
       renderBench();
       renderMinutes();
@@ -2245,9 +2270,13 @@ function clearSavedState() {
       refreshAfterGameControlChange();
     }
 
-    function saveSegmentSnapshot() {
+    function saveSegmentSnapshot(auto = false) {
       const allIds = state.onCourt.concat(state.bench);
       if (!allIds.length) return;
+
+      const existingIndex = state.segments.findIndex(seg =>
+        seg.modeLabel === MODES[state.mode].label && seg.segment === state.currentSegment
+      );
 
       const snapshot = allIds.map(id => ({
         id,
@@ -2259,20 +2288,21 @@ function clearSavedState() {
 
       const top = snapshot.slice(0, 3);
 
-      state.segments.push({
+      const savedSnapshot = {
         segment: state.currentSegment,
         modeLabel: MODES[state.mode].label,
-        top
-      });
+        top,
+        completed: auto || state.clockSeconds <= 0
+      };
+      if (existingIndex >= 0) state.segments[existingIndex] = savedSnapshot;
+      else state.segments.push(savedSnapshot);
 
       renderSegments();
       saveState();
-
       const segmentsContainer = document.getElementById('segments');
       const lastCard = segmentsContainer.lastElementChild;
-
       flashElement(lastCard, 'segment-flash', 450);
-      flashElement(document.getElementById('saveSegmentBtn'), 'btn-haptic', 150);
+      if (!auto) flashElement(document.getElementById('saveSegmentBtn'), 'btn-haptic', 150);
     }
 
     // ---------- SUGGESTED SUBS ----------
@@ -2441,21 +2471,36 @@ function clearSavedState() {
 
     // ---------- EVENT LISTENERS ----------
     document.getElementById('startBtn').addEventListener('click', () => {
-      if (!state.running && state.clockSeconds <= 0) {
-        state.clockSeconds = MODES[state.mode].segmentLength;
-      }
+      if (!state.running && state.clockSeconds <= 0) return;
       state.running = !state.running;
-
       const startBtn = document.getElementById('startBtn');
       startBtn.textContent = state.running ? 'Pause' : 'Start';
-
       flashElement(startBtn, 'btn-haptic', 150);
-
       renderClock();
+      renderQuarterStatus();
       renderCourt();
       renderBench();
       renderMinutes();
       renderFullCourt();
+      syncStartButton();
+      saveState();
+    });
+
+    document.getElementById('nextSegmentBtn').addEventListener('click', () => {
+      if (state.running || state.clockSeconds > 0) return;
+      const labels = MODES[state.mode].segmentLabels;
+      const index = labels.indexOf(state.currentSegment);
+      if (index < 0 || index >= labels.length - 1) return;
+      state.currentSegment = labels[index + 1];
+      state.clockSeconds = MODES[state.mode].segmentLength;
+      state.running = false;
+      state.subMode = false;
+      state.selectedOn = [];
+      state.selectedBench = [];
+      initBenchTimers();
+      renderAll();
+      syncStartButton();
+      renderQuarterStatus();
       saveState();
     });
 
@@ -2547,12 +2592,14 @@ function clearSavedState() {
       renderSubMode();
       renderSegmentControls();
       renderClock();
+      renderQuarterStatus();
       renderCourt();
       renderBench();
       renderMinutes();
       renderAlerts();
       renderFullCourt();
       syncStartButton();
+      renderQuarterStatus();
       saveState();
     });
 
