@@ -1336,6 +1336,7 @@
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
             <button class="btn small" id="fiveOutSetupBtn">5-Out Setup</button>
             <button class="btn small" id="earlyCourtSetupBtn">Early</button>
+            <button class="btn small" id="breakerSetupBtn">Breaker</button>
             <button class="btn small" id="resetCourtPositionsBtn">Reset Spots</button>
             <button class="btn small" id="resetBallBtn">Reset Ball</button>
           </div>
@@ -2827,6 +2828,44 @@ function clearSavedState() {
       setupEarlyOffence();
       flashElement(document.getElementById('earlyCourtSetupBtn'), 'btn-haptic', 150);
     });
+
+    document.getElementById('breakerSetupBtn').addEventListener('click', () => {
+      setupBreakerInbound();
+      flashElement(document.getElementById('breakerSetupBtn'), 'btn-haptic', 150);
+    });
+
+    function setupBreakerInbound() {
+      // Baseline inbound formation based on the supplied reference image.
+      // Brooks (centre) is placed on the top baseline, with the option to drag
+      // him slightly behind it if the board's overflow allows it.
+      const rolePositions = {
+        C:  { x: 58, y: 3 },
+        PF: { x: 62, y: 22 },
+        PG: { x: 63, y: 40 },
+        SG: { x: 12, y: 50 },
+        SF: { x: 88, y: 50 }
+      };
+      const fallbackPositions = [
+        { x: 58, y: 3 },
+        { x: 62, y: 22 },
+        { x: 63, y: 40 },
+        { x: 12, y: 50 },
+        { x: 88, y: 50 }
+      ];
+
+      state.fullCourtPositions = {};
+      state.onCourt.forEach((id, index) => {
+        const player = findPlayer(id);
+        const role = String(player?.short || '').toUpperCase();
+        const pos = rolePositions[role] || fallbackPositions[index % fallbackPositions.length];
+        state.fullCourtPositions[id] = { ...pos };
+      });
+
+      // Place the ball beside Brooks at the inbound spot.
+      state.fullCourtBallPosition = { x: 51, y: 4 };
+      renderFullCourt();
+      saveState();
+    }
 
     function setupEarlyOffence() {
       // Match the user's reference image: point guard and ball at halfway,
