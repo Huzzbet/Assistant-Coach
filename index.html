@@ -1659,22 +1659,32 @@ function clearSavedState() {
     }
 
     function setupFiveOut() {
-      // Centre player starts with the ball at halfway; two diags fill the wings
-      // and two drifts fill the deep corners on the attacking half.
-      const fiveOutPositions = [
-        { x: 50, y: 50 }, // ball handler at centre circle
-        { x: 28, y: 65 }, // left diag
-        { x: 72, y: 65 }, // right diag
-        { x: 12, y: 82 }, // left drift / corner
-        { x: 88, y: 82 }  // right drift / corner
+      // Five-out spacing based on the user's court reference: PG at the top,
+      // two wings spaced wide, and two players deep in the corners.
+      const rolePositions = {
+        PG: { x: 50, y: 50 },
+        SG: { x: 22, y: 68 },
+        SF: { x: 75, y: 69 },
+        PF: { x: 7, y: 86 },
+        C:  { x: 91, y: 86 }
+      };
+      const fallbackPositions = [
+        { x: 50, y: 50 },
+        { x: 22, y: 68 },
+        { x: 75, y: 69 },
+        { x: 7, y: 86 },
+        { x: 91, y: 86 }
       ];
 
       state.fullCourtPositions = {};
       state.onCourt.forEach((id, index) => {
-        state.fullCourtPositions[id] = { ...fiveOutPositions[index % fiveOutPositions.length] };
+        const player = findPlayer(id);
+        const role = String(player?.short || '').toUpperCase();
+        const pos = rolePositions[role] || fallbackPositions[index % fallbackPositions.length];
+        state.fullCourtPositions[id] = { ...pos };
       });
-      // Offset the ball slightly so it remains visible beside the centre player.
-      state.fullCourtBallPosition = { x: 66, y: 50 };
+      // Keep the ball just off the point guard so both remain visible.
+      state.fullCourtBallPosition = { x: 58, y: 50 };
       renderFullCourt();
       saveState();
     }
