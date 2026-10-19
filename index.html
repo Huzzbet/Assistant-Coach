@@ -1546,9 +1546,19 @@ function loadSavedState() {
       rosterIds.every(id => savedIds.includes(id)) &&
       savedIds.every(id => rosterIds.includes(id));
 
-    if (!rosterMatches) {
+    // Recover if a saved session has lost its on-court or bench assignments.
+    // For these team presets, five players must be on court and everyone else on the bench.
+    const assignmentsIncomplete = !Array.isArray(state.onCourt) ||
+      state.onCourt.length !== 5 ||
+      !Array.isArray(state.bench) ||
+      state.onCourt.length + state.bench.length !== cfg.players.length;
+
+    if (!rosterMatches || assignmentsIncomplete) {
       state.onCourt = [...cfg.initialOn];
       state.bench = [...cfg.initialBench];
+      state.subMode = false;
+      state.selectedOn = [];
+      state.selectedBench = [];
       state.minutes = {};
       state.fouls = {};
       state.segments = [];
