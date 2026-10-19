@@ -2918,14 +2918,7 @@ function clearSavedState() {
       saveState();
     }
 
-    document.getElementById('earlySetupBtn').addEventListener('click', () => {
-      setupEarlyOffence();
-      state.currentPage = 'court';
-      renderPageToggle();
-      renderFullCourt();
-      saveState();
-      flashElement(document.getElementById('earlySetupBtn'), 'btn-haptic', 150);
-    });
+    // Early setup remains available from the Full Court controls only.
 
     document.getElementById('resetCourtPositionsBtn').addEventListener('click', () => {
       resetFullCourtPositions();
