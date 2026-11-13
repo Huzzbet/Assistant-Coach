@@ -1825,7 +1825,7 @@ function clearSavedState() {
       }
     }
 
-    function createCourtChip(id) {
+    function createCourtChip(id, courtPosition) {
       const p = findPlayer(id);
       if (!p) return document.createElement('div');
 
@@ -1850,7 +1850,7 @@ function clearSavedState() {
       meta.className = 'player-meta';
       meta.innerHTML = `
         <div class="player-name">${p.name}</div>
-        <div class="player-role">${p.short}</div>
+        <div class="player-role">Position ${courtPosition}</div>
         <div class="player-mins">${formatTime(state.minutes[id])} mins</div>
         ${fatigueBarHTML(id)}
       `;
@@ -1892,9 +1892,9 @@ function clearSavedState() {
 
       const ids = state.onCourt;
 
-      [ids[0], ids[1]].forEach(id => id != null && top.appendChild(createCourtChip(id)));
-      [ids[2], ids[3]].forEach(id => id != null && mid.appendChild(createCourtChip(id)));
-      if (ids[4] != null) bot.appendChild(createCourtChip(ids[4]));
+      [0, 1].forEach(index => ids[index] != null && top.appendChild(createCourtChip(ids[index], index + 1)));
+      [2, 3].forEach(index => ids[index] != null && mid.appendChild(createCourtChip(ids[index], index + 1)));
+      if (ids[4] != null) bot.appendChild(createCourtChip(ids[4], 5));
     }
 
     function renderBench() {
@@ -2123,10 +2123,11 @@ function clearSavedState() {
       holder.innerHTML = '';
       legend.innerHTML = '';
 
-      state.onCourt.forEach(id => {
+      state.onCourt.forEach((id, index) => {
         const p = findPlayer(id);
         if (!p) return;
 
+        const courtPosition = index + 1;
         const pos = state.fullCourtPositions[id] || { x: 50, y: 50 };
 
         const marker = document.createElement('div');
@@ -2138,7 +2139,7 @@ function clearSavedState() {
 
         marker.innerHTML = `
           <div class="court-player-number">${p.number}</div>
-          <div class="court-player-role">${p.short}</div>
+          <div class="court-player-role">Position ${courtPosition}</div>
           <div class="court-player-name">${p.name.split(' ')[0]}</div>
         `;
 
