@@ -1893,7 +1893,7 @@ function clearSavedState() {
       const ids = state.onCourt;
 
       [0, 1].forEach(index => ids[index] != null && top.appendChild(createCourtChip(ids[index], 5 - index)));
-      [2, 3].forEach(index => ids[index] != null && mid.appendChild(createCourtChip(ids[index], index + 1)));
+      [2, 3].forEach(index => ids[index] != null && mid.appendChild(createCourtChip(ids[index], 5 - index)));
       if (ids[4] != null) bot.appendChild(createCourtChip(ids[4], 1));
     }
 
