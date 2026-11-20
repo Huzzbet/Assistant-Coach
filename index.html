@@ -1969,7 +1969,16 @@ function clearSavedState() {
       if(!state.scoutBoardPositions)state.scoutBoardPositions={};
       if(!state.scoutBoardPositions[positionKey])state.scoutBoardPositions[positionKey]={};
       const savedPositions=state.scoutBoardPositions[positionKey];
-      const opp=press?[[50,18],[22,35],[78,35],[38,55],[62,55]]:[[50,23],[27,37],[73,37],[35,56],[65,56]];
+      const oppSteps=press?[
+        [[50,18],[22,35],[78,35],[38,55],[62,55]],
+        [[50,25],[30,42],[70,42],[40,60],[60,60]],
+        [[50,34],[38,48],[62,48],[43,65],[57,65]]
+      ]:[
+        [[50,23],[27,37],[73,37],[35,56],[65,56]],
+        [[50,29],[33,42],[67,42],[38,59],[62,59]],
+        [[50,36],[39,47],[61,47],[42,64],[58,64]]
+      ];
+      const opp=oppSteps[idx],previousOpp=oppSteps[Math.max(0,idx-1)];
       function addScoutToken(kind,index,startPosition,endPosition,label){
         const tokenKey=kind==='ball'?'ball':kind+index;
         const saved=savedPositions[tokenKey];
@@ -1977,13 +1986,13 @@ function clearSavedState() {
         const final=saved?{x:saved.x,y:saved.y}:{x:endPosition[0],y:endPosition[1]};
         const el=document.createElement('div');el.className='scout-token '+(kind==='opp'?'theirs':kind==='our'?'ours':'ball');
         el.dataset.scoutToken=tokenKey;el.style.left=initial.x+'%';el.style.top=initial.y+'%';el.textContent=label;
-        if(!saved&&(kind==='our'||kind==='ball'))el.classList.add('is-moving');
+        if(!saved&&(kind==='our'||kind==='opp'||kind==='ball'))el.classList.add('is-moving');
         attachScoutTokenDrag(el,positionKey,tokenKey,board);tokens.appendChild(el);
-        if(!saved&&(kind==='our'||kind==='ball')){
+        if(!saved&&(kind==='our'||kind==='opp'||kind==='ball')){
           requestAnimationFrame(()=>{el.style.left=final.x+'%';el.style.top=final.y+'%';});
         }
       }
-      opp.forEach((p,i)=>addScoutToken('opp',i,p,p,i+1));
+      opp.forEach((p,i)=>addScoutToken('opp',i,previousOpp[i],p,i+1));
       step.to.forEach((p,i)=>addScoutToken('our',i,step.from[i],p,i+1));
       const previousBall=idx>0?steps[idx-1].ball:step.ball;
       addScoutToken('ball',0,previousBall,step.ball,'●');
