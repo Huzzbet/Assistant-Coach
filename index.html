@@ -1204,6 +1204,24 @@
     .scout-response{border:1px solid rgba(56,189,248,.55);background:radial-gradient(circle at top left,rgba(8,47,73,.55),#020617 75%);border-radius:18px;padding:15px;margin-top:12px}.scout-response h3{margin:0 0 8px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#7dd3fc}.scout-response ul{margin:6px 0 0;padding-left:18px;color:#dbeafe;font-size:12px;line-height:1.65}
     .scout-note{width:100%;min-height:82px;resize:vertical;border-radius:13px;padding:11px;border:1px solid rgba(75,85,99,.9);background:#020617;color:#e5e7eb;font:inherit;font-size:12px;outline:none}
     .scout-note:focus{border-color:#3b82f6;box-shadow:0 0 0 2px rgba(59,130,246,.16)}
+.offence-play-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:12px 0}
+.offence-play-option{min-width:0;text-align:left;padding:10px;border-radius:13px;border:1px solid rgba(55,65,81,.9);background:linear-gradient(145deg,#0b1224,#020617);color:#e5e7eb;cursor:pointer;display:flex;flex-direction:column;gap:5px}
+.offence-play-option strong{font-size:11px;line-height:1.35}.offence-play-option span{font-size:10px;line-height:1.4;color:#9ca3af}.offence-play-option.active{border-color:#3b82f6;background:linear-gradient(145deg,rgba(30,64,175,.42),#020617)}
+.offence-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(240px,.8fr);gap:14px;align-items:start}
+.offence-court-panel,.offence-instructions{border:1px solid rgba(55,65,81,.9);border-radius:18px;padding:13px;background:rgba(2,6,23,.72)}
+.offence-court-heading{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}.offence-step-count{font-size:10px;color:#93c5fd;letter-spacing:.12em}
+.offence-half-court{position:relative;width:100%;max-width:440px;margin:auto;aspect-ratio:1/1.05;overflow:hidden;border:2px solid #64748b;border-radius:9px 9px 2px 2px;background:radial-gradient(ellipse at 50% 0%,#24533f,#123426 72%,#0c281f)}
+.offence-baseline{position:absolute;top:7%;left:0;width:100%;border-top:2px solid #e2e8eb99}.offence-backboard{position:absolute;top:3.5%;left:43%;width:14%;border-top:4px solid #e5e7eb}.offence-hoop{position:absolute;top:7%;left:47%;width:6%;aspect-ratio:1;border:2px solid #fb923c;border-radius:50%}
+.offence-key{position:absolute;top:7%;left:30%;width:40%;height:42%;border:1.5px solid #e2e8eb99;border-top:0}.offence-free-throw{position:absolute;top:36%;left:38%;width:24%;aspect-ratio:1;border:1.5px solid #e2e8eb99;border-radius:50%}.offence-three-arc{position:absolute;top:7%;left:9%;width:82%;height:78%;border:1.5px solid #e2e8eb99;border-top:0;border-radius:0 0 48% 48%}
+.offence-court-label{position:absolute;top:1%;left:0;width:100%;text-align:center;font-size:8px;letter-spacing:.18em;color:#d1fae5}
+.offence-player{position:absolute;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#fb923c,#c2410c);border:2px solid #ffedd5;color:#fff;font-weight:800;font-size:13px;box-shadow:0 5px 12px #0008;transform:translate(-50%,-50%);transition:left .55s ease,top .55s ease;z-index:3}
+.offence-player small{position:absolute;top:35px;white-space:nowrap;font-size:8px;color:white;background:#020617cc;padding:2px 4px;border-radius:4px}
+.offence-ball{position:absolute;width:17px;height:17px;border-radius:50%;background:#facc15;border:2px solid #fff7ae;color:#713f12;font-size:9px;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);z-index:5;transition:left .55s ease,top .55s ease}
+.offence-legend{margin:9px;text-align:center;color:#9ca3af;font-size:10px}.offence-step-controls{display:flex;justify-content:space-between;gap:8px;margin-top:10px}
+.offence-step-kicker{font-size:10px;letter-spacing:.16em;color:#60a5fa;font-weight:700}.offence-instructions{min-height:280px}.offence-instructions h3{font-size:19px;margin:10px 0 8px}.offence-instructions>p,.offence-coach-cue p,.offence-read p{font-size:12px;line-height:1.65;color:#cbd5e1;margin:5px 0 0}
+.offence-coach-cue,.offence-read{margin-top:14px;padding:11px;border-radius:12px;background:rgba(30,64,175,.12);border:1px solid rgba(59,130,246,.3)}.offence-coach-cue .panel-title,.offence-read .panel-title{color:#93c5fd;font-size:9px}
+.offence-age-note,.offence-footer-note{font-size:10px;line-height:1.55;color:#9ca3af;margin-top:13px}
+@media(max-width:800px){.offence-play-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.offence-layout{grid-template-columns:1fr}.offence-instructions{min-height:0}}
     @media(max-width:640px){.full-court{border-radius:14px}.court-player{width:52px;height:52px}.court-player-name{font-size:9px;top:56px}.scout-grid{grid-template-columns:1fr}}
   </style>
 </head>
@@ -1248,6 +1266,7 @@
       <button class="mode-pill active" data-page="rotation">Rotation</button>
       <button class="mode-pill" data-page="court">Full Court Magnetic Board</button>
       <button class="mode-pill" data-page="opposition">Opposition Defence</button>
+      <button class="mode-pill" data-page="offence">Offensive Playbook</button>
     </div>
 
     <div id="rotationPage">
@@ -1380,6 +1399,20 @@
       </div>
     </div>
 
+    <div id="offencePage" class="hidden"><div class="panel">
+<div class="panel-header"><div><div class="panel-title">Offensive Playbook</div><div class="panel-sub">Five simple actions to build confident, connected team offence.</div></div><div class="panel-sub">U12–U14 · 5 PLAYS</div></div>
+<div class="offence-play-grid" id="offencePlayOptions">
+<button class="offence-play-option active" data-play="fiveOut"><strong>01 · Five-Out Motion</strong><span>Spacing, pass and cut, fill the space.</span></button>
+<button class="offence-play-option" data-play="giveGo"><strong>02 · Give and Go</strong><span>Pass, cut hard, receive back.</span></button>
+<button class="offence-play-option" data-play="driveKick"><strong>03 · Drive and Kick</strong><span>Penetrate, draw help, find the open player.</span></button>
+<button class="offence-play-option" data-play="pickRoll"><strong>04 · High Pick and Roll</strong><span>Use a high screen and read the coverage.</span></button>
+<button class="offence-play-option" data-play="backdoor"><strong>05 · Backdoor Cut</strong><span>Attack the space behind an overplaying defender.</span></button></div>
+<div class="offence-layout"><div class="offence-court-panel"><div class="offence-court-heading"><div><div class="panel-title" id="offencePlayTitle">Five-Out Motion</div><div class="panel-sub" id="offencePlaySubtitle"></div></div><div class="offence-step-count" id="offenceStepCount"></div></div>
+<div class="offence-half-court"><div class="offence-baseline"></div><div class="offence-hoop"></div><div class="offence-backboard"></div><div class="offence-key"></div><div class="offence-free-throw"></div><div class="offence-three-arc"></div><div class="offence-court-label">ATTACKING BASKET</div><div id="offencePlayers"></div><div class="offence-ball" id="offenceBall">●</div></div>
+<div class="offence-legend">🟠 Our players · 1–5　 🟡 Ball</div><div class="offence-step-controls"><button class="btn" id="offencePrevBtn">← Previous</button><button class="btn primary" id="offenceNextBtn">Next step →</button></div></div>
+<div class="offence-instructions"><div class="offence-step-kicker" id="offenceStepKicker"></div><h3 id="offenceStepTitle"></h3><p id="offenceStepText"></p><div class="offence-coach-cue"><div class="panel-title">COACHING CUE</div><p id="offenceCoachCue"></p></div><div class="offence-read"><div class="panel-title">WHAT SHOULD PLAYERS READ?</div><p id="offenceRead"></p></div><div class="offence-age-note" id="offenceAgeNote"></div></div></div>
+<div class="offence-footer-note">Teaching tip: walk through each step, run it at half speed, then add guided defence before progressing to live play.</div></div></div>
+
     <div id="oppositionPage" class="hidden">
       <div class="panel">
         <div class="panel-header"><div><div class="panel-title">Opposition Defence</div><div class="panel-sub">Identify their defensive setup and get practical ways to attack it.</div></div><div class="panel-sub">TACTICAL SCOUT</div></div>
@@ -1479,6 +1512,8 @@ const TEAM_CONFIGS = {
       segments: [],
       lastWentBenchAt: {},
       currentPage: 'rotation',
+      offensivePlay: 'fiveOut',
+      offensiveStep: 0,
       oppositionDefence: 'man',
       oppositionVariant: 'Man-to-man',
       oppositionNotes: '',
@@ -1857,6 +1892,7 @@ function clearSavedState() {
       document.getElementById('rotationPage').classList.toggle('hidden', state.currentPage !== 'rotation');
       document.getElementById('courtPage').classList.toggle('hidden', state.currentPage !== 'court');
       document.getElementById('oppositionPage').classList.toggle('hidden', state.currentPage !== 'opposition');
+      document.getElementById('offencePage').classList.toggle('hidden', state.currentPage !== 'offence');
     }
 
     function renderSubMode() {
