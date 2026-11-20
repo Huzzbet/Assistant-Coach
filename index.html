@@ -2329,6 +2329,7 @@ function renderOffensivePlay(){
   renderSegmentControls();
   renderFullCourt();
   renderOppositionScout();
+  renderOffensivePlay();
   saveState();
 }
 
@@ -2876,6 +2877,7 @@ function renderOffensivePlay(){
       renderPageToggle();
       if (state.currentPage === 'court') renderFullCourt();
       if (state.currentPage === 'opposition') renderOppositionScout();
+      if (state.currentPage === 'offence') renderOffensivePlay();
       saveState();
     });
 
@@ -2885,6 +2887,18 @@ function renderOffensivePlay(){
       renderOppositionScout();saveState();
     });
     document.getElementById('scoutNotes').addEventListener('input',e=>{state.oppositionNotes=e.target.value;saveState();});
+    document.getElementById('offencePlayOptions').addEventListener('click',e=>{
+      const b=e.target.closest('[data-play]');if(!b||!OFFENSIVE_PLAYS[b.dataset.play])return;
+      state.offensivePlay=b.dataset.play;state.offensiveStep=0;renderOffensivePlay();saveState();
+    });
+    document.getElementById('offencePrevBtn').addEventListener('click',()=>{
+      state.offensiveStep=Math.max(0,state.offensiveStep-1);renderOffensivePlay();saveState();
+    });
+    document.getElementById('offenceNextBtn').addEventListener('click',()=>{
+      const steps=OFFENSIVE_PLAYS[state.offensivePlay].steps;
+      state.offensiveStep=state.offensiveStep>=steps.length-1?0:state.offensiveStep+1;
+      renderOffensivePlay();saveState();
+    });
 
     document.getElementById('courtArea').addEventListener('click', e => {
       const chip = e.target.closest('.player-chip');
