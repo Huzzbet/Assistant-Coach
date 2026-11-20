@@ -1226,7 +1226,72 @@
 
 /* Opposition tactical board mirrors the Full Court Magnetic Board */
 .scout-board-toolbar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0}.scout-board-wrap{background:radial-gradient(circle at top,#0f3d32,#06251f 70%);border:1px solid rgba(75,85,99,.9);border-radius:18px;padding:10px}.scout-board{position:relative;width:100%;max-width:680px;margin:0 auto;aspect-ratio:.58;background:linear-gradient(90deg,#b87945,#c98a52 50%,#b87945);border:3px solid rgba(255,255,255,.85);border-radius:5px;overflow:hidden}.scout-board.half{aspect-ratio:.82;max-width:680px}.scout-board:before{content:'';position:absolute;left:0;right:0;top:50%;border-top:2px solid #ffffffbf}.scout-center{position:absolute;width:27%;aspect-ratio:1;border:2px solid #ffffffbf;border-radius:50%;left:36.5%;top:36.5%}.scout-hoop{position:absolute;left:50%;transform:translateX(-50%);width:8%;height:2%;border:2px solid white;border-radius:50%}.scout-hoop.top{top:3%}.scout-hoop.bottom{bottom:3%}.scout-key{position:absolute;left:34%;width:32%;height:18%;border:2px solid #ffffffc7}.scout-key.top{top:0;border-top:0}.scout-key.bottom{bottom:0;border-bottom:0}.scout-arc{position:absolute;left:18%;width:64%;height:28%;border:2px solid #ffffffb8;border-radius:50%}.scout-arc.top{top:-15%}.scout-arc.bottom{bottom:-15%}.scout-token{touch-action:none;cursor:grab;user-select:none;position:absolute;z-index:4;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);font-size:13px;font-weight:800;color:white;border:2px solid white;box-shadow:0 4px 12px #0008}.scout-token.ours{background:#2563eb}.scout-token.theirs{background:#dc2626}.scout-token.ball{width:22px;height:22px;background:#facc15;color:#422006;font-size:14px}.scout-move-layer{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}.scout-move-layer path{stroke:#86efac;stroke-width:1.1;fill:none;stroke-dasharray:2.5 1.6;vector-effect:non-scaling-stroke}.scout-target{position:absolute;z-index:2;width:17%;aspect-ratio:1;border:2px dashed #86efac;border-radius:50%;background:#22c55e22;transform:translate(-50%,-50%)}.scout-board-legend{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;font-size:11px;color:#cbd5e1;padding:9px 0 2px}.scout-board-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(240px,.8fr);gap:14px;margin-top:12px}.scout-step-card{border:1px solid #374151;border-radius:16px;padding:13px;background:#050b1b}.scout-step-nav{display:flex;gap:8px;margin-top:12px}.scout-step-nav .btn{flex:1;justify-content:center}.scout-step-kicker{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#7dd3fc}.scout-step-card h3{font-size:17px;margin:7px 0}.scout-step-card p{font-size:13px;line-height:1.5;color:#d1d5db}.scout-cue{padding:10px;border-radius:12px;background:#0b2540;border:1px solid #1d4ed8;margin-top:10px;font-size:12px;color:#dbeafe}.scout-response{margin-top:12px}@media(max-width:760px){.scout-board-layout{grid-template-columns:1fr}.scout-board{max-width:480px}.scout-token{width:34px;height:34px;font-size:12px}}
-  </style>
+  
+    /* Match the Offensive Playbook and Opposition Defence courts to the Full Court Magnetic Board */
+    .offence-court-panel,
+    .scout-board-wrap {
+      background: #020617;
+      border: 1px solid rgba(148,163,184,.35);
+      border-radius: 18px;
+      padding: 12px;
+      box-shadow: inset 0 0 24px rgba(0,0,0,.28);
+    }
+    .offence-half-court,
+    .scout-board {
+      background: linear-gradient(180deg, #0b1833 0%, #081224 100%);
+      border: 2px solid rgba(148,163,184,.45);
+      border-radius: 18px;
+      box-shadow: inset 0 0 40px rgba(0,0,0,.55), 0 18px 42px rgba(0,0,0,.4);
+      overflow: hidden;
+    }
+    .offence-baseline,
+    .offence-backboard,
+    .offence-key,
+    .offence-free-throw,
+    .offence-three-arc,
+    .scout-board:before,
+    .scout-center,
+    .scout-hoop,
+    .scout-key,
+    .scout-arc {
+      border-color: rgba(203,213,225,.48);
+    }
+    .offence-hoop { border-color: #fb923c; }
+    .offence-court-label { color: #cbd5e1; }
+    .offence-player {
+      background: linear-gradient(145deg, #60a5fa 0%, #2563eb 48%, #1e40af 100%);
+      border: 2px solid rgba(219,234,254,.95);
+      box-shadow: 0 10px 24px rgba(37,99,235,.38), inset 0 1px 0 rgba(255,255,255,.32);
+    }
+    .offence-player small {
+      color: #e5e7eb;
+      background: rgba(2,6,23,.88);
+      border: 1px solid rgba(148,163,184,.35);
+      border-radius: 999px;
+      padding: 3px 7px;
+    }
+    .offence-ball {
+      background: #facc15;
+      border: 2px solid #fff7ae;
+      box-shadow: 0 3px 7px rgba(0,0,0,.24);
+    }
+    .scout-board-wrap { background: #020617; }
+    .scout-board { border-radius: 18px; }
+    .scout-token.ours {
+      background: linear-gradient(145deg, #60a5fa 0%, #2563eb 48%, #1e40af 100%);
+      border-color: rgba(219,234,254,.95);
+      box-shadow: 0 10px 24px rgba(37,99,235,.38), inset 0 1px 0 rgba(255,255,255,.32);
+    }
+    .scout-token.theirs {
+      background: linear-gradient(145deg, #f87171 0%, #dc2626 55%, #991b1b 100%);
+      border-color: rgba(254,202,202,.95);
+    }
+    .scout-token.ball {
+      background: #facc15;
+      border-color: #fff7ae;
+      color: #422006;
+    }
+</style>
 </head>
 
 <body>
