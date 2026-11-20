@@ -1223,6 +1223,9 @@
 .offence-age-note,.offence-footer-note{font-size:10px;line-height:1.55;color:#9ca3af;margin-top:13px}
 @media(max-width:800px){.offence-play-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.offence-layout{grid-template-columns:1fr}.offence-instructions{min-height:0}}
     @media(max-width:640px){.full-court{border-radius:14px}.court-player{width:52px;height:52px}.court-player-name{font-size:9px;top:56px}.scout-grid{grid-template-columns:1fr}}
+
+/* Opposition tactical board mirrors the Full Court Magnetic Board */
+.scout-board-toolbar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0}.scout-board-wrap{background:radial-gradient(circle at top,#0f3d32,#06251f 70%);border:1px solid rgba(75,85,99,.9);border-radius:18px;padding:10px}.scout-board{position:relative;width:100%;max-width:680px;margin:0 auto;aspect-ratio:.58;background:linear-gradient(90deg,#b87945,#c98a52 50%,#b87945);border:3px solid rgba(255,255,255,.85);border-radius:5px;overflow:hidden}.scout-board.half{aspect-ratio:.82;max-width:680px}.scout-board:before{content:'';position:absolute;left:0;right:0;top:50%;border-top:2px solid #ffffffbf}.scout-center{position:absolute;width:27%;aspect-ratio:1;border:2px solid #ffffffbf;border-radius:50%;left:36.5%;top:36.5%}.scout-hoop{position:absolute;left:50%;transform:translateX(-50%);width:8%;height:2%;border:2px solid white;border-radius:50%}.scout-hoop.top{top:3%}.scout-hoop.bottom{bottom:3%}.scout-key{position:absolute;left:34%;width:32%;height:18%;border:2px solid #ffffffc7}.scout-key.top{top:0;border-top:0}.scout-key.bottom{bottom:0;border-bottom:0}.scout-arc{position:absolute;left:18%;width:64%;height:28%;border:2px solid #ffffffb8;border-radius:50%}.scout-arc.top{top:-15%}.scout-arc.bottom{bottom:-15%}.scout-token{position:absolute;z-index:4;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);font-size:13px;font-weight:800;color:white;border:2px solid white;box-shadow:0 4px 12px #0008}.scout-token.ours{background:#2563eb}.scout-token.theirs{background:#dc2626}.scout-token.ball{width:22px;height:22px;background:#facc15;color:#422006;font-size:14px}.scout-move-layer{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}.scout-move-layer path{stroke:#86efac;stroke-width:1.1;fill:none;stroke-dasharray:2.5 1.6;vector-effect:non-scaling-stroke}.scout-target{position:absolute;z-index:2;width:17%;aspect-ratio:1;border:2px dashed #86efac;border-radius:50%;background:#22c55e22;transform:translate(-50%,-50%)}.scout-board-legend{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;font-size:11px;color:#cbd5e1;padding:9px 0 2px}.scout-board-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(240px,.8fr);gap:14px;margin-top:12px}.scout-step-card{border:1px solid #374151;border-radius:16px;padding:13px;background:#050b1b}.scout-step-nav{display:flex;gap:8px;margin-top:12px}.scout-step-nav .btn{flex:1;justify-content:center}.scout-step-kicker{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#7dd3fc}.scout-step-card h3{font-size:17px;margin:7px 0}.scout-step-card p{font-size:13px;line-height:1.5;color:#d1d5db}.scout-cue{padding:10px;border-radius:12px;background:#0b2540;border:1px solid #1d4ed8;margin-top:10px;font-size:12px;color:#dbeafe}.scout-response{margin-top:12px}@media(max-width:760px){.scout-board-layout{grid-template-columns:1fr}.scout-board{max-width:480px}.scout-token{width:34px;height:34px;font-size:12px}}
   </style>
 </head>
 
@@ -1413,20 +1416,19 @@
 <div class="offence-instructions"><div class="offence-step-kicker" id="offenceStepKicker"></div><h3 id="offenceStepTitle"></h3><p id="offenceStepText"></p><div class="offence-coach-cue"><div class="panel-title">COACHING CUE</div><p id="offenceCoachCue"></p></div><div class="offence-read"><div class="panel-title">WHAT SHOULD PLAYERS READ?</div><p id="offenceRead"></p></div><div class="offence-age-note" id="offenceAgeNote"></div></div></div>
 <div class="offence-footer-note">Teaching tip: walk through each step, run it at half speed, then add guided defence before progressing to live play.</div></div></div>
 
-    <div id="oppositionPage" class="hidden">
-      <div class="panel">
-        <div class="panel-header"><div><div class="panel-title">Opposition Defence</div><div class="panel-sub">Identify their defensive setup and get practical ways to attack it.</div></div><div class="panel-sub">TACTICAL SCOUT</div></div>
-        <div class="scout-grid" id="scoutDefenceOptions">
-          <button class="scout-option active" data-defence="man"><strong>01 · Man-to-man</strong><span>Individual defensive matchups across the court.</span></button>
-          <button class="scout-option" data-defence="press"><strong>02 · Full-court press</strong><span>Pressure applied across the full length of the court.</span></button>
-          <button class="scout-option" data-defence="trap"><strong>03 · Half-court trap</strong><span>Two defenders trap the ball handler in the front court.</span></button>
-          <button class="scout-option" data-defence="half"><strong>04 · Half-court defence</strong><span>Organised man, zone or match-up defence in the half court.</span></button>
-        </div>
-        <div class="panel" style="margin-top:12px;padding:12px"><div class="panel-title">Defensive variation</div><div class="panel-sub" id="scoutVariantHint"></div><div class="scout-suboptions" id="scoutSuboptions"></div></div>
-        <div class="scout-response"><h3>How to attack it</h3><div id="scoutSummary" style="font-size:13px;color:#e5e7eb;font-weight:600"></div><div class="scout-grid" style="margin-top:12px"><div><div class="panel-title">What to look for</div><ul id="scoutWhatToLookFor"></ul></div><div><div class="panel-title">Our counter moves</div><ul id="scoutCounterMoves"></ul></div></div></div>
-        <div class="panel" style="margin-top:12px;padding:12px"><div class="panel-title" style="margin-bottom:7px">Live coaching notes</div><div class="panel-sub" style="margin-bottom:8px">Record what the opposition is doing and what is working for us.</div><textarea id="scoutNotes" class="scout-note" placeholder="e.g. They are trapping near the right sideline. Middle is open. Our first pass out is too slow..."></textarea><div class="footnote">Notes are saved with your coaching session on this device.</div></div>
-      </div>
-    </div>
+    <div id="oppositionPage" class="hidden"><div class="panel">
+<div class="panel-header"><div><div class="panel-title">Opposition Defence</div><div class="panel-sub">Select what they are doing. The board builds our response.</div></div><div class="panel-sub">TACTICAL BOARD</div></div>
+<div class="scout-grid" id="scoutDefenceOptions">
+<button class="scout-option active" data-defence="man"><strong>01 · Man-to-man</strong><span>Beat match-ups with movement and spacing.</span></button>
+<button class="scout-option" data-defence="press"><strong>02 · Full-court press</strong><span>Set up the press break across the full court.</span></button>
+<button class="scout-option" data-defence="trap"><strong>03 · Half-court trap</strong><span>Find the release pass and attack the rotation.</span></button>
+<button class="scout-option" data-defence="half"><strong>04 · Zone / half-court</strong><span>Find gaps in their half-court structure.</span></button></div>
+<div class="panel" style="margin-top:12px;padding:12px"><div class="panel-title">What are they running?</div><div class="panel-sub" id="scoutVariantHint"></div><div class="scout-suboptions" id="scoutSuboptions"></div></div>
+<div class="scout-board-toolbar"><div><div class="panel-title">Tactical magnetic board</div><div class="panel-sub" id="scoutBoardMode"></div></div><button class="btn small" id="scoutResetStep">Reset solution</button></div>
+<div class="scout-board-layout"><div><div class="scout-board-wrap"><div class="scout-board half" id="scoutCourt"><div class="scout-center"></div><div class="scout-hoop top"></div><div class="scout-hoop bottom"></div><div class="scout-key top"></div><div class="scout-key bottom"></div><div class="scout-arc top"></div><div class="scout-arc bottom"></div><svg class="scout-move-layer" id="scoutMoveLayer" viewBox="0 0 100 100" preserveAspectRatio="none"></svg><div id="scoutBoardTokens"></div></div><div class="scout-board-legend"><span>🔵 Our players</span><span>🔴 Opposition</span><span>🟡 Ball</span><span>🟢 Movement / target</span></div></div></div>
+<div class="scout-step-card"><div class="scout-step-kicker" id="scoutStepKicker"></div><h3 id="scoutStepTitle"></h3><p id="scoutStepText"></p><div class="scout-cue"><strong>COACHING CUE</strong><p id="scoutCoachCue" style="margin:5px 0 0"></p></div><div class="scout-step-nav"><button class="btn" id="scoutPrevBtn">← Previous</button><button class="btn primary" id="scoutNextBtn">Next step →</button></div><div class="scout-response"><div class="panel-title">WHY THIS WORKS</div><p id="scoutSummary" style="font-size:12px;color:#d1d5db;line-height:1.5"></p><div class="panel-title" style="margin-top:12px">WHAT TO LOOK FOR</div><ul id="scoutWhatToLookFor"></ul></div></div></div>
+<div class="panel" style="margin-top:12px;padding:12px"><div class="panel-title" style="margin-bottom:7px">Live coaching notes</div><div class="panel-sub" style="margin-bottom:8px">Record what the opposition is doing and what is working for us.</div><textarea id="scoutNotes" class="scout-note" placeholder="e.g. They are trapping near the right sideline. Middle is open. Our first pass out is too slow..."></textarea><div class="footnote">Notes are saved with your coaching session on this device.</div></div>
+</div></div>
 
   </div>
 
@@ -1847,10 +1849,24 @@ function clearSavedState() {
       document.querySelectorAll('[data-defence]').forEach(b=>b.classList.toggle('active',b.dataset.defence===state.oppositionDefence));
       document.getElementById('scoutVariantHint').textContent=cfg.hint;
       const sub=document.getElementById('scoutSuboptions');sub.innerHTML='';
-      cfg.variants.forEach(name=>{const b=document.createElement('button');b.type='button';b.className='scout-chip'+(name===variant?' active':'');b.textContent=name;b.addEventListener('click',()=>{state.oppositionVariant=name;renderOppositionScout();saveState();});sub.appendChild(b);});
-      const d=cfg.data[variant];document.getElementById('scoutSummary').textContent=d.summary;
-      document.getElementById('scoutWhatToLookFor').innerHTML=d.look.map(x=>'<li>'+x+'</li>').join('');
-      document.getElementById('scoutCounterMoves').innerHTML=d.counter.map(x=>'<li>'+x+'</li>').join('');
+      cfg.variants.forEach(name=>{const b=document.createElement('button');b.type='button';b.className='scout-chip'+(name===variant?' active':'');b.textContent=name;b.addEventListener('click',()=>{state.oppositionVariant=name;state.scoutStep=0;renderOppositionScout();saveState();});sub.appendChild(b);});
+      const d=cfg.data[variant],press=state.oppositionDefence==='press';
+      document.getElementById('scoutCourt').classList.toggle('half',!press);
+      document.getElementById('scoutBoardMode').textContent=press?'Full-court press break · advance up the floor':'Half-court tactical setup · identify and attack the open space';
+      const steps=[
+       {title:'Set the shape',text:press?'Give the inbounder two safe outlets, a middle target and a player ahead of the ball. Use width and depth.':'Keep five players spaced. Identify the ball defender, help defenders and the space we want to attack.',cue:press?'Show hands early. Do not bring every player back to the ball.':'Space the floor, move the defence and make the next pass on time.',from:[[50,12],[22,30],[78,30],[30,70],[70,70]],to:[[50,30],[25,45],[75,45],[30,72],[70,72]],ball:[50,9],target:[50,48]},
+       {title:'Move the defence',text:press?'Pass away from the first line of pressure. Use the middle flash or diagonal outlet to get behind the trap.':'Move the ball quickly and make the defence shift. Use a cut, screen or drive to force a second defender to help.',cue:press?'Pass ahead into space. The receiver should catch facing up court.':'Make the defence guard two actions in a row. Cut hard, then fill the space you leave.',from:[[50,30],[25,45],[75,45],[30,72],[70,72]],to:[[50,48],[18,38],[82,38],[25,76],[75,76]],ball:[50,48],target:[78,40]},
+       {title:'Attack the advantage',text:press?'Once the first line is beaten, run wide lanes and attack before the defence can recover.':'Attack the gap created by the movement. If help commits, pass to the open teammate; if it stays home, finish the drive.',cue:press?'Eyes up, sprint wide and make the defence turn and run.':'Drive with purpose. Draw help, then make the simple pass to the free player.',from:[[50,48],[18,38],[82,38],[25,76],[75,76]],to:[[50,24],[15,34],[85,34],[24,70],[76,70]],ball:[50,24],target:[50,24]}
+      ];
+      const idx=Math.max(0,Math.min(2,Number(state.scoutStep)||0));state.scoutStep=idx;const step=steps[idx],tokens=document.getElementById('scoutBoardTokens');tokens.innerHTML='';
+      const opp=press?[[50,18],[22,35],[78,35],[38,55],[62,55]]:[[50,23],[27,37],[73,37],[35,56],[65,56]];
+      opp.forEach((p,i)=>{const el=document.createElement('div');el.className='scout-token theirs';el.style.left=p[0]+'%';el.style.top=p[1]+'%';el.textContent=i+1;tokens.appendChild(el);});
+      step.to.forEach((p,i)=>{const el=document.createElement('div');el.className='scout-token ours';el.style.left=p[0]+'%';el.style.top=p[1]+'%';el.textContent=i+1;tokens.appendChild(el);});
+      const ball=document.createElement('div');ball.className='scout-token ball';ball.style.left=step.ball[0]+'%';ball.style.top=step.ball[1]+'%';ball.textContent='●';tokens.appendChild(ball);
+      const target=document.createElement('div');target.className='scout-target';target.style.left=step.target[0]+'%';target.style.top=step.target[1]+'%';tokens.appendChild(target);
+      document.getElementById('scoutMoveLayer').innerHTML=step.from.map((p,i)=>'<path d="M '+p[0]+' '+p[1]+' L '+step.to[i][0]+' '+step.to[i][1]+'"></path>').join('');
+      document.getElementById('scoutStepKicker').textContent='SOLUTION · STEP '+(idx+1)+' OF 3';document.getElementById('scoutStepTitle').textContent=step.title;document.getElementById('scoutStepText').textContent=step.text;document.getElementById('scoutCoachCue').textContent=step.cue;document.getElementById('scoutSummary').textContent=d.summary;document.getElementById('scoutWhatToLookFor').innerHTML=d.look.map(x=>'<li>'+x+'</li>').join('');
+      document.getElementById('scoutPrevBtn').disabled=idx===0;document.getElementById('scoutNextBtn').textContent=idx===2?'Restart solution ↺':'Next step →';
       const n=document.getElementById('scoutNotes');if(n&&n.value!==(state.oppositionNotes||''))n.value=state.oppositionNotes||'';
     }
 
@@ -2887,6 +2903,9 @@ function renderOffensivePlay(){
       renderOppositionScout();saveState();
     });
     document.getElementById('scoutNotes').addEventListener('input',e=>{state.oppositionNotes=e.target.value;saveState();});
+    document.getElementById('scoutPrevBtn').addEventListener('click',()=>{state.scoutStep=Math.max(0,(state.scoutStep||0)-1);renderOppositionScout();saveState();});
+    document.getElementById('scoutNextBtn').addEventListener('click',()=>{state.scoutStep=(state.scoutStep||0)>=2?0:(state.scoutStep||0)+1;renderOppositionScout();saveState();});
+    document.getElementById('scoutResetStep').addEventListener('click',()=>{state.scoutStep=0;renderOppositionScout();saveState();});
     document.getElementById('offencePlayOptions').addEventListener('click',e=>{
       const b=e.target.closest('[data-play]');if(!b||!OFFENSIVE_PLAYS[b.dataset.play])return;
       state.offensivePlay=b.dataset.play;state.offensiveStep=0;renderOffensivePlay();saveState();
