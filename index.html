@@ -1227,6 +1227,15 @@
 /* Opposition tactical board mirrors the Full Court Magnetic Board */
 .scout-board-toolbar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0}.scout-board-wrap{background:radial-gradient(circle at top,#0f3d32,#06251f 70%);border:1px solid rgba(75,85,99,.9);border-radius:18px;padding:10px}.scout-board{position:relative;width:100%;max-width:680px;margin:0 auto;aspect-ratio:.58;background:linear-gradient(90deg,#b87945,#c98a52 50%,#b87945);border:3px solid rgba(255,255,255,.85);border-radius:5px;overflow:hidden}.scout-board.half{aspect-ratio:.82;max-width:680px}.scout-board:before{content:'';position:absolute;left:0;right:0;top:50%;border-top:2px solid #ffffffbf}.scout-center{position:absolute;width:27%;aspect-ratio:1;border:2px solid #ffffffbf;border-radius:50%;left:36.5%;top:36.5%}.scout-hoop{position:absolute;left:50%;transform:translateX(-50%);width:8%;height:2%;border:2px solid white;border-radius:50%}.scout-hoop.top{top:3%}.scout-hoop.bottom{bottom:3%}.scout-key{position:absolute;left:34%;width:32%;height:18%;border:2px solid #ffffffc7}.scout-key.top{top:0;border-top:0}.scout-key.bottom{bottom:0;border-bottom:0}.scout-arc{position:absolute;left:18%;width:64%;height:28%;border:2px solid #ffffffb8;border-radius:50%}.scout-arc.top{top:-15%}.scout-arc.bottom{bottom:-15%}.scout-token{touch-action:none;cursor:grab;user-select:none;position:absolute;z-index:4;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);font-size:13px;font-weight:800;color:white;border:2px solid white;box-shadow:0 4px 12px #0008}.scout-token.ours{background:#2563eb}.scout-token.theirs{background:#dc2626}.scout-token.ball{width:22px;height:22px;background:#facc15;color:#422006;font-size:14px}.scout-move-layer{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}.scout-move-layer path{stroke:#86efac;stroke-width:1.1;fill:none;stroke-dasharray:2.5 1.6;vector-effect:non-scaling-stroke}.scout-target{position:absolute;z-index:2;width:17%;aspect-ratio:1;border:2px dashed #86efac;border-radius:50%;background:#22c55e22;transform:translate(-50%,-50%)}.scout-board-legend{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;font-size:11px;color:#cbd5e1;padding:9px 0 2px}.scout-board-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(240px,.8fr);gap:14px;margin-top:12px}.scout-step-card{border:1px solid #374151;border-radius:16px;padding:13px;background:#050b1b}.scout-step-nav{display:flex;gap:8px;margin-top:12px}.scout-step-nav .btn{flex:1;justify-content:center}.scout-step-kicker{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#7dd3fc}.scout-step-card h3{font-size:17px;margin:7px 0}.scout-step-card p{font-size:13px;line-height:1.5;color:#d1d5db}.scout-cue{padding:10px;border-radius:12px;background:#0b2540;border:1px solid #1d4ed8;margin-top:10px;font-size:12px;color:#dbeafe}.scout-response{margin-top:12px}@media(max-width:760px){.scout-board-layout{grid-template-columns:1fr}.scout-board{max-width:480px}.scout-token{width:34px;height:34px;font-size:12px}}
   
+    /* Animated defensive solution paths */
+    .scout-token{transition:left .72s cubic-bezier(.2,.75,.25,1),top .72s cubic-bezier(.2,.75,.25,1)}
+    .scout-token.is-moving{will-change:left,top}
+    .scout-move-layer{z-index:3;overflow:visible}
+    .scout-move-layer .scout-player-route{fill:none;stroke:#86efac;stroke-width:1.15;stroke-dasharray:2.2 1.4;vector-effect:non-scaling-stroke;opacity:.95}
+    .scout-move-layer .scout-ball-route{fill:none;stroke:#facc15;stroke-width:1.55;stroke-dasharray:1.4 1.3;vector-effect:non-scaling-stroke}
+    .scout-target{animation:scoutTargetPulse 1.7s ease-in-out infinite}
+    @keyframes scoutTargetPulse{0%,100%{box-shadow:0 0 0 0 rgba(134,239,172,0)}50%{box-shadow:0 0 0 8px rgba(134,239,172,.12)}}
+    @media(prefers-reduced-motion:reduce){.scout-token{transition:none}.scout-target{animation:none}}
     /* Animated offensive teaching paths */
     .offence-move-layer{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;overflow:visible}
     .offence-move-arrow{fill:none;stroke:#86efac;stroke-width:1.25;stroke-dasharray:2.4 1.5;vector-effect:non-scaling-stroke;opacity:.95}
@@ -1497,7 +1506,7 @@
 <button class="scout-option" data-defence="half"><strong>04 · Zone / half-court</strong><span>Find gaps in their half-court structure.</span></button></div>
 <div class="panel" style="margin-top:12px;padding:12px"><div class="panel-title">What are they running?</div><div class="panel-sub" id="scoutVariantHint"></div><div class="scout-suboptions" id="scoutSuboptions"></div></div>
 <div class="scout-board-toolbar"><div><div class="panel-title">Tactical magnetic board</div><div class="panel-sub" id="scoutBoardMode"></div></div><button class="btn small" id="scoutResetStep">Reset solution</button></div>
-<div class="scout-board-layout"><div><div class="scout-board-wrap"><div class="scout-board half" id="scoutCourt"><div class="scout-center"></div><div class="scout-hoop top"></div><div class="scout-hoop bottom"></div><div class="scout-key top"></div><div class="scout-key bottom"></div><div class="scout-arc top"></div><div class="scout-arc bottom"></div><svg class="scout-move-layer" id="scoutMoveLayer" viewBox="0 0 100 100" preserveAspectRatio="none"></svg><div id="scoutBoardTokens"></div></div><div class="scout-board-legend"><span>🔵 Our players</span><span>🔴 Opposition</span><span>🟡 Ball</span><span>🟢 Movement / target</span></div></div></div>
+<div class="scout-board-layout"><div><div class="scout-board-wrap"><div class="scout-board half" id="scoutCourt"><div class="scout-center"></div><div class="scout-hoop top"></div><div class="scout-hoop bottom"></div><div class="scout-key top"></div><div class="scout-key bottom"></div><div class="scout-arc top"></div><div class="scout-arc bottom"></div><svg class="scout-move-layer" id="scoutMoveLayer" viewBox="0 0 100 100" preserveAspectRatio="none"></svg><div id="scoutBoardTokens"></div></div><div class="scout-board-legend"><span>🔵 Our players</span><span>🔴 Opposition</span><span>🟡 Ball / pass path</span><span>🟢 Player movement / target</span></div></div></div>
 <div class="scout-step-card"><div class="scout-step-kicker" id="scoutStepKicker"></div><h3 id="scoutStepTitle"></h3><p id="scoutStepText"></p><div class="scout-cue"><strong>COACHING CUE</strong><p id="scoutCoachCue" style="margin:5px 0 0"></p></div><div class="scout-step-nav"><button class="btn" id="scoutPrevBtn">← Previous</button><button class="btn primary" id="scoutNextBtn">Next step →</button></div><div class="scout-response"><div class="panel-title">WHY THIS WORKS</div><p id="scoutSummary" style="font-size:12px;color:#d1d5db;line-height:1.5"></p><div class="panel-title" style="margin-top:12px">WHAT TO LOOK FOR</div><ul id="scoutWhatToLookFor"></ul></div></div></div>
 <div class="panel" style="margin-top:12px;padding:12px"><div class="panel-title" style="margin-bottom:7px">Live coaching notes</div><div class="panel-sub" style="margin-bottom:8px">Record what the opposition is doing and what is working for us.</div><textarea id="scoutNotes" class="scout-note" placeholder="e.g. They are trapping near the right sideline. Middle is open. Our first pass out is too slow..."></textarea><div class="footnote">Notes are saved with your coaching session on this device.</div></div>
 </div></div>
@@ -1953,25 +1962,47 @@ function clearSavedState() {
        {title:'Move the defence',text:press?'Pass away from the first line of pressure. Use the middle flash or diagonal outlet to get behind the trap.':'Move the ball quickly and make the defence shift. Use a cut, screen or drive to force a second defender to help.',cue:press?'Pass ahead into space. The receiver should catch facing up court.':'Make the defence guard two actions in a row. Cut hard, then fill the space you leave.',from:[[50,30],[25,45],[75,45],[30,72],[70,72]],to:[[50,48],[18,38],[82,38],[25,76],[75,76]],ball:[50,48],target:[78,40]},
        {title:'Attack the advantage',text:press?'Once the first line is beaten, run wide lanes and attack before the defence can recover.':'Attack the gap created by the movement. If help commits, pass to the open teammate; if it stays home, finish the drive.',cue:press?'Eyes up, sprint wide and make the defence turn and run.':'Drive with purpose. Draw help, then make the simple pass to the free player.',from:[[50,48],[18,38],[82,38],[25,76],[75,76]],to:[[50,24],[15,34],[85,34],[24,70],[76,70]],ball:[50,24],target:[50,24]}
       ];
-      const idx=Math.max(0,Math.min(2,Number(state.scoutStep)||0));state.scoutStep=idx;const step=steps[idx],tokens=document.getElementById('scoutBoardTokens');tokens.innerHTML='';
+      const idx=Math.max(0,Math.min(2,Number(state.scoutStep)||0));state.scoutStep=idx;const step=steps[idx],tokens=document.getElementById('scoutBoardTokens');
+      tokens.innerHTML='';
       const board=document.getElementById('scoutCourt');
       const positionKey=state.oppositionDefence+'|'+variant+'|'+idx;
       if(!state.scoutBoardPositions)state.scoutBoardPositions={};
       if(!state.scoutBoardPositions[positionKey])state.scoutBoardPositions[positionKey]={};
       const savedPositions=state.scoutBoardPositions[positionKey];
       const opp=press?[[50,18],[22,35],[78,35],[38,55],[62,55]]:[[50,23],[27,37],[73,37],[35,56],[65,56]];
-      function addScoutToken(kind,index,position,label){
+      function addScoutToken(kind,index,startPosition,endPosition,label){
         const tokenKey=kind==='ball'?'ball':kind+index;
-        const pos=savedPositions[tokenKey]||{x:position[0],y:position[1]};
+        const saved=savedPositions[tokenKey];
+        const initial=saved?{x:saved.x,y:saved.y}:{x:startPosition[0],y:startPosition[1]};
+        const final=saved?{x:saved.x,y:saved.y}:{x:endPosition[0],y:endPosition[1]};
         const el=document.createElement('div');el.className='scout-token '+(kind==='opp'?'theirs':kind==='our'?'ours':'ball');
-        el.dataset.scoutToken=tokenKey;el.style.left=pos.x+'%';el.style.top=pos.y+'%';el.textContent=label;
+        el.dataset.scoutToken=tokenKey;el.style.left=initial.x+'%';el.style.top=initial.y+'%';el.textContent=label;
+        if(!saved&&(kind==='our'||kind==='ball'))el.classList.add('is-moving');
         attachScoutTokenDrag(el,positionKey,tokenKey,board);tokens.appendChild(el);
+        if(!saved&&(kind==='our'||kind==='ball')){
+          requestAnimationFrame(()=>{el.style.left=final.x+'%';el.style.top=final.y+'%';});
+        }
       }
-      opp.forEach((p,i)=>addScoutToken('opp',i,p,i+1));
-      step.to.forEach((p,i)=>addScoutToken('our',i,p,i+1));
-      addScoutToken('ball',0,step.ball,'●');
+      opp.forEach((p,i)=>addScoutToken('opp',i,p,p,i+1));
+      step.to.forEach((p,i)=>addScoutToken('our',i,step.from[i],p,i+1));
+      const previousBall=idx>0?steps[idx-1].ball:step.ball;
+      addScoutToken('ball',0,previousBall,step.ball,'●');
       const target=document.createElement('div');target.className='scout-target';target.style.left=step.target[0]+'%';target.style.top=step.target[1]+'%';tokens.appendChild(target);
-      document.getElementById('scoutMoveLayer').innerHTML=step.from.map((p,i)=>'<path d="M '+p[0]+' '+p[1]+' L '+step.to[i][0]+' '+step.to[i][1]+'"></path>').join('');
+      const layer=document.getElementById('scoutMoveLayer');layer.innerHTML='';
+      const ns='http://www.w3.org/2000/svg';
+      const defs=document.createElementNS(ns,'defs');
+      const marker=document.createElementNS(ns,'marker');marker.setAttribute('id','scoutArrowHead');marker.setAttribute('markerWidth','5');marker.setAttribute('markerHeight','5');marker.setAttribute('refX','4');marker.setAttribute('refY','2.5');marker.setAttribute('orient','auto');
+      const head=document.createElementNS(ns,'path');head.setAttribute('d','M0,0 L5,2.5 L0,5 Z');head.setAttribute('fill','#86efac');marker.appendChild(head);defs.appendChild(marker);layer.appendChild(defs);
+      step.from.forEach((p,i)=>{
+        const q=step.to[i];if(Math.hypot(q[0]-p[0],q[1]-p[1])<2)return;
+        const path=document.createElementNS(ns,'path');path.setAttribute('d',`M ${p[0]} ${p[1]} Q ${(p[0]+q[0])/2+((i%2)?-2:2)} ${(p[1]+q[1])/2} ${q[0]} ${q[1]}`);
+        path.setAttribute('class','scout-player-route');path.setAttribute('marker-end','url(#scoutArrowHead)');layer.appendChild(path);
+      });
+      const ballStart=previousBall,ballEnd=step.ball;
+      if(Math.hypot(ballEnd[0]-ballStart[0],ballEnd[1]-ballStart[1])>2){
+        const pass=document.createElementNS(ns,'path');pass.setAttribute('d',`M ${ballStart[0]} ${ballStart[1]} Q ${(ballStart[0]+ballEnd[0])/2+5} ${(ballStart[1]+ballEnd[1])/2-5} ${ballEnd[0]} ${ballEnd[1]}`);
+        pass.setAttribute('class','scout-ball-route');layer.appendChild(pass);
+      }
       document.getElementById('scoutStepKicker').textContent='SOLUTION · STEP '+(idx+1)+' OF 3';document.getElementById('scoutStepTitle').textContent=step.title;document.getElementById('scoutStepText').textContent=step.text;document.getElementById('scoutCoachCue').textContent=step.cue;document.getElementById('scoutSummary').textContent=d.summary;document.getElementById('scoutWhatToLookFor').innerHTML=d.look.map(x=>'<li>'+x+'</li>').join('');
       document.getElementById('scoutPrevBtn').disabled=idx===0;document.getElementById('scoutNextBtn').textContent=idx===2?'Restart solution ↺':'Next step →';
       const n=document.getElementById('scoutNotes');if(n&&n.value!==(state.oppositionNotes||''))n.value=state.oppositionNotes||'';
