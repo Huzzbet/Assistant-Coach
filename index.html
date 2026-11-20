@@ -1854,6 +1854,49 @@ function clearSavedState() {
       const n=document.getElementById('scoutNotes');if(n&&n.value!==(state.oppositionNotes||''))n.value=state.oppositionNotes||'';
     }
 
+    const OFFENSIVE_PLAYS={
+fiveOut:{title:'Five-Out Motion',subtitle:'Five players outside the key · spacing is the starting point',age:'U12–U14: master spacing and timing before adding complex reads.',steps:[
+['Start in five-out','One player at the top, two on the wings and two in the corners. Keep enough distance that one defender cannot guard two players.','“Wide spots, see the ball and see your player.”','Are all five spots filled? Are the driving lanes open?',[[50,65],[18,48],[82,48],[12,82],[88,82]],[50,65]],
+['Pass and basket cut','The top player passes to a wing and immediately cuts hard to the basket. The receiver looks for the cutter first. If the pass is not on, the cutter clears through.','“Pass, cut hard, show your hands.”','Did the defender turn their head? Is the lane open?',[[50,34],[18,48],[82,48],[12,82],[88,82]],[82,48]],
+['Fill the empty space','The cutter clears through and fills an empty corner or wing. Teammates slide one spot to keep five-out spacing. Attack an open gap if the defence is late.','“Cut through, fill behind, keep the floor balanced.”','Did everyone replace an empty spot? Is a drive or extra pass available?',[[50,34],[18,48],[82,48],[12,82],[88,82]],[82,48]]]},
+giveGo:{title:'Give and Go',subtitle:'Two-player action · pass then cut',age:'U12–U14: focus on timing, a sharp change of speed and passing to a moving target.',steps:[
+['Create a passing angle','Player 1 has the ball at the top. Player 2 presents on the wing. The other three players stay spaced.','“Show a target and give your teammate room.”','Is the passing lane clear? Is the receiver ready?',[[50,65],[22,49],[78,49],[14,83],[86,83]],[50,65]],
+['Pass and explode','Player 1 passes to Player 2, then changes speed and cuts directly to the basket. Player 2 looks for the cutter before dribbling.','“Pass, sprint, show your hands.”','Has the defender watched the ball? Can the cutter get a step?',[[50,32],[22,49],[78,49],[14,83],[86,83]],[22,49]],
+['Return pass or clear','Player 2 leads the pass into Player 1’s path for a layup. If the lane is covered, keep the ball and Player 1 clears through.','“Pass to space, not behind your teammate.”','Is the cutter ahead? If not, can the receiver attack or swing the ball?',[[50,32],[22,49],[78,49],[14,83],[86,83]],[50,32]]]},
+driveKick:{title:'Drive and Kick',subtitle:'Penetrate · draw help · find the open player',age:'U12–U14: eyes up, controlled drives and balanced feet on the catch. Do not force a shot into traffic.',steps:[
+['Space the floor','Player 1 starts with the ball on the wing. Teammates fill the top, opposite wing and corners. Keep the middle open.','“Corners wide, one at the top, hands ready.”','Where is the biggest gap? Who is likely to help?',[[22,53],[50,65],[80,50],[12,84],[88,84]],[22,53]],
+['Attack the gap','Player 1 drives hard towards the paint. Teammates stay spaced and get ready to receive. The nearest defender must decide whether to help.','“Beat your player, eyes up.”','Has a second defender committed? Who has been left free?',[[43,34],[50,65],[80,50],[12,84],[88,84]],[43,34]],
+['Kick to the open player','If help arrives, Player 1 passes to the open teammate. The receiver catches ready to shoot, drive the close-out or move the ball on.','“Draw two, pass out, catch ready.”','Is the close-out long or short? Shoot, attack or make the extra pass.',[[43,34],[50,65],[80,50],[12,84],[88,84]],[88,84]]]},
+pickRoll:{title:'High Pick and Roll',subtitle:'High screen · ball handler reads the coverage',age:'U13–U14 progression: start with a stationary screen and simple roll. Add switches and slips only when basics are consistent.',steps:[
+['Set the high screen','Player 1 has the ball near the top. Player 5 moves up and sets a strong, legal screen. The other three players stay spaced.','“Arrive early, feet still, give the ball handler a shoulder.”','Is the screen in the right spot? Is the screener stationary?',[[50,65],[18,49],[82,49],[12,84],[58,58]],[50,65]],
+['Use the screen','Player 1 dribbles shoulder-to-hip past the screen. Player 5 pivots and rolls hard towards the basket, showing a target.','“Rub shoulders, turn the corner, roll to the rim.”','Does the defender go under, over or switch? Is the roll lane open?',[[58,43],[18,49],[82,49],[12,84],[50,30]],[58,43]],
+['Read the advantage','Player 1 looks for the rolling screener. If defence stops the roll, keep the dribble alive and pass to the open wing or corner.','“Ball handler reads the help; screener runs to the hoop.”','Is the roller open? Which weak-side defender has left a shooter?',[[58,43],[18,49],[82,49],[12,84],[50,30]],[50,30]]]},
+backdoor:{title:'Backdoor Cut',subtitle:'Punish a defender who overplays the passing lane',age:'U12–U14: sell the move away from the ball, change direction sharply and lead the cutter to the basket.',steps:[
+['Spot the overplay','Player 1 has the ball at the top. Player 2 is on the wing. The defender is denying the pass and standing high in the passing lane.','“See the ball and your defender. Notice when they lean.”','Is the defender reaching, leaning or turning their back?',[[50,65],[20,49],[80,49],[12,84],[88,84]],[50,65]],
+['Sell then go backdoor','Player 2 takes one or two sharp steps towards the ball, then plants and cuts behind the defender to the hoop.','“Show hands, plant hard, explode behind them.”','Has the defender stepped above the cutter or lost sight of the ball?',[[50,65],[50,30],[80,49],[12,84],[88,84]],[50,65]],
+['Lead the pass','Player 1 passes into the space ahead of the cutter. If help protects the basket, the cutter can stop short and the team keeps its spacing.','“Pass to the space in front — make the defender turn.”','Is the lane clear? If help arrives, can the cutter become a passing option?',[[50,65],[50,30],[80,49],[12,84],[88,84]],[50,30]]]}
+};
+function renderOffensivePlay(){
+ const play=OFFENSIVE_PLAYS[state.offensivePlay]||OFFENSIVE_PLAYS.fiveOut;
+ state.offensiveStep=Math.max(0,Math.min(play.steps.length-1,Number(state.offensiveStep)||0));
+ const step=play.steps[state.offensiveStep];
+ document.querySelectorAll('[data-play]').forEach(b=>b.classList.toggle('active',b.dataset.play===state.offensivePlay));
+ document.getElementById('offencePlayTitle').textContent=play.title;
+ document.getElementById('offencePlaySubtitle').textContent=play.subtitle;
+ document.getElementById('offenceStepCount').textContent='STEP '+(state.offensiveStep+1)+' / '+play.steps.length;
+ document.getElementById('offenceStepKicker').textContent='STEP '+(state.offensiveStep+1)+' · '+play.title.toUpperCase();
+ document.getElementById('offenceStepTitle').textContent=step[0];
+ document.getElementById('offenceStepText').textContent=step[1];
+ document.getElementById('offenceCoachCue').textContent=step[2];
+ document.getElementById('offenceRead').textContent=step[3];
+ document.getElementById('offenceAgeNote').textContent=play.age;
+ const holder=document.getElementById('offencePlayers');holder.innerHTML='';
+ step[4].forEach((pos,i)=>{const p=document.createElement('div');p.className='offence-player';p.style.left=pos[0]+'%';p.style.top=pos[1]+'%';p.innerHTML=(i+1)+'<small>P'+(i+1)+'</small>';holder.appendChild(p);});
+ const ball=document.getElementById('offenceBall');ball.style.left=step[5][0]+'%';ball.style.top=step[5][1]+'%';
+ document.getElementById('offencePrevBtn').disabled=state.offensiveStep===0;
+ document.getElementById('offenceNextBtn').textContent=state.offensiveStep===play.steps.length-1?'Restart play ↺':'Next step →';
+}
+
     // ---------- RENDER ----------
     function renderTeamSelect() {
       const select = document.getElementById('teamSelect');
