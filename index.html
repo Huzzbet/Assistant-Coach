@@ -1227,6 +1227,13 @@
 /* Opposition tactical board mirrors the Full Court Magnetic Board */
 .scout-board-toolbar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 0}.scout-board-wrap{background:radial-gradient(circle at top,#0f3d32,#06251f 70%);border:1px solid rgba(75,85,99,.9);border-radius:18px;padding:10px}.scout-board{position:relative;width:100%;max-width:680px;margin:0 auto;aspect-ratio:.58;background:linear-gradient(90deg,#b87945,#c98a52 50%,#b87945);border:3px solid rgba(255,255,255,.85);border-radius:5px;overflow:hidden}.scout-board.half{aspect-ratio:.82;max-width:680px}.scout-board:before{content:'';position:absolute;left:0;right:0;top:50%;border-top:2px solid #ffffffbf}.scout-center{position:absolute;width:27%;aspect-ratio:1;border:2px solid #ffffffbf;border-radius:50%;left:36.5%;top:36.5%}.scout-hoop{position:absolute;left:50%;transform:translateX(-50%);width:8%;height:2%;border:2px solid white;border-radius:50%}.scout-hoop.top{top:3%}.scout-hoop.bottom{bottom:3%}.scout-key{position:absolute;left:34%;width:32%;height:18%;border:2px solid #ffffffc7}.scout-key.top{top:0;border-top:0}.scout-key.bottom{bottom:0;border-bottom:0}.scout-arc{position:absolute;left:18%;width:64%;height:28%;border:2px solid #ffffffb8;border-radius:50%}.scout-arc.top{top:-15%}.scout-arc.bottom{bottom:-15%}.scout-token{touch-action:none;cursor:grab;user-select:none;position:absolute;z-index:4;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);font-size:13px;font-weight:800;color:white;border:2px solid white;box-shadow:0 4px 12px #0008}.scout-token.ours{background:#2563eb}.scout-token.theirs{background:#dc2626}.scout-token.ball{width:22px;height:22px;background:#facc15;color:#422006;font-size:14px}.scout-move-layer{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}.scout-move-layer path{stroke:#86efac;stroke-width:1.1;fill:none;stroke-dasharray:2.5 1.6;vector-effect:non-scaling-stroke}.scout-target{position:absolute;z-index:2;width:17%;aspect-ratio:1;border:2px dashed #86efac;border-radius:50%;background:#22c55e22;transform:translate(-50%,-50%)}.scout-board-legend{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;font-size:11px;color:#cbd5e1;padding:9px 0 2px}.scout-board-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(240px,.8fr);gap:14px;margin-top:12px}.scout-step-card{border:1px solid #374151;border-radius:16px;padding:13px;background:#050b1b}.scout-step-nav{display:flex;gap:8px;margin-top:12px}.scout-step-nav .btn{flex:1;justify-content:center}.scout-step-kicker{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#7dd3fc}.scout-step-card h3{font-size:17px;margin:7px 0}.scout-step-card p{font-size:13px;line-height:1.5;color:#d1d5db}.scout-cue{padding:10px;border-radius:12px;background:#0b2540;border:1px solid #1d4ed8;margin-top:10px;font-size:12px;color:#dbeafe}.scout-response{margin-top:12px}@media(max-width:760px){.scout-board-layout{grid-template-columns:1fr}.scout-board{max-width:480px}.scout-token{width:34px;height:34px;font-size:12px}}
   
+    /* Animated offensive teaching paths */
+    .offence-move-layer{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;overflow:visible}
+    .offence-move-arrow{fill:none;stroke:#86efac;stroke-width:1.25;stroke-dasharray:2.4 1.5;vector-effect:non-scaling-stroke;opacity:.95}
+    .offence-pass-arrow{fill:none;stroke:#facc15;stroke-width:1.5;stroke-dasharray:1.5 1.5;vector-effect:non-scaling-stroke}
+    .offence-player{z-index:4;transition:left .7s cubic-bezier(.2,.75,.25,1),top .7s cubic-bezier(.2,.75,.25,1)}
+    .offence-ball{z-index:5;transition:left .65s cubic-bezier(.2,.75,.25,1),top .65s cubic-bezier(.2,.75,.25,1)}
+    .offence-legend{line-height:1.8}
     /* Match the Offensive Playbook and Opposition Defence courts to the Full Court Magnetic Board */
     .offence-court-panel,
     .scout-board-wrap {
@@ -1476,7 +1483,7 @@
 <button class="offence-play-option" data-play="pickRoll"><strong>04 · High Pick and Roll</strong><span>Use a high screen and read the coverage.</span></button>
 <button class="offence-play-option" data-play="backdoor"><strong>05 · Backdoor Cut</strong><span>Attack the space behind an overplaying defender.</span></button></div>
 <div class="offence-layout"><div class="offence-court-panel"><div class="offence-court-heading"><div><div class="panel-title" id="offencePlayTitle">Five-Out Motion</div><div class="panel-sub" id="offencePlaySubtitle"></div></div><div class="offence-step-count" id="offenceStepCount"></div></div>
-<div class="offence-half-court"><div class="offence-baseline"></div><div class="offence-hoop"></div><div class="offence-backboard"></div><div class="offence-key"></div><div class="offence-free-throw"></div><div class="offence-three-arc"></div><div class="offence-court-label">ATTACKING BASKET</div><div id="offencePlayers"></div><div class="offence-ball" id="offenceBall">●</div></div>
+<div class="offence-half-court"><div class="offence-baseline"></div><div class="offence-hoop"></div><div class="offence-backboard"></div><div class="offence-key"></div><div class="offence-free-throw"></div><div class="offence-three-arc"></div><div class="offence-court-label">ATTACKING BASKET</div><svg class="offence-move-layer" id="offenceMoveLayer" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg><div id="offencePlayers"></div><div class="offence-ball" id="offenceBall">●</div></div>
 <div class="offence-legend">🟠 Our players · 1–5　 🟡 Ball</div><div class="offence-step-controls"><button class="btn" id="offencePrevBtn">← Previous</button><button class="btn primary" id="offenceNextBtn">Next step →</button></div></div>
 <div class="offence-instructions"><div class="offence-step-kicker" id="offenceStepKicker"></div><h3 id="offenceStepTitle"></h3><p id="offenceStepText"></p><div class="offence-coach-cue"><div class="panel-title">COACHING CUE</div><p id="offenceCoachCue"></p></div><div class="offence-read"><div class="panel-title">WHAT SHOULD PLAYERS READ?</div><p id="offenceRead"></p></div><div class="offence-age-note" id="offenceAgeNote"></div></div></div>
 <div class="offence-footer-note">Teaching tip: walk through each step, run it at half speed, then add guided defence before progressing to live play.</div></div></div>
@@ -1996,6 +2003,7 @@ function renderOffensivePlay(){
  const play=OFFENSIVE_PLAYS[state.offensivePlay]||OFFENSIVE_PLAYS.fiveOut;
  state.offensiveStep=Math.max(0,Math.min(play.steps.length-1,Number(state.offensiveStep)||0));
  const step=play.steps[state.offensiveStep];
+ const previous=state.offensiveStep>0?play.steps[state.offensiveStep-1]:null;
  document.querySelectorAll('[data-play]').forEach(b=>b.classList.toggle('active',b.dataset.play===state.offensivePlay));
  document.getElementById('offencePlayTitle').textContent=play.title;
  document.getElementById('offencePlaySubtitle').textContent=play.subtitle;
@@ -2006,8 +2014,36 @@ function renderOffensivePlay(){
  document.getElementById('offenceCoachCue').textContent=step[2];
  document.getElementById('offenceRead').textContent=step[3];
  document.getElementById('offenceAgeNote').textContent=play.age;
- const holder=document.getElementById('offencePlayers');holder.innerHTML='';
- step[4].forEach((pos,i)=>{const p=document.createElement('div');p.className='offence-player';p.style.left=pos[0]+'%';p.style.top=pos[1]+'%';p.innerHTML=(i+1)+'<small>P'+(i+1)+'</small>';holder.appendChild(p);});
+ const holder=document.getElementById('offencePlayers');
+ const existing=[...holder.querySelectorAll('.offence-player')];
+ step[4].forEach((pos,i)=>{
+   let p=existing[i];
+   if(!p){p=document.createElement('div');p.className='offence-player';p.innerHTML=(i+1)+'<small>P'+(i+1)+'</small>';holder.appendChild(p);}
+   p.style.left=pos[0]+'%';p.style.top=pos[1]+'%';
+ });
+ const arrows=document.getElementById('offenceMoveLayer');
+ if(arrows){
+   arrows.innerHTML='';
+   if(previous){
+     const ns='http://www.w3.org/2000/svg';
+     const defs=document.createElementNS(ns,'defs');
+     const marker=document.createElementNS(ns,'marker');
+     marker.setAttribute('id','offenceArrowHead');marker.setAttribute('markerWidth','5');marker.setAttribute('markerHeight','5');marker.setAttribute('refX','4');marker.setAttribute('refY','2.5');marker.setAttribute('orient','auto');
+     const head=document.createElementNS(ns,'path');head.setAttribute('d','M0,0 L5,2.5 L0,5 Z');head.setAttribute('fill','#86efac');marker.appendChild(head);defs.appendChild(marker);arrows.appendChild(defs);
+     step[4].forEach((pos,i)=>{
+       const from=previous[4][i];if(!from||Math.hypot(pos[0]-from[0],pos[1]-from[1])<3)return;
+       const path=document.createElementNS(ns,'path');
+       path.setAttribute('d',`M ${from[0]} ${from[1]} Q ${(from[0]+pos[0])/2} ${(from[1]+pos[1])/2-3} ${pos[0]} ${pos[1]}`);
+       path.setAttribute('class','offence-move-arrow');path.setAttribute('marker-end','url(#offenceArrowHead)');arrows.appendChild(path);
+     });
+     const ballFrom=previous[5],ballTo=step[5];
+     if(Math.hypot(ballTo[0]-ballFrom[0],ballTo[1]-ballFrom[1])>3){
+       const pass=document.createElementNS(ns,'path');
+       pass.setAttribute('d',`M ${ballFrom[0]} ${ballFrom[1]} Q ${(ballFrom[0]+ballTo[0])/2} ${(ballFrom[1]+ballTo[1])/2-5} ${ballTo[0]} ${ballTo[1]}`);
+       pass.setAttribute('class','offence-pass-arrow');arrows.appendChild(pass);
+     }
+   }
+ }
  const ball=document.getElementById('offenceBall');ball.style.left=step[5][0]+'%';ball.style.top=step[5][1]+'%';
  document.getElementById('offencePrevBtn').disabled=state.offensiveStep===0;
  document.getElementById('offenceNextBtn').textContent=state.offensiveStep===play.steps.length-1?'Restart play ↺':'Next step →';
